@@ -1,0 +1,74 @@
+name: LoveActivities
+version: 1.0.0
+main: dev.lovelace.loveactivities.LoveActivities
+api-version: '26.2'
+author: Lovelace
+description: Interactive 1v1 mini-game suite with physical LoveCore currency betting
+softdepend: [PlaceholderAPI, LoveCore, Vesuvio]
+
+commands:
+  blackjack:
+    description: Challenge a player to Blackjack (21)
+    aliases: [блэкджек, 21]
+    usage: /<command> <player>
+  dice:
+    description: Challenge a player to Dice games
+    aliases: [кости]
+    usage: /<command> <player>
+  rps:
+    description: Challenge a player to Rock-Paper-Scissors
+    aliases: [кнб]
+    usage: /<command> <player>
+  gwent:
+    description: Challenge a player to Gwent
+    aliases: [гвинт]
+    usage: /<command> <player>
+  cards:
+    description: Challenge a player to Card games
+    aliases: [карты]
+    usage: /<command> <player>
+  poker:
+    description: Challenge a player to Poker (Texas Hold'em)
+    aliases: [покер, texasholdem, holdem]
+    usage: /<command> <player>
+  durak:
+    description: Challenge a player to Durak (card game)
+    aliases: [дурак]
+    usage: /<command> <player>
+  war:
+    description: Challenge a player to War (card game)
+    aliases: [война, пьяница]
+    usage: /<command> <player>
+  pokerdice:
+    description: Challenge a player to Poker on Dice (5D6)
+    aliases: [покеркости, костипокер, yahtzee]
+    usage: /<command> <player>
+  classicdice:
+    description: Challenge a player to Classic 2D6 Dice
+    aliases: [киданиекостей, 2d6]
+    usage: /<command> <player>
+  chess:
+    description: Challenge a player to Mini-Chess (5x5)
+    aliases: [шахматы, минишахматы, minichess]
+    usage: /<command> <player>
+  loveactivities:
+    description: Personal settings and invitation management
+    aliases: [la, activities]
+    usage: /<command> [settings|disable|accept|decline|cancel|tutorial]
+  boardgames:
+    description: Interactive catalog and guide for all mini-games
+    aliases: [настолки, games, игры, tabletop]
+    usage: /<command> [игра]
+  loveactivitiesadmin:
+    description: Administrative management for LoveActivities
+    aliases: [laadmin]
+    permission: loveactivities.admin
+    usage: /<command> [reload|endgame|stats|npc]
+
+permissions:
+  loveactivities.admin:
+    description: Access to administrative commands of LoveActivities
+    default: op
+  loveactivities.use:
+    description: Access to playing mini-games
+    default: true

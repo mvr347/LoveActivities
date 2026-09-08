@@ -1,0 +1,127 @@
+# =========================================================
+# LoveActivities Configuration
+# Platform: Paper / Purpur 1.21.4 (Java 25)
+# =========================================================
+
+# Current active language: "ru" or "en"
+language: "ru"
+
+# Gameplay & Request Settings
+gameplay:
+  # Maximum allowed distance between players to start and maintain a game (in blocks)
+  max_distance: 3.0
+  # Challenge request expiration timeout in seconds
+  request_timeout_seconds: 30
+  # Request cooldown between challenges from the same player in seconds
+  request_cooldown_seconds: 5
+  # AFK turn timeout in seconds (auto-forfeit if a player does not make a move)
+  afk_turn_timeout_seconds: 45
+  # Countdown duration in seconds inside the betting GUI before the game begins
+  bet_countdown_seconds: 3
+  # Показ всплывающего окна обучения перед началом игры (если false — игра начинается сразу без задержек)
+  pre_game_tutorial: false
+
+# Betting & Economy Settings
+betting:
+  # Minimum allowed bet in LoveCore physical currency
+  min_bet: 1
+  # Global maximum allowed bet
+  max_bet_global: 1000000
+  # Predefined quick-add increments in the betting GUI
+  quick_amounts: [1, 5, 10, 50, 100, 500, 1000]
+  # Per-game maximum bet overrides
+  limits:
+    blackjack: 1000000
+    dice: 1000000
+    rps: 250000
+    gwent: 1000000
+    cards: 500000
+
+# NPC & Activities Interaction Settings
+# Все привязанные NPC и их уникальные реплики настраиваются в файле npcs.yml!
+# Команды управления NPC:
+#   /laadmin npc bind <игра> [ставка] [имя] — привязать NPC (наведя прицел)
+#   /laadmin npc unbind                    — отвязать NPC
+#   /laadmin npc list                      — список всех привязанных NPC
+npc:
+  # Включить диалоговые реплики NPC в чате при игре
+  dialogues_enabled: true
+  # Формат отображения реплики NPC в чате
+  dialogue_format: "<gradient:#FF9966:#FF5E62><bold>[{npc}]</bold></gradient> <dark_gray>»</dark_gray> <gray>{text}</gray>"
+  # Шанс согласия NPC сыграть по умолчанию (если не переопределен в npcs.yml)
+  default_accept_chance: 1.0
+
+# Audio & Visual FX
+effects:
+  sounds_enabled: true
+  particles_enabled: true
+
+# Database (SQLite)
+database:
+  file_name: "data.db"
+  maximum_pool_size: 5
+  minimum_idle: 2
+  connection_timeout_ms: 10000
+
+# Logging
+logging:
+  bets_log_file: "bets.log"
+
+# =========================================================
+# ItemsAdder Card Textures Configuration
+# =========================================================
+# ItemsAdder Card Textures Configuration
+# =========================================================
+# Включение и названия кастомных текстур предметов карт ItemsAdder.
+# Правило отображения:
+# 1. Обычные числовые карты (2, 3, 4, 5, 6, 7, 8, 9, 10):
+#    Используют ВСЕГО 1 текстуру на каждую масть!
+#    Количество предмета в слоте инвентаря соответствует достоинству карты:
+#    Например: 5 бубей = 5 шт bubna в одном слоте; 5 чирва = 5 шт chirva.
+# 2. Лицевые карты (Валет, Дама, Король, Туз):
+#    Имеют свои уникальные текстуры (количество предметов = 1).
+#    Например: bubnajoker, bubnaqueen, bubnaking, bubnaace.
+# 3. Рубашка карт (скрытые карты):
+#    Использует текстуру cardback (количество = 1).
+# Если ItemsAdder не установлен или текстура не найдена — автоматически
+# используется текстура кастомной головы из heads.yml.
+itemsadder:
+  enabled: true
+  # Префикс namespace ItemsAdder (если предметы созданы в отдельном паке, например "loveactivities" или "custom").
+  # Оставьте пустым (""), если ID регистрируются без обязательного префикса.
+  namespace: ""
+  cards:
+    # Рубашка карт (закрытая карта соперника / дилера / колода)
+    back: "cardback"
+
+    # Текстуры числовых карт (2-10): 1 текстура на масть, число = количество предметов!
+    suits:
+      bubna: "bubna"       # Бубны (♦)
+      chirva: "chirva"     # Черви (♥)
+      chresta: "chresta"   # Крести / Трефы (♣)
+      pika: "pika"         # Пики (♠)
+
+    # Лицевые карты (картинки): Валет (Joker), Дама, Король, Туз (количество = 1)
+    faces:
+      jack:
+        bubna: "bubnajoker"
+        chirva: "chirvajoker"
+        chresta: "chrestajoker"
+        pika: "pikajoker"
+      queen:
+        bubna: "bubnaqueen"
+        chirva: "chirvaqueen"
+        chresta: "chrestaqueen"
+        pika: "pikaqueen"
+      king:
+        bubna: "bubnaking"
+        chirva: "chirvaking"
+        chresta: "chrestaking"
+        pika: "pikaking"
+      ace:
+        bubna: "bubnaace"
+        chirva: "chirvaace"
+        chresta: "chrestaace"
+        pika: "pikaace"
+
+
