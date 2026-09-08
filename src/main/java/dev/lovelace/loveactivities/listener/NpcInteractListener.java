@@ -11,12 +11,21 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 
+import java.util.Map;
 import java.util.Random;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class NpcInteractListener implements Listener {
 
     private final LoveActivities plugin;
     private final Random random = new Random();
+
+    // Bukkit fires BOTH PlayerInteractEntityEvent and PlayerInteractAtEntityEvent for a single
+    // right-click on some entity types (e.g. ArmorStand-based NPCs). Without this guard that would
+    // run handleNpcClick() twice for one click - double-charging the bet and starting two sessions.
+    private final Map<UUID, Long> lastNpcInteract = new ConcurrentHashMap<>();
+    private static final long DEBOUNCE_MILLIS = 250L;
 
     public NpcInteractListener(LoveActivities plugin) {
         this.plugin = plugin;
@@ -38,6 +47,12 @@ public class NpcInteractListener implements Listener {
         if (config == null) return;
 
         event.setCancelled(true);
+
+        long now = System.currentTimeMillis();
+        Long last = lastNpcInteract.put(player.getUniqueId(), now);
+        if (last != null && now - last < DEBOUNCE_MILLIS) {
+            return;
+        }
 
         if (plugin.getSessionManager().isInGame(player.getUniqueId())) {
             plugin.getNpcManager().speak(player, config.getCustomName(), "Ты уже участвуешь в игре! Закончи сначала текущую партию.");
