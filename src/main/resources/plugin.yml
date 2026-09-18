@@ -6,58 +6,127 @@ author: Lovelace
 description: Interactive 1v1 mini-game suite with physical LoveCore currency betting
 softdepend: [PlaceholderAPI, LoveCore, Vesuvio]
 
+# Каждая англоязычная команда продублирована отдельной русскоязычной командой (а не
+# просто алиасом), потому что у алиаса нет собственного permission - право доступа
+# всегда общее для всей команды целиком. Раздельная регистрация (см. LoveActivities#onEnable,
+# оба варианта ведут на один и тот же CommandExecutor) - единственный способ реально
+# скрыть английский вариант из автодополнения и заблокировать его выполнение для игроков
+# без loveactivities.english, оставив русский вариант полностью рабочим для всех.
 commands:
   blackjack:
     description: Challenge a player to Blackjack (21)
-    aliases: [блэкджек, 21]
+    aliases: ['21']
+    permission: loveactivities.english
     usage: /<command> <player>
+  блэкджек:
+    description: Вызов игрока в Блэкджек (21)
+    permission: loveactivities.use
+    usage: /<command> <игрок>
   dice:
     description: Challenge a player to Dice games
-    aliases: [кости]
+    permission: loveactivities.english
     usage: /<command> <player>
+  кости:
+    description: Вызов игрока в игру с костями
+    permission: loveactivities.use
+    usage: /<command> <игрок>
   rps:
     description: Challenge a player to Rock-Paper-Scissors
-    aliases: [кнб]
+    permission: loveactivities.english
     usage: /<command> <player>
+  кнб:
+    description: Вызов игрока в Камень-Ножницы-Бумага
+    permission: loveactivities.use
+    usage: /<command> <игрок>
   gwent:
     description: Challenge a player to Gwent
-    aliases: [гвинт]
+    permission: loveactivities.english
     usage: /<command> <player>
+  гвинт:
+    description: Вызов игрока в Гвинт
+    permission: loveactivities.use
+    usage: /<command> <игрок>
   cards:
     description: Challenge a player to Card games
-    aliases: [карты]
+    permission: loveactivities.english
     usage: /<command> <player>
+  карты:
+    description: Вызов игрока в карточную игру
+    permission: loveactivities.use
+    usage: /<command> <игрок>
   poker:
     description: Challenge a player to Poker (Texas Hold'em)
-    aliases: [покер, texasholdem, holdem]
+    aliases: [texasholdem, holdem]
+    permission: loveactivities.english
     usage: /<command> <player>
+  покер:
+    description: Вызов игрока в Покер (Техасский Холдем)
+    permission: loveactivities.use
+    usage: /<command> <игрок>
   durak:
     description: Challenge a player to Durak (card game)
-    aliases: [дурак]
+    permission: loveactivities.english
     usage: /<command> <player>
+  дурак:
+    description: Вызов игрока в Дурака
+    permission: loveactivities.use
+    usage: /<command> <игрок>
   war:
     description: Challenge a player to War (card game)
-    aliases: [война, пьяница]
+    permission: loveactivities.english
     usage: /<command> <player>
+  война:
+    description: Вызов игрока в Войну (Пьяницу)
+    aliases: [пьяница]
+    permission: loveactivities.use
+    usage: /<command> <игрок>
   pokerdice:
     description: Challenge a player to Poker on Dice (5D6)
-    aliases: [покеркости, костипокер, yahtzee]
+    aliases: [yahtzee]
+    permission: loveactivities.english
     usage: /<command> <player>
+  покеркости:
+    description: Вызов игрока в Покер на костях (5D6)
+    aliases: [костипокер]
+    permission: loveactivities.use
+    usage: /<command> <игрок>
   classicdice:
     description: Challenge a player to Classic 2D6 Dice
-    aliases: [киданиекостей, 2d6]
+    aliases: ['2d6']
+    permission: loveactivities.english
     usage: /<command> <player>
+  киданиекостей:
+    description: Вызов игрока в Кидание костей (2D6)
+    permission: loveactivities.use
+    usage: /<command> <игрок>
   chess:
     description: Challenge a player to Mini-Chess (5x5)
-    aliases: [шахматы, минишахматы, minichess]
+    aliases: [minichess]
+    permission: loveactivities.english
     usage: /<command> <player>
+  шахматы:
+    description: Вызов игрока в Мини-шахматы (5x5)
+    aliases: [минишахматы]
+    permission: loveactivities.use
+    usage: /<command> <игрок>
   loveactivities:
     description: Personal settings and invitation management
     aliases: [la, activities]
+    permission: loveactivities.english
+    usage: /<command> [settings|disable|accept|decline|cancel|tutorial]
+  активности:
+    description: Личные настройки и управление приглашениями
+    permission: loveactivities.use
     usage: /<command> [settings|disable|accept|decline|cancel|tutorial]
   boardgames:
     description: Interactive catalog and guide for all mini-games
-    aliases: [настолки, games, игры, tabletop]
+    aliases: [games, tabletop]
+    permission: loveactivities.english
+    usage: /<command> [game]
+  настолки:
+    description: Интерактивный каталог и гайд по мини-играм
+    aliases: [игры]
+    permission: loveactivities.use
     usage: /<command> [игра]
   loveactivitiesadmin:
     description: Administrative management for LoveActivities
@@ -70,5 +139,8 @@ permissions:
     description: Access to administrative commands of LoveActivities
     default: op
   loveactivities.use:
-    description: Access to playing mini-games
+    description: Access to playing mini-games via their Russian command names
     default: true
+  loveactivities.english:
+    description: Access to the English command names/aliases for mini-games (Russian names are always available via loveactivities.use)
+    default: op

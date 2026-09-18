@@ -63,7 +63,10 @@ public class PlayerActivityCommand implements CommandExecutor, TabCompleter {
                 SoundUtil.playClick(player);
             }
             case "games", "настолки", "list" -> {
-                player.performCommand("boardgames");
+                // Routed through the Russian-named "настолки" entry rather than "boardgames"
+                // itself: the latter now requires loveactivities.english (see plugin.yml), and
+                // this subcommand must keep working for players without that permission too.
+                player.performCommand("настолки");
             }
             case "bot", "play" -> {
                 GameType type = args.length > 1 ? GameType.fromString(args[1]) : GameType.BLACKJACK;
@@ -90,13 +93,17 @@ public class PlayerActivityCommand implements CommandExecutor, TabCompleter {
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (args.length == 1) {
             List<String> list = new ArrayList<>();
-            for (String s : List.of("settings", "disable", "accept", "decline", "cancel", "tutorial", "games", "bot")) {
+            // "обучение" и "настолки" - русские синонимы, которые onCommand() выше уже
+            // принимает (case "tutorial", "guide", "обучение", "rules" / case "games", "настолки",
+            // "list"), но раньше не предлагались в автодополнении - виден и работал только
+            // английский вариант.
+            for (String s : List.of("settings", "disable", "accept", "decline", "cancel", "tutorial", "обучение", "games", "настолки", "bot")) {
                 if (s.startsWith(args[0].toLowerCase())) {
                     list.add(s);
                 }
             }
             return list;
-        } else if (args.length == 2 && (args[0].equalsIgnoreCase("tutorial") || args[0].equalsIgnoreCase("guide"))) {
+        } else if (args.length == 2 && (args[0].equalsIgnoreCase("tutorial") || args[0].equalsIgnoreCase("guide") || args[0].equalsIgnoreCase("обучение"))) {
             List<String> list = new ArrayList<>();
             for (String g : List.of("durak", "poker", "war", "blackjack", "dice_poker", "dice_classic", "gwent", "rps")) {
                 if (g.startsWith(args[1].toLowerCase())) {
