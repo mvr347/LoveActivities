@@ -296,10 +296,16 @@ public class MiniChessGUI extends AbstractGUI {
         // Check if clicking on an already highlighted valid move target
         for (MiniChessBoard.Move m : currentMoves) {
             if (m.toR() == r && m.toC() == c) {
-                game.actionMakeMove(player, m);
+                // Clear the selection BEFORE making the move: actionMakeMove() mutates the
+                // board and re-renders synchronously (syncViews() -> initializeItems()), and
+                // renderBoard() checks the still-stale `currentMoves` to decide whether a
+                // square is a valid-move/capture target. Clearing after the call left the
+                // destination square - now occupied by the piece that just moved there -
+                // matching a leftover entry and rendering as "capture your own piece".
                 selectedR = -1;
                 selectedC = -1;
                 currentMoves = List.of();
+                game.actionMakeMove(player, m);
                 return;
             }
         }

@@ -106,14 +106,19 @@ public class TextUtil {
             } catch (Throwable ignored) {}
         }
 
-        // 3. Fallback for coin font images if neither PAPI nor ItemsAdder resolved them
+        // 3. Fallback for coin font images if neither PAPI nor ItemsAdder resolved them.
+        // Each denomination gets its own glyph - CurrencyUtil.formatCoinsShort() shows only
+        // the icon plus a count with no name text next to it, so collapsing all five coins
+        // to the same "🪙" made every denomination look identical there. Only the five known
+        // coin keys are substituted; any other still-unresolved "%img_xxx%" (a non-coin UI
+        // glyph, e.g. ItemsAdder missing/disabled) is left alone instead of being caught by
+        // a blanket regex and mislabeled as a coin.
         if (text.contains("%img_")) {
-            text = text.replace("%img_coppercoin%", "🪙")
-                    .replace("%img_ironcoin%", "🪙")
-                    .replace("%img_goldcoin%", "🪙")
-                    .replace("%img_diamondcoin%", "🪙")
-                    .replace("%img_netheritecoin%", "🪙");
-            text = text.replaceAll("%img_[a-zA-Z0-9_]+%", "🪙");
+            text = text.replace("%img_netheritecoin%", "⬥")
+                    .replace("%img_diamondcoin%", "◆")
+                    .replace("%img_goldcoin%", "●")
+                    .replace("%img_ironcoin%", "○")
+                    .replace("%img_coppercoin%", "•");
         }
 
         // Clean up any stray or invalid </color> closing tags

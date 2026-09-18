@@ -44,75 +44,62 @@ public class BoardGamesCommand implements CommandExecutor, TabCompleter {
 
         SoundUtil.playClick(player);
 
+        // Игрок без loveactivities.english не может выполнить английские команды (см.
+        // plugin.yml) - подставляем в кликабельные подсказки русские имена команд, иначе
+        // каталог предлагал бы кнопки, которые такому игроку сервер тут же отклонит.
+        boolean english = player.hasPermission("loveactivities.english");
+        String tutorialCmd = english ? "loveactivities" : "активности";
+
         // Print Rich Interactive MiniMessage Catalog
         player.sendMessage(TextUtil.parse("<gradient:#FF5E62:#FF9966><bold>════════════════ [НАСТОЛЬНЫЕ ИГРЫ] ════════════════</bold></gradient>"));
         player.sendMessage(TextUtil.parse("<gray>Выберите мини-игру для вызова игрока или изучения правил:</gray>\n"));
 
         // 1. Durak
-        player.sendMessage(TextUtil.parse(
-                "<yellow><bold>1. 🃏 Дурак (подкидной)</bold></yellow> <dark_gray>—</dark_gray> <gray>Карточная игра на 36 карт</gray>\n" +
-                "   <click:suggest_command:'/durak '><hover:show_text:'<green>Нажмите для вызова игрока:\n<white>/durak <ник></white>'><green><bold>[ВЫЗВАТЬ]</bold></green></hover></click>  " +
-                "<click:run_command:'/loveactivities tutorial durak'><hover:show_text:'<yellow>Нажмите, чтобы открыть правила игры'><yellow><bold>[ОБУЧЕНИЕ]</bold></yellow></hover></click>"
-        ));
+        player.sendMessage(gameLine("1. 🃏 Дурак (подкидной)", "Карточная игра на 36 карт",
+                english ? "durak" : "дурак", tutorialCmd, "durak"));
 
         // 2. Texas Hold'em Poker
-        player.sendMessage(TextUtil.parse(
-                "<yellow><bold>2. ♠ Техасский Холдем (Покер)</bold></yellow> <dark_gray>—</dark_gray> <gray>2 карты на руках + 5 на столе</gray>\n" +
-                "   <click:suggest_command:'/poker '><hover:show_text:'<green>Нажмите для вызова игрока:\n<white>/poker <ник></white>'><green><bold>[ВЫЗВАТЬ]</bold></green></hover></click>  " +
-                "<click:run_command:'/loveactivities tutorial poker'><hover:show_text:'<yellow>Нажмите, чтобы открыть правила и комбинации'><yellow><bold>[ОБУЧЕНИЕ]</bold></yellow></hover></click>"
-        ));
+        player.sendMessage(gameLine("2. ♠ Техасский Холдем (Покер)", "2 карты на руках + 5 на столе",
+                english ? "poker" : "покер", tutorialCmd, "poker"));
 
         // 3. War (Пьяница)
-        player.sendMessage(TextUtil.parse(
-                "<yellow><bold>3. ⚔ Пьяница / Война</bold></yellow> <dark_gray>—</dark_gray> <gray>Быстрая карточная дуэль на старшинство</gray>\n" +
-                "   <click:suggest_command:'/war '><hover:show_text:'<green>Нажмите для вызова игрока:\n<white>/war <ник></white>'><green><bold>[ВЫЗВАТЬ]</bold></green></hover></click>  " +
-                "<click:run_command:'/loveactivities tutorial war'><hover:show_text:'<yellow>Нажмите, чтобы открыть правила игры'><yellow><bold>[ОБУЧЕНИЕ]</bold></yellow></hover></click>"
-        ));
+        player.sendMessage(gameLine("3. ⚔ Пьяница / Война", "Быстрая карточная дуэль на старшинство",
+                english ? "war" : "война", tutorialCmd, "war"));
 
         // 4. Poker on Dice (5D6)
-        player.sendMessage(TextUtil.parse(
-                "<yellow><bold>4. 🎲 Покер на костях (5D6)</bold></yellow> <dark_gray>—</dark_gray> <gray>5 костей, перебросы и сбор комбинаций</gray>\n" +
-                "   <click:suggest_command:'/pokerdice '><hover:show_text:'<green>Нажмите для вызова игрока:\n<white>/pokerdice <ник></white>'><green><bold>[ВЫЗВАТЬ]</bold></green></hover></click>  " +
-                "<click:run_command:'/loveactivities tutorial dice_poker'><hover:show_text:'<yellow>Нажмите, чтобы открыть правила и комбинации'><yellow><bold>[ОБУЧЕНИЕ]</bold></yellow></hover></click>"
-        ));
+        player.sendMessage(gameLine("4. 🎲 Покер на костях (5D6)", "5 костей, перебросы и сбор комбинаций",
+                english ? "pokerdice" : "покеркости", tutorialCmd, "dice_poker"));
 
         // 5. Classic Dice (2D6)
-        player.sendMessage(TextUtil.parse(
-                "<yellow><bold>5. 🎲 Кидание костей (2D6)</bold></yellow> <dark_gray>—</dark_gray> <gray>Бросок 2 костей на наибольшую сумму</gray>\n" +
-                "   <click:suggest_command:'/classicdice '><hover:show_text:'<green>Нажмите для вызова игрока:\n<white>/classicdice <ник></white>'><green><bold>[ВЫЗВАТЬ]</bold></green></hover></click>  " +
-                "<click:run_command:'/loveactivities tutorial dice_classic'><hover:show_text:'<yellow>Нажмите, чтобы открыть правила игры'><yellow><bold>[ОБУЧЕНИЕ]</bold></yellow></hover></click>"
-        ));
+        player.sendMessage(gameLine("5. 🎲 Кидание костей (2D6)", "Бросок 2 костей на наибольшую сумму",
+                english ? "classicdice" : "киданиекостей", tutorialCmd, "dice_classic"));
 
         // 6. Blackjack (21)
-        player.sendMessage(TextUtil.parse(
-                "<yellow><bold>6. 🃏 Блэкджек (21)</bold></yellow> <dark_gray>—</dark_gray> <gray>Набор карт до 21, дабл-бет и дилер</gray>\n" +
-                "   <click:suggest_command:'/blackjack '><hover:show_text:'<green>Нажмите для вызова игрока:\n<white>/blackjack <ник></white>'><green><bold>[ВЫЗВАТЬ]</bold></green></hover></click>  " +
-                "<click:run_command:'/loveactivities tutorial blackjack'><hover:show_text:'<yellow>Нажмите, чтобы открыть правила игры'><yellow><bold>[ОБУЧЕНИЕ]</bold></yellow></hover></click>"
-        ));
+        player.sendMessage(gameLine("6. 🃏 Блэкджек (21)", "Набор карт до 21, дабл-бет и дилер",
+                english ? "blackjack" : "блэкджек", tutorialCmd, "blackjack"));
 
         // 7. Mini Chess
-        player.sendMessage(TextUtil.parse(
-                "<yellow><bold>7. ♟ Мини-шахматы (5x5)</bold></yellow> <dark_gray>—</dark_gray> <gray>Компактные тактические шахматы Гарднера</gray>\n" +
-                "   <click:suggest_command:'/chess '><hover:show_text:'<green>Нажмите для вызова игрока:\n<white>/chess <ник></white>'><green><bold>[ВЫЗВАТЬ]</bold></green></hover></click>  " +
-                "<click:run_command:'/loveactivities tutorial chess'><hover:show_text:'<yellow>Нажмите, чтобы открыть правила игры'><yellow><bold>[ОБУЧЕНИЕ]</bold></yellow></hover></click>"
-        ));
+        player.sendMessage(gameLine("7. ♟ Мини-шахматы (5x5)", "Компактные тактические шахматы Гарднера",
+                english ? "chess" : "шахматы", tutorialCmd, "chess"));
 
         // 8. Gwent
-        player.sendMessage(TextUtil.parse(
-                "<yellow><bold>8. 🎴 Гвинт (Minecraft Edition)</bold></yellow> <dark_gray>—</dark_gray> <gray>3 боевых ряда, погода, шпионы, медики</gray>\n" +
-                "   <click:suggest_command:'/gwent '><hover:show_text:'<green>Нажмите для вызова игрока:\n<white>/gwent <ник></white>'><green><bold>[ВЫЗВАТЬ]</bold></green></hover></click>  " +
-                "<click:run_command:'/loveactivities tutorial gwent'><hover:show_text:'<yellow>Нажмите, чтобы открыть правила игры'><yellow><bold>[ОБУЧЕНИЕ]</bold></yellow></hover></click>"
-        ));
+        player.sendMessage(gameLine("8. 🎴 Гвинт (Minecraft Edition)", "3 боевых ряда, погода, шпионы, медики",
+                english ? "gwent" : "гвинт", tutorialCmd, "gwent"));
 
         // 9. RPS (КНБ)
-        player.sendMessage(TextUtil.parse(
-                "<yellow><bold>9. ✂ Камень, Ножницы, Бумага (КНБ)</bold></yellow> <dark_gray>—</dark_gray> <gray>Серия дуэлей до 2 побед</gray>\n" +
-                "   <click:suggest_command:'/rps '><hover:show_text:'<green>Нажмите для вызова игрока:\n<white>/rps <ник></white>'><green><bold>[ВЫЗВАТЬ]</bold></green></hover></click>  " +
-                "<click:run_command:'/loveactivities tutorial rps'><hover:show_text:'<yellow>Нажмите, чтобы открыть правила игры'><yellow><bold>[ОБУЧЕНИЕ]</bold></yellow></hover></click>"
-        ));
+        player.sendMessage(gameLine("9. ✂ Камень, Ножницы, Бумага (КНБ)", "Серия дуэлей до 2 побед",
+                english ? "rps" : "кнб", tutorialCmd, "rps"));
 
         player.sendMessage(TextUtil.parse("<gradient:#FF5E62:#FF9966><bold>═══════════════════════════════════════════════════</bold></gradient>"));
         return true;
+    }
+
+    private net.kyori.adventure.text.Component gameLine(String title, String desc, String challengeCmd, String tutorialCmd, String tutorialKey) {
+        return TextUtil.parse(
+                "<yellow><bold>" + title + "</bold></yellow> <dark_gray>—</dark_gray> <gray>" + desc + "</gray>\n" +
+                "   <click:suggest_command:'/" + challengeCmd + " '><hover:show_text:'<green>Нажмите для вызова игрока:\n<white>/" + challengeCmd + " <ник></white>'><green><bold>[ВЫЗВАТЬ]</bold></green></hover></click>  " +
+                "<click:run_command:'/" + tutorialCmd + " tutorial " + tutorialKey + "'><hover:show_text:'<yellow>Нажмите, чтобы открыть правила игры'><yellow><bold>[ОБУЧЕНИЕ]</bold></yellow></hover></click>"
+        );
     }
 
     @Override
