@@ -19,8 +19,14 @@ public class SettingsManager {
     public SettingsManager(LoveActivities plugin, PlayerSettingsDao dao) {
         this.plugin = plugin;
         this.dao = dao;
+        // executor(Runnable::run): без этого Caffeine планирует обслуживание кэша на общем
+        // ForkJoinPool.commonPool() — потоке, переживающем выгрузку плагина. Отложенная задача
+        // после disable/reload пытается подгрузить класс через уже закрытый classloader ->
+        // "zip file closed" в логах (см. тот же фикс в StatsManager). Синхронное исполнение на
+        // вызывающем потоке убирает этот класс багов.
         this.cache = Caffeine.newBuilder()
                 .expireAfterAccess(30, TimeUnit.MINUTES)
+                .executor(Runnable::run)
                 .build();
         warmUpCache();
     }

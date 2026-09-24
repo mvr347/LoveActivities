@@ -25,16 +25,25 @@ public class StatsManager {
         this.plugin = plugin;
         this.dao = dao;
 
+        // executor(Runnable::run): без этого Caffeine планирует обслуживание кэша (эвикшены)
+        // на общем ForkJoinPool.commonPool() — потоке, который переживает выгрузку плагина.
+        // После disable/reload класслоадер плагина закрывается, а отложенная задача на
+        // commonPool всё ещё пытается лениво подгрузить класс через уже закрытый classloader
+        // -> "zip file closed" / IllegalStateException в логах. Синхронное исполнение на
+        // вызывающем потоке убирает этот класс багов целиком.
         this.cache = Caffeine.newBuilder()
                 .expireAfterAccess(30, TimeUnit.MINUTES)
+                .executor(Runnable::run)
                 .build();
 
         this.topWinsCache = Caffeine.newBuilder()
                 .expireAfterWrite(60, TimeUnit.SECONDS)
+                .executor(Runnable::run)
                 .build(game -> dao.getTopWins(game, 10));
 
         this.topWonMoneyCache = Caffeine.newBuilder()
                 .expireAfterWrite(60, TimeUnit.SECONDS)
+                .executor(Runnable::run)
                 .build(game -> dao.getTopWonMoney(game, 10));
 
         warmUpCache();
