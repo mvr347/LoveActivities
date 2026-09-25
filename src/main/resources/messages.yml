@@ -6,8 +6,8 @@ ru:
   prefix: "<gradient:#FF5E62:#FF9966><bold>LoveActivities</bold></gradient> <dark_gray>»</dark_gray> "
 
   # Запросы
-  request_sent: "<gray>Вы бросили вызов игроку <gradient:#00C9FF:#92FE9D>{player}</gradient> на игру <yellow>{game}</yellow>!</gray> <click:run_command:'/loveactivities cancel {id}'><hover:show_text:'<red>Нажмите для отмены вызова'><red>[✖ ОТМЕНИТЬ]</red></hover></click>"
-  request_received: "<gradient:#00C9FF:#92FE9D>{player}</gradient> <gray>бросает вам вызов на игру</gray> <yellow>{game}</yellow>!\n  <click:run_command:'/loveactivities accept {id}'><hover:show_text:'<green>Принять вызов'><green>[✔ ПРИНЯТЬ]</green></hover></click>   <click:run_command:'/loveactivities decline {id}'><hover:show_text:'<red>Отклонить вызов'><red>[✖ ОТКЛОНИТЬ]</red></hover></click>"
+  request_sent: "<gray>Вы бросили вызов игроку <gradient:#00C9FF:#92FE9D>{player}</gradient> на игру <yellow>{game}</yellow>!</gray> <click:run_command:'/активности cancel {id}'><hover:show_text:'<red>Нажмите для отмены вызова'><red>[✖ ОТМЕНИТЬ]</red></hover></click>"
+  request_received: "<gradient:#00C9FF:#92FE9D>{player}</gradient> <gray>бросает вам вызов на игру</gray> <yellow>{game}</yellow>!\n  <click:run_command:'/активности accept {id}'><hover:show_text:'<green>Принять вызов'><green>[✔ ПРИНЯТЬ]</green></hover></click>   <click:run_command:'/активности decline {id}'><hover:show_text:'<red>Отклонить вызов'><red>[✖ ОТКЛОНИТЬ]</red></hover></click>"
   request_cancelled: "<gray>Вызов игроку <yellow>{player}</yellow> был <red>отменён</red>.</gray>"
   request_declined: "<yellow>{player}</yellow> <red>отклонил</red> ваш вызов."
   request_declined_self: "<gray>Вы <red>отклонили</red> вызов от <yellow>{player}</yellow>.</gray>"
@@ -67,8 +67,8 @@ en:
   prefix: "<gradient:#FF5E62:#FF9966><bold>LoveActivities</bold></gradient> <dark_gray>»</dark_gray> "
 
   # Requests
-  request_sent: "<gray>You challenged <gradient:#00C9FF:#92FE9D>{player}</gradient> to <yellow>{game}</yellow>!</gray> <click:run_command:'/loveactivities cancel {id}'><hover:show_text:'<red>Click to cancel challenge'><red>[✖ CANCEL]</red></hover></click>"
-  request_received: "<gradient:#00C9FF:#92FE9D>{player}</gradient> <gray>has challenged you to</gray> <yellow>{game}</yellow>!\n  <click:run_command:'/loveactivities accept {id}'><hover:show_text:'<green>Accept challenge'><green>[✔ ACCEPT]</green></hover></click>   <click:run_command:'/loveactivities decline {id}'><hover:show_text:'<red>Decline challenge'><red>[✖ DECLINE]</red></hover></click>"
+  request_sent: "<gray>You challenged <gradient:#00C9FF:#92FE9D>{player}</gradient> to <yellow>{game}</yellow>!</gray> <click:run_command:'/активности cancel {id}'><hover:show_text:'<red>Click to cancel challenge'><red>[✖ CANCEL]</red></hover></click>"
+  request_received: "<gradient:#00C9FF:#92FE9D>{player}</gradient> <gray>has challenged you to</gray> <yellow>{game}</yellow>!\n  <click:run_command:'/активности accept {id}'><hover:show_text:'<green>Accept challenge'><green>[✔ ACCEPT]</green></hover></click>   <click:run_command:'/активности decline {id}'><hover:show_text:'<red>Decline challenge'><red>[✖ DECLINE]</red></hover></click>"
   request_cancelled: "<gray>Challenge to <yellow>{player}</yellow> was <red>cancelled</red>.</gray>"
   request_declined: "<yellow>{player}</yellow> <red>declined</red> your challenge."
   request_declined_self: "<gray>You <red>declined</red> the challenge from <yellow>{player}</yellow>.</gray>"
