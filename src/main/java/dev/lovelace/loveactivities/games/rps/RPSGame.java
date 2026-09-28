@@ -260,9 +260,29 @@ public class RPSGame implements GameSession {
     @Override
     public void onPlayerClick(Player player, int slot, ClickType clickType) {}
 
+    private final long sessionStartTime = System.currentTimeMillis();
+
+    public void reopenGui(Player player) {
+        RPSGUI gui = player.getUniqueId().equals(player1) ? guiP1 : guiP2;
+        if (gui != null) {
+            gui.setSwitchingInventory(true);
+            gui.open();
+        }
+    }
+
     @Override
     public void onPlayerClose(Player player) {
         if (state != GameState.PLAYING) {
+            return;
+        }
+        if (System.currentTimeMillis() - sessionStartTime < 2000L) {
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                if (state == GameState.PLAYING && player.isOnline()) {
+                    if (!(player.getOpenInventory().getTopInventory().getHolder() instanceof AbstractGUI)) {
+                        reopenGui(player);
+                    }
+                }
+            }, 2L);
             return;
         }
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
@@ -276,7 +296,7 @@ public class RPSGame implements GameSession {
             }
             this.state = GameState.FINISHED;
             autoLose(player.getUniqueId(), "autolose_gui_close");
-        }, 3L);
+        }, 15L);
     }
 
     private void closeAllGuis() {

@@ -10,17 +10,29 @@ public class NpcActivityConfig {
     private String customName;
     private GameType gameType;
     private long defaultBet;
+    private long maxBet;
+    private boolean playsBets;
+    private long refusedUntil;
+    private int refusalCooldownMinutes;
     private boolean allowFreePlay;
     private double acceptChance;
     private final Map<String, List<String>> dialogues = new HashMap<>();
 
     public NpcActivityConfig(UUID entityUuid, String customName, GameType gameType, long defaultBet) {
+        this(entityUuid, customName, gameType, defaultBet, 0L, true);
+    }
+
+    public NpcActivityConfig(UUID entityUuid, String customName, GameType gameType, long defaultBet, long maxBet, boolean playsBets) {
         this.entityUuid = entityUuid;
         this.customName = customName != null ? customName : "NPC Игрок";
         this.gameType = gameType != null ? gameType : GameType.BLACKJACK;
         this.defaultBet = Math.max(0L, defaultBet);
+        this.maxBet = Math.max(0L, maxBet);
+        this.playsBets = playsBets;
+        this.refusedUntil = 0L;
+        this.refusalCooldownMinutes = 5;
         this.allowFreePlay = true;
-        this.acceptChance = 1.0;
+        this.acceptChance = 0.85;
         initDefaultDialogues();
     }
 
@@ -113,6 +125,42 @@ public class NpcActivityConfig {
 
     public void setDefaultBet(long defaultBet) {
         this.defaultBet = defaultBet;
+    }
+
+    public long getMaxBet() {
+        return maxBet;
+    }
+
+    public void setMaxBet(long maxBet) {
+        this.maxBet = Math.max(0L, maxBet);
+    }
+
+    public boolean isPlaysBets() {
+        return playsBets;
+    }
+
+    public void setPlaysBets(boolean playsBets) {
+        this.playsBets = playsBets;
+    }
+
+    public long getRefusedUntil() {
+        return refusedUntil;
+    }
+
+    public void setRefusedUntil(long refusedUntil) {
+        this.refusedUntil = refusedUntil;
+    }
+
+    public boolean isRefusing() {
+        return System.currentTimeMillis() < refusedUntil;
+    }
+
+    public int getRefusalCooldownMinutes() {
+        return refusalCooldownMinutes;
+    }
+
+    public void setRefusalCooldownMinutes(int refusalCooldownMinutes) {
+        this.refusalCooldownMinutes = Math.max(1, refusalCooldownMinutes);
     }
 
     public boolean isAllowFreePlay() {

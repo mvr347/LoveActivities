@@ -105,28 +105,56 @@ public class AdminActivityCommand implements CommandExecutor, TabCompleter {
                 switch (npcSub) {
                     case "bind" -> {
                         if (args.length < 3) {
-                            sender.sendMessage("§cИспользование: /laadmin npc bind <game> [bet] [name]");
+                            sender.sendMessage("§cИспользование: /laadmin npc bind <game> [bet] [max_bet] [plays_bets: true|false] [name]");
                             return true;
                         }
 
                         GameType gameType = GameType.fromString(args[2]);
                         if (gameType == null) {
-                            sender.sendMessage("§cНеизвестная игра: " + args[2] + ". Доступны: blackjack, cards, dice, rps, gwent");
+                            sender.sendMessage("§cНеизвестная игра: " + args[2] + ". Доступны: blackjack, cards, dice, rps, gwent, chess");
                             return true;
                         }
 
                         long bet = 0L;
-                        if (args.length > 3) {
+                        long maxBet = 0L;
+                        boolean playsBets = true;
+                        int nextIndex = 3;
+
+                        // Arg 3: bet (number)
+                        if (args.length > nextIndex) {
                             try {
-                                bet = Math.max(0L, Long.parseLong(args[3]));
+                                bet = Math.max(0L, Long.parseLong(args[nextIndex]));
+                                nextIndex++;
                             } catch (NumberFormatException ignored) {}
                         }
 
+                        // Arg 4: max_bet (number) or plays_bets (boolean)
+                        if (args.length > nextIndex) {
+                            if (args[nextIndex].equalsIgnoreCase("true") || args[nextIndex].equalsIgnoreCase("false")) {
+                                playsBets = Boolean.parseBoolean(args[nextIndex]);
+                                nextIndex++;
+                            } else {
+                                try {
+                                    maxBet = Math.max(0L, Long.parseLong(args[nextIndex]));
+                                    nextIndex++;
+                                } catch (NumberFormatException ignored) {}
+                            }
+                        }
+
+                        // Arg 5: plays_bets (boolean) if not already consumed
+                        if (args.length > nextIndex) {
+                            if (args[nextIndex].equalsIgnoreCase("true") || args[nextIndex].equalsIgnoreCase("false")) {
+                                playsBets = Boolean.parseBoolean(args[nextIndex]);
+                                nextIndex++;
+                            }
+                        }
+
+                        // Remaining args: custom name
                         String customName = null;
-                        if (args.length > 4) {
+                        if (args.length > nextIndex) {
                             StringBuilder sb = new StringBuilder();
-                            for (int i = 4; i < args.length; i++) {
-                                if (i > 4) sb.append(" ");
+                            for (int i = nextIndex; i < args.length; i++) {
+                                if (i > nextIndex) sb.append(" ");
                                 sb.append(args[i]);
                             }
                             customName = sb.toString();
@@ -139,9 +167,13 @@ public class AdminActivityCommand implements CommandExecutor, TabCompleter {
                             return true;
                         }
 
-                        plugin.getNpcManager().bindNpc(target, gameType, bet, customName);
+                        plugin.getNpcManager().bindNpc(target, gameType, bet, maxBet, playsBets, customName);
                         SoundUtil.playSuccess(player);
-                        sender.sendMessage("§a✔ NPC §e" + (customName != null ? customName : target.getName()) + "§a успешно привязан к игре §6" + gameType.getNameRu() + "§a (Ставка: §e" + bet + " " + plugin.getLoveCoreBridge().currencyName() + "§a)!");
+                        sender.sendMessage("§a✔ NPC §e" + (customName != null ? customName : target.getName()) +
+                                "§a успешно привязан к игре §6" + gameType.getNameRu() +
+                                "§a (Ставка: §e" + bet +
+                                "§a, Макс: §e" + (maxBet > 0 ? maxBet : "∞") +
+                                "§a, На деньги: §b" + (playsBets ? "Да" : "Нет") + "§a)!");
                     }
                     case "unbind" -> {
                         Entity target = plugin.getNpcManager().findTargetEntity(player);
@@ -167,7 +199,15 @@ public class AdminActivityCommand implements CommandExecutor, TabCompleter {
                         }
                         sender.sendMessage("§6=== Список привязанных NPC (" + npcs.size() + ") ===");
                         for (NpcActivityConfig n : npcs.values()) {
-                            sender.sendMessage("§7• §e" + n.getCustomName() + " §7| Игра: §6" + n.getGameType().getNameRu() + " §7| Ставка: §e" + n.getDefaultBet() + " §7| UUID: §8" + n.getEntityUuid());
+                            String mood = n.isRefusing() ?
+                                    "§cОтказывается (~" + Math.max(1, (n.getRefusedUntil() - System.currentTimeMillis()) / 60000L) + " мин)§7" :
+                                    "§aГотов играть§7";
+                            sender.sendMessage("§7• §e" + n.getCustomName() +
+                                    " §7| Игра: §6" + n.getGameType().getNameRu() +
+                                    " §7| Ставка: §e" + n.getDefaultBet() +
+                                    " §7| Макс: §e" + (n.getMaxBet() > 0 ? n.getMaxBet() : "∞") +
+                                    " §7| Ставки: §b" + (n.isPlaysBets() ? "Да" : "Нет") +
+                                    " §7| Настроение: " + mood);
                         }
                     }
                     default -> sender.sendMessage("§cИспользование: /laadmin npc <bind|unbind|list>");
@@ -207,6 +247,10 @@ public class AdminActivityCommand implements CommandExecutor, TabCompleter {
             return list;
         } else if (args.length == 4 && args[0].equalsIgnoreCase("npc") && args[1].equalsIgnoreCase("bind")) {
             return List.of("0", "10", "50", "100", "500");
+        } else if (args.length == 5 && args[0].equalsIgnoreCase("npc") && args[1].equalsIgnoreCase("bind")) {
+            return List.of("0", "100", "500", "1000", "5000", "true", "false");
+        } else if (args.length == 6 && args[0].equalsIgnoreCase("npc") && args[1].equalsIgnoreCase("bind")) {
+            return List.of("true", "false");
         } else if (args.length == 2 && (args[0].equalsIgnoreCase("endgame") || args[0].equalsIgnoreCase("stats"))) {
             List<String> list = new ArrayList<>();
             for (Player p : Bukkit.getOnlinePlayers()) {

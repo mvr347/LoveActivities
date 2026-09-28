@@ -75,11 +75,32 @@ public class NpcInteractListener implements Listener {
             return;
         }
 
-        // Check accept chance
-        if (random.nextDouble() > config.getAcceptChance()) {
+        // 1. Check if NPC is in a temporary refusal mood
+        if (config.isRefusing()) {
+            long remainingSec = Math.max(1, (config.getRefusedUntil() - now) / 1000L);
+            long remainingMin = (remainingSec + 59) / 60;
             String refuse = config.getRandomDialogue("refuse");
-            plugin.getNpcManager().speak(player, config.getCustomName(), refuse != null ? refuse : "Не сейчас, путник. Я занят.");
-            SoundUtil.playClick(player);
+            if (refuse == null) refuse = "Я сейчас не в настроении играть. Приходи позже.";
+            plugin.getNpcManager().speak(player, config.getCustomName(), refuse + " <dark_gray>(Отказывается ещё " + remainingMin + " мин.)</dark_gray>");
+            SoundUtil.playError(player);
+            return;
+        }
+
+        // 2. Check accept chance
+        double roll = random.nextDouble();
+        double acceptChance = config.getAcceptChance();
+        if (roll > acceptChance) {
+            // NPC enters a refusal period
+            int cooldownMins = config.getRefusalCooldownMinutes();
+            if (cooldownMins <= 0) cooldownMins = 3 + random.nextInt(6);
+            long refuseUntil = now + (cooldownMins * 60 * 1000L);
+            config.setRefusedUntil(refuseUntil);
+            plugin.getNpcManager().save();
+
+            String refuse = config.getRandomDialogue("refuse");
+            if (refuse == null) refuse = "Не сейчас, путник. Я занят и не хочу играть.";
+            plugin.getNpcManager().speak(player, config.getCustomName(), refuse + " <dark_gray>(Отказывается на " + cooldownMins + " мин.)</dark_gray>");
+            SoundUtil.playError(player);
             return;
         }
 

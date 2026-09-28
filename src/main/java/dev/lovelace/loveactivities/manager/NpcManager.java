@@ -67,10 +67,16 @@ public class NpcManager {
                     String name = section.getString(key + ".name", "NPC Игрок");
                     GameType type = GameType.fromString(section.getString(key + ".game", "BLACKJACK"));
                     long bet = section.getLong(key + ".bet", 0L);
-                    double acceptChance = section.getDouble(key + ".accept_chance", 1.0);
+                    long maxBet = section.getLong(key + ".max_bet", 0L);
+                    boolean playsBets = section.getBoolean(key + ".plays_bets", true);
+                    double acceptChance = section.getDouble(key + ".accept_chance", 0.85);
+                    int refusalCooldown = section.getInt(key + ".refusal_cooldown_minutes", 5);
+                    long refusedUntil = section.getLong(key + ".refused_until", 0L);
 
-                    NpcActivityConfig npc = new NpcActivityConfig(uuid, name, type, bet);
+                    NpcActivityConfig npc = new NpcActivityConfig(uuid, name, type, bet, maxBet, playsBets);
                     npc.setAcceptChance(acceptChance);
+                    npc.setRefusalCooldownMinutes(refusalCooldown);
+                    npc.setRefusedUntil(refusedUntil);
 
                     ConfigurationSection dSec = section.getConfigurationSection(key + ".dialogues");
                     if (dSec != null) {
@@ -96,7 +102,11 @@ public class NpcManager {
             config.set(path + ".name", npc.getCustomName());
             config.set(path + ".game", npc.getGameType().name());
             config.set(path + ".bet", npc.getDefaultBet());
+            config.set(path + ".max_bet", npc.getMaxBet());
+            config.set(path + ".plays_bets", npc.isPlaysBets());
             config.set(path + ".accept_chance", npc.getAcceptChance());
+            config.set(path + ".refusal_cooldown_minutes", npc.getRefusalCooldownMinutes());
+            config.set(path + ".refused_until", npc.getRefusedUntil());
 
             for (Map.Entry<String, List<String>> d : npc.getDialogues().entrySet()) {
                 config.set(path + ".dialogues." + d.getKey(), d.getValue());
@@ -122,14 +132,18 @@ public class NpcManager {
         return Collections.unmodifiableMap(npcMap);
     }
 
-    public void bindNpc(Entity entity, GameType gameType, long bet, String customName) {
+    public void bindNpc(Entity entity, GameType gameType, long bet, long maxBet, boolean playsBets, String customName) {
         if (entity == null) return;
         String name = (customName != null && !customName.isBlank()) ? customName : entity.getName();
         if (name == null || name.isBlank()) name = "NPC " + gameType.getNameRu();
 
-        NpcActivityConfig npc = new NpcActivityConfig(entity.getUniqueId(), name, gameType, bet);
+        NpcActivityConfig npc = new NpcActivityConfig(entity.getUniqueId(), name, gameType, bet, maxBet, playsBets);
         npcMap.put(entity.getUniqueId(), npc);
         save();
+    }
+
+    public void bindNpc(Entity entity, GameType gameType, long bet, String customName) {
+        bindNpc(entity, gameType, bet, 0L, true, customName);
     }
 
     public boolean unbindNpc(UUID entityUuid) {

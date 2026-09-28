@@ -114,12 +114,28 @@ public class BlackjackGame implements GameSession {
             this.guiP2.open();
         }
 
-        if (BlackjackDeck.isBlackjack(handP1) && !BlackjackDeck.isBlackjack(handP2)) {
-            endWithWinner(player1);
-        } else if (BlackjackDeck.isBlackjack(handP2) && !BlackjackDeck.isBlackjack(handP1)) {
-            endWithWinner(player2);
-        } else if (BlackjackDeck.isBlackjack(handP1) && BlackjackDeck.isBlackjack(handP2)) {
-            endWithDraw();
+        if (BlackjackDeck.isBlackjack(handP1) || BlackjackDeck.isBlackjack(handP2)) {
+            syncViews();
+            if (p1 != null) {
+                if (BlackjackDeck.isBlackjack(handP1)) {
+                    p1.sendActionBar(dev.lovelace.loveactivities.util.TextUtil.parse("<gold><bold>★ БЛЭКДЖЕК! 21 ОЧКО! ★</bold></gold>"));
+                    SoundUtil.playSuccess(p1);
+                } else {
+                    p1.sendActionBar(dev.lovelace.loveactivities.util.TextUtil.parse("<red><bold>У дилера Блэкджек (21 очко)!</bold></red>"));
+                    SoundUtil.playLoss(p1);
+                }
+            }
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                if (state != GameState.PLAYING) return;
+                if (BlackjackDeck.isBlackjack(handP1) && !BlackjackDeck.isBlackjack(handP2)) {
+                    endWithWinner(player1);
+                } else if (BlackjackDeck.isBlackjack(handP2) && !BlackjackDeck.isBlackjack(handP1)) {
+                    endWithWinner(player2);
+                } else if (BlackjackDeck.isBlackjack(handP1) && BlackjackDeck.isBlackjack(handP2)) {
+                    endWithDraw();
+                }
+            }, 35L);
+            return;
         }
     }
 
@@ -374,9 +390,31 @@ public class BlackjackGame implements GameSession {
     @Override
     public void onPlayerClick(Player player, int slot, ClickType clickType) {}
 
+    private final long sessionStartTime = System.currentTimeMillis();
+
+    public void reopenGui(Player player) {
+        if (player.getUniqueId().equals(player1) && guiP1 != null) {
+            guiP1.setSwitchingInventory(true);
+            guiP1.open();
+        } else if (player.getUniqueId().equals(player2) && guiP2 != null) {
+            guiP2.setSwitchingInventory(true);
+            guiP2.open();
+        }
+    }
+
     @Override
     public void onPlayerClose(Player player) {
         if (state != GameState.PLAYING || (viewingTutorial != null && viewingTutorial.contains(player.getUniqueId()))) {
+            return;
+        }
+        if (System.currentTimeMillis() - sessionStartTime < 2000L) {
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                if (state == GameState.PLAYING && player.isOnline()) {
+                    if (!(player.getOpenInventory().getTopInventory().getHolder() instanceof AbstractGUI)) {
+                        reopenGui(player);
+                    }
+                }
+            }, 2L);
             return;
         }
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
@@ -391,7 +429,7 @@ public class BlackjackGame implements GameSession {
             }
             this.state = GameState.FINISHED;
             autoLose(player.getUniqueId(), "autolose_gui_close");
-        }, 3L);
+        }, 15L);
     }
 
     private void closeAllGuis() {

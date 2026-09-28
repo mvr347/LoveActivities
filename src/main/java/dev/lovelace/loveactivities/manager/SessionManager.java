@@ -188,6 +188,14 @@ public class SessionManager {
     public void startNpcSession(Player player, GameType gameType, String subMode, long bet, String customNpcName, NpcActivityConfig npcConfig) {
         String npcName = (customNpcName != null && !customNpcName.isBlank()) ? customNpcName : NPC_NAME;
 
+        if (npcConfig != null) {
+            if (!npcConfig.isPlaysBets()) {
+                bet = 0L;
+            } else if (npcConfig.getMaxBet() > 0 && bet > npcConfig.getMaxBet()) {
+                bet = npcConfig.getMaxBet();
+            }
+        }
+
         // Плохая / конфликтная репутация — NPC не играют
         if (plugin.getLoveCoreBridge().isBadOrConflictReputation(player.getUniqueId())) {
             player.sendMessage(net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().deserialize(
