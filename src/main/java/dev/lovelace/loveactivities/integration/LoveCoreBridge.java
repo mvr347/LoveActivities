@@ -39,7 +39,6 @@ public class LoveCoreBridge {
             return eco.get().has(player, amount);
         }
 
-        // Fallback: check physical coin items in player inventory
         long physicalTotal = 0L;
         for (ItemStack item : player.getInventory().getContents()) {
             if (item != null && item.getType() != Material.AIR) {
@@ -58,7 +57,6 @@ public class LoveCoreBridge {
             return eco.get().balance(player);
         }
 
-        // Fallback: sum physical coins in inventory
         long physicalTotal = 0L;
         for (ItemStack item : player.getInventory().getContents()) {
             if (item != null && item.getType() != Material.AIR) {
@@ -77,8 +75,6 @@ public class LoveCoreBridge {
             return eco.get().charge(player, amount);
         }
 
-        // Fallback: remove physical coins from inventory
-        if (!hasBalance(player, amount)) return false;
         long needed = amount;
         ItemStack[] contents = player.getInventory().getContents();
         for (int i = 0; i < contents.length; i++) {
@@ -87,15 +83,14 @@ public class LoveCoreBridge {
                 long unitVal = CurrencyUtil.getUnitCoinValue(item);
                 int count = item.getAmount();
                 long stackVal = unitVal * count;
-
                 if (stackVal <= needed) {
                     needed -= stackVal;
                     player.getInventory().setItem(i, null);
                 } else {
-                    int removeCount = (int) Math.ceil((double) needed / unitVal);
+                    int removeCount = (int) ((needed + unitVal - 1) / unitVal);
+                    if (removeCount > count) removeCount = count;
                     long totalRemovedVal = (long) removeCount * unitVal;
                     long change = totalRemovedVal - needed;
-
                     item.setAmount(count - removeCount);
                     if (item.getAmount() <= 0) {
                         player.getInventory().setItem(i, null);
@@ -120,7 +115,6 @@ public class LoveCoreBridge {
         if (eco.isPresent()) {
             eco.get().give(player, amount);
         } else {
-            // Fallback: give physical coin items
             CurrencyUtil.giveCoinsToPlayer(player, amount);
         }
     }
@@ -131,7 +125,6 @@ public class LoveCoreBridge {
         if (player != null && player.isOnline()) {
             give(player, amount);
         } else {
-            // Player offline - queue to offline_payouts table
             LoveActivities.getInstance().getOfflinePayoutDao().addPayout(uuid, amount, reason);
         }
     }
@@ -142,5 +135,24 @@ public class LoveCoreBridge {
 
     public String currencyName() {
         return getEconomy().map(LoveEconomy::currencyName).orElse("монет");
+    }
+
+    /**
+     * Плохая / конфликтная репутация — NPC не играют с таким игроком.
+     * OUTCAST и BAD по ReputationOracle; если Oracle нет — пропускаем (разрешаем).
+     */
+    public boolean isBadOrConflictReputation(java.util.UUID playerId) {
+        if (playerId == null) return false;
+        try {
+            return dev.lovelace.lovecore.api.LoveCore.service(
+                    dev.lovelace.lovecore.api.social.ReputationOracle.class
+            ).map(oracle -> {
+                var tier = oracle.tier(playerId);
+                return tier == dev.lovelace.lovecore.api.social.ReputationOracle.Tier.OUTCAST
+                        || tier == dev.lovelace.lovecore.api.social.ReputationOracle.Tier.BAD;
+            }).orElse(false);
+        } catch (Throwable ignored) {
+            return false;
+        }
     }
 }

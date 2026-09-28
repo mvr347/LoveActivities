@@ -1,125 +1,55 @@
 # =========================================================
 # LoveActivities Localization (MiniMessage format)
+# Bold tags reduced per style guide
 # =========================================================
 
 ru:
-  prefix: "<gradient:#FF5E62:#FF9966><bold>LoveActivities</bold></gradient> <dark_gray>»</dark_gray> "
+  prefix: "<gradient:#FF5E62:#FF9966>LoveActivities</gradient> <dark_gray>»</dark_gray> "
 
-  # Запросы
-  request_sent: "<gray>Вы бросили вызов игроку <gradient:#00C9FF:#92FE9D>{player}</gradient> на игру <yellow>{game}</yellow>!</gray> <click:run_command:'/активности cancel {id}'><hover:show_text:'<red>Нажмите для отмены вызова'><red>[✖ ОТМЕНИТЬ]</red></hover></click>"
-  request_received: "<gradient:#00C9FF:#92FE9D>{player}</gradient> <gray>бросает вам вызов на игру</gray> <yellow>{game}</yellow>!\n  <click:run_command:'/активности accept {id}'><hover:show_text:'<green>Принять вызов'><green>[✔ ПРИНЯТЬ]</green></hover></click>   <click:run_command:'/активности decline {id}'><hover:show_text:'<red>Отклонить вызов'><red>[✖ ОТКЛОНИТЬ]</red></hover></click>"
-  request_cancelled: "<gray>Вызов игроку <yellow>{player}</yellow> был <red>отменён</red>.</gray>"
-  request_declined: "<yellow>{player}</yellow> <red>отклонил</red> ваш вызов."
-  request_declined_self: "<gray>Вы <red>отклонили</red> вызов от <yellow>{player}</yellow>.</gray>"
-  request_expired: "<gray>Время ожидания ответа от <yellow>{player}</yellow> <red>истекло</red>.</gray>"
-  request_cooldown: "<red>Подождите <yellow>{seconds}</yellow> сек. перед отправкой следующего вызова.</red>"
+  request_sent: "<gray>Вы бросили вызов игроку <gradient:#00C9FF:#92FE9D>{player}</gradient> на игру <yellow>{game}</yellow>!</gray>"
+  request_received: "<gray>Игрок <gradient:#00C9FF:#92FE9D>{player}</gradient> бросает вам вызов на <yellow>{game}</yellow>! <click:run_command:'/активности accept {id}'><hover:show_text:'Принять'><green>[Принять]</green></hover></click> <click:run_command:'/активности deny {id}'><hover:show_text:'Отклонить'><red>[Отклонить]</red></hover></click></gray>"
+  request_accepted: "<gray>Вызов принят! Открывается комната ставок...</gray>"
+  request_denied: "<gray>Вызов отклонён.</gray>"
+  request_expired: "<gray>Время на ответ истекло.</gray>"
+  request_cancelled: "<gray>Вызов отменён.</gray>"
 
-  # Ошибки вызова
-  error_target_offline: "<red>Игрок не найден или не в сети!</red>"
-  error_self_challenge: "<red>Вы не можете играть с самим собой!</red>"
-  error_too_far: "<red>Игрок находится слишком далеко! Подойдите ближе (макс. <yellow>{distance}</yellow> бл.).</red>"
-  error_you_busy: "<red>Вы уже находитесь в игре или имеете активный запрос!</red>"
-  error_target_busy: "<red>Игрок уже находится в игре или обрабатывает другой запрос.</red>"
-  error_target_dnd: "<red>У игрока включён режим «Не беспокоить».</red>"
-  error_game_blacklisted_by_you: "<red>Эта игра отключена в ваших личных настройках (/la settings)!</red>"
-  error_game_blacklisted_by_target: "<red>Игрок отключил эту игру в своих личных настройках.</red>"
-  error_no_active_request: "<red>У вас нет активного запроса с таким ID или он уже недействителен.</red>"
+  bet_not_enough_money: "<red>Недостаточно средств. Баланс: <yellow>{balance}</yellow></red>"
+  bet_refunded: "<gray>Ставка возвращена: <yellow>{amount}</yellow> {currency}</gray>"
+  game_started: "<gray>Игра <yellow>{game}</yellow> началась!</gray>"
+  game_won: "<green>Победа! Выигрыш: <yellow>{amount}</yellow> {currency}</green>"
+  game_lost: "<red>Поражение.</red>"
+  game_draw: "<yellow>Ничья. Ставки возвращены.</yellow>"
 
-  # Ставки
-  bet_currency: "монет"
-  bet_not_enough_money: "<red>У вас недостаточно физических монет для этой ставки! Баланс: <yellow>{balance}</yellow></red>"
-  bet_max_exceeded: "<red>Максимально допустимая ставка: <yellow>{max} {currency}</yellow>.</red>"
-  bet_min_not_met: "<red>Минимальная ставка: <yellow>{min} {currency}</yellow>.</red>"
-  bet_refunded: "<gray>Ваша ставка в размере <yellow>{amount} {currency}</yellow> возвращена в инвентарь.</gray>"
-  bet_escrow_failed: "<red>Ошибка списания ставки! Игра отменена, монеты в безопасности.</red>"
+  npc_refuse_reputation: "<red>С тобой не хотят иметь дел. Улучши репутацию.</red>"
+  npc_refuse_chance: "<gray>{npc} отказывается играть сейчас.</gray>"
 
-  # Игра и автолуз
-  game_started: "<green>Игра <yellow>{game}</yellow> началась! Желаем удачи!</green>"
-  game_cancelled: "<gray>Игра <yellow>{game}</yellow> была <red>отменена</red>.</gray>"
-  game_win: "<gradient:#00C9FF:#92FE9D>ПОБЕДА!</gradient> <green>Вы победили игрока <yellow>{player}</yellow> в <yellow>{game}</yellow>! Выигрыш: <gold>+{amount} {currency}</gold></green>"
-  game_win_no_bets: "<gradient:#00C9FF:#92FE9D>ПОБЕДА!</gradient> <green>Вы победили игрока <yellow>{player}</yellow> в <yellow>{game}</yellow>!</green>"
-  game_loss: "<gradient:#FF5E62:#FF9966>ПОРАЖЕНИЕ!</gradient> <gray>Вы уступили победу игроку <yellow>{player}</yellow> в <yellow>{game}</yellow>.</gray>"
-  game_draw: "<gradient:#FFE000:#799F0C>НИЧЬЯ!</gradient> <gray>Победитель не определен. Ставки возвращены в полном объеме.</gray>"
-  game_draw_no_bets: "<gradient:#FFE000:#799F0C>НИЧЬЯ!</gradient> <gray>Победитель не определен. Отличная игра!</gray>"
-  autolose_distance: "<red>Игрок <yellow>{player}</yellow> отошел дальше 3 блоков и получил автопоражение!</red>"
-  autolose_disconnect: "<red>Игрок <yellow>{player}</yellow> вышел с сервера и получил автопоражение!</red>"
-  autolose_disconnected: "<red>Игрок <yellow>{player}</yellow> вышел с сервера и получил автопоражение!</red>"
-  autolose_death: "<red>Игрок <yellow>{player}</yellow> погиб и получил автопоражение!</red>"
-  autolose_gui_close: "<red>Игрок <yellow>{player}</yellow> закрыл меню игры и получил автопоражение!</red>"
-  autolose_afk: "<red>Игрок <yellow>{player}</yellow> превысил время ожидания хода и получил автопоражение!</red>"
-  autolose_surrender: "<yellow>{player}</yellow> <gray>признал поражение в игре <yellow>{game}</yellow>.</gray>"
-  autolose_pvp: "<red>Игра отменена из-за начала боя (PvP)!</red>"
-  plugin_shutdown: "<red>Игра отменена из-за перезагрузки плагина.</red>"
+  autolose_disconnect: "<gray>Игрок {player} отключился — автопоражение.</gray>"
+  autolose_distance: "<gray>Слишком далеко от соперника — автопоражение.</gray>"
+  autolose_timeout: "<gray>Время хода истекло — автопоражение.</gray>"
 
-  # Настройки
-  dnd_enabled: "<gold>Режим «Не беспокоить» <green>включён</green>. Вы не получаете вызовы на игры.</gold>"
-  dnd_disabled: "<gold>Режим «Не беспокоить» <red>выключён</red>. Вы снова можете принимать вызовы.</gold>"
-  settings_saved: "<green>Настройки успешно сохранены!</green>"
-
-  # Админ
-  admin_reload: "<green>Конфигурация, локализация и текстуры голов LoveActivities успешно перезагружены!</green>"
-  admin_game_ended: "<green>Активная игровая сессия игрока <yellow>{player}</yellow> была завершена с возвратом ставок.</green>"
-  admin_player_not_in_game: "<red>У игрока <yellow>{player}</yellow> нет активных игровых сессий.</red>"
-  admin_stats_header: "<gradient:#FF5E62:#FF9966>Статистика LoveActivities для {player}:</gradient>"
-  admin_stats_line: "<gray>• <yellow>{game}</yellow>: Побед: <green>{wins}</green> | Поражений: <red>{losses}</red> | Выиграно: <gold>{won}</gold> | Проиграно: <gold>{lost}</gold></gray>"
+  error_generic: "<red>Ошибка. Попробуйте ещё раз.</red>"
+  no_permission: "<red>Нет прав.</red>"
+  only_players: "<red>Только для игроков.</red>"
 
 en:
-  prefix: "<gradient:#FF5E62:#FF9966><bold>LoveActivities</bold></gradient> <dark_gray>»</dark_gray> "
-
-  # Requests
-  request_sent: "<gray>You challenged <gradient:#00C9FF:#92FE9D>{player}</gradient> to <yellow>{game}</yellow>!</gray> <click:run_command:'/активности cancel {id}'><hover:show_text:'<red>Click to cancel challenge'><red>[✖ CANCEL]</red></hover></click>"
-  request_received: "<gradient:#00C9FF:#92FE9D>{player}</gradient> <gray>has challenged you to</gray> <yellow>{game}</yellow>!\n  <click:run_command:'/активности accept {id}'><hover:show_text:'<green>Accept challenge'><green>[✔ ACCEPT]</green></hover></click>   <click:run_command:'/активности decline {id}'><hover:show_text:'<red>Decline challenge'><red>[✖ DECLINE]</red></hover></click>"
-  request_cancelled: "<gray>Challenge to <yellow>{player}</yellow> was <red>cancelled</red>.</gray>"
-  request_declined: "<yellow>{player}</yellow> <red>declined</red> your challenge."
-  request_declined_self: "<gray>You <red>declined</red> the challenge from <yellow>{player}</yellow>.</gray>"
-  request_expired: "<gray>Challenge to <yellow>{player}</yellow> has <red>expired</red>.</gray>"
-  request_cooldown: "<red>Please wait <yellow>{seconds}</yellow>s before sending another challenge.</red>"
-
-  # Request Errors
-  error_target_offline: "<red>Player not found or is offline!</red>"
-  error_self_challenge: "<red>You cannot play against yourself!</red>"
-  error_too_far: "<red>Player is too far away! Move closer (max <yellow>{distance}</yellow> blocks).</red>"
-  error_you_busy: "<red>You are already in a game or have a pending request!</red>"
-  error_target_busy: "<red>Target player is currently busy in a game or pending request.</red>"
-  error_target_dnd: "<red>This player has Do Not Disturb enabled.</red>"
-  error_game_blacklisted_by_you: "<red>This game is disabled in your personal settings (/la settings)!</red>"
-  error_game_blacklisted_by_target: "<red>Target player has disabled this game in their settings.</red>"
-  error_no_active_request: "<red>No active request found with that ID or it expired.</red>"
-
-  # Betting
-  bet_currency: "coins"
-  bet_not_enough_money: "<red>You do not have enough physical coins for this bet! Balance: <yellow>{balance}</yellow></red>"
-  bet_max_exceeded: "<red>Maximum allowed bet is: <yellow>{max} {currency}</yellow>.</red>"
-  bet_min_not_met: "<red>Minimum bet is: <yellow>{min} {currency}</yellow>.</red>"
-  bet_refunded: "<gray>Your bet of <yellow>{amount} {currency}</yellow> has been refunded to your inventory.</gray>"
-  bet_escrow_failed: "<red>Failed to charge bet! Game cancelled, coins are safe.</red>"
-
-  # Gameplay & Auto-lose
-  game_started: "<green>Game <yellow>{game}</yellow> has started! Good luck!</green>"
-  game_cancelled: "<gray>Game <yellow>{game}</yellow> was <red>cancelled</red>.</gray>"
-  game_win: "<gradient:#00C9FF:#92FE9D>VICTORY!</gradient> <green>You defeated <yellow>{player}</yellow> in <yellow>{game}</yellow>! Winnings: <gold>+{amount} {currency}</gold></green>"
-  game_win_no_bets: "<gradient:#00C9FF:#92FE9D>VICTORY!</gradient> <green>You defeated <yellow>{player}</yellow> in <yellow>{game}</yellow>!</green>"
-  game_loss: "<gradient:#FF5E62:#FF9966>DEFEAT!</gradient> <gray>You were defeated by <yellow>{player}</yellow> in <yellow>{game}</yellow>.</gray>"
-  game_draw: "<gradient:#FFE000:#799F0C>DRAW!</gradient> <gray>No winner. Bets have been refunded in full.</gray>"
-  game_draw_no_bets: "<gradient:#FFE000:#799F0C>DRAW!</gradient> <gray>No winner. Great game!</gray>"
-  autolose_distance: "<red>Player <yellow>{player}</yellow> moved further than 3 blocks and auto-lost!</red>"
-  autolose_disconnect: "<red>Player <yellow>{player}</yellow> disconnected and auto-lost!</red>"
-  autolose_disconnected: "<red>Player <yellow>{player}</yellow> disconnected and auto-lost!</red>"
-  autolose_death: "<red>Player <yellow>{player}</yellow> died and auto-lost!</red>"
-  autolose_gui_close: "<red>Player <yellow>{player}</yellow> closed the game menu and auto-lost!</red>"
-  autolose_afk: "<red>Player <yellow>{player}</yellow> ran out of time and auto-lost!</red>"
-  autolose_surrender: "<yellow>{player}</yellow> <gray>surrendered in <yellow>{game}</yellow>.</gray>"
-  autolose_pvp: "<red>Game was cancelled due to combat (PvP)!</red>"
-  plugin_shutdown: "<red>Game was cancelled due to plugin reload.</red>"
-
-  # Settings
-  dnd_enabled: "<gold>Do Not Disturb is now <green>enabled</green>. You will not receive game invites.</gold>"
-  dnd_disabled: "<gold>Do Not Disturb is now <red>disabled</red>. You can receive game invites.</gold>"
-  settings_saved: "<green>Settings saved successfully!</green>"
-
-  # Admin
-  admin_reload: "<green>LoveActivities config, messages, and heads successfully reloaded!</green>"
-  admin_game_ended: "<green>Active game session of <yellow>{player}</yellow> was ended and bets refunded.</green>"
-  admin_player_not_in_game: "<red>Player <yellow>{player}</yellow> is not currently in a game session.</red>"
-  admin_stats_header: "<gradient:#FF5E62:#FF9966>LoveActivities Stats for {player}:</gradient>"
-  admin_stats_line: "<gray>• <yellow>{game}</yellow>: Wins: <green>{wins}</green> | Losses: <red>{losses}</red> | Won: <gold>{won}</gold> | Lost: <gold>{lost}</gold></gray>"
+  prefix: "<gradient:#FF5E62:#FF9966>LoveActivities</gradient> <dark_gray>»</dark_gray> "
+  request_sent: "<gray>You challenged <gradient:#00C9FF:#92FE9D>{player}</gradient> to <yellow>{game}</yellow>!</gray>"
+  request_received: "<gray><gradient:#00C9FF:#92FE9D>{player}</gradient> challenges you to <yellow>{game}</yellow>!</gray>"
+  request_accepted: "<gray>Challenge accepted! Opening betting room...</gray>"
+  request_denied: "<gray>Challenge denied.</gray>"
+  request_expired: "<gray>Request expired.</gray>"
+  request_cancelled: "<gray>Challenge cancelled.</gray>"
+  bet_not_enough_money: "<red>Not enough funds. Balance: <yellow>{balance}</yellow></red>"
+  bet_refunded: "<gray>Bet refunded: <yellow>{amount}</yellow> {currency}</gray>"
+  game_started: "<gray>Game <yellow>{game}</yellow> started!</gray>"
+  game_won: "<green>Victory! Prize: <yellow>{amount}</yellow> {currency}</green>"
+  game_lost: "<red>Defeat.</red>"
+  game_draw: "<yellow>Draw. Bets returned.</yellow>"
+  npc_refuse_reputation: "<red>They refuse to deal with you. Improve your reputation.</red>"
+  npc_refuse_chance: "<gray>{npc} refuses to play right now.</gray>"
+  autolose_disconnect: "<gray>Player {player} disconnected — auto-loss.</gray>"
+  autolose_distance: "<gray>Too far from opponent — auto-loss.</gray>"
+  autolose_timeout: "<gray>Turn timeout — auto-loss.</gray>"
+  error_generic: "<red>Error. Try again.</red>"
+  no_permission: "<red>No permission.</red>"
+  only_players: "<red>Players only.</red>"
