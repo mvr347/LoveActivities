@@ -45,7 +45,7 @@ public class BettingRoomGUI extends AbstractGUI {
     }
 
     private BettingRoomGUI(Player p1, Player p2, GameType gameType, String subMode, SharedBetState state) {
-        super(p1, 54, "<gradient:#FF5E62:#FF9966><bold>Комната ставок</bold></gradient>");
+        super(p1, 54, "<gradient:#FF5E62:#FF9966>Комната ставок</gradient>");
         this.p1 = p1;
         this.p2 = p2;
         this.gameType = gameType;
@@ -86,12 +86,12 @@ public class BettingRoomGUI extends AbstractGUI {
 
         // Center column
         setItem(4, plugin.getHeadManager().createBuilder("game_icons." + gameType.getIconKey())
-                .name("<yellow><bold>" + gameType.getNameRu() + "</bold></yellow>")
+                .name("<yellow>" + gameType.getNameRu() + "</yellow>")
                 .lore("<gray>Выбранная игра</gray>")
                 .build());
 
         setItem(13, plugin.getHeadManager().createBuilder("ui.info")
-                .name("<gold><bold>Внесение монет</bold></gold>")
+                .name("<gold>Внесение монет</gold>")
                 .lore(
                         "<gray>Нажимайте на слоты монет, чтобы внести ставку.</gray>",
                         "<gray>Списание происходит только после подтверждения обоих игроков.</gray>",
@@ -108,47 +108,47 @@ public class BettingRoomGUI extends AbstractGUI {
                 default -> plugin.getHeadManager().getTexture("ui.coin_stack");
             };
             setItem(31, ItemBuilder.base64Head(countHead)
-                    .name("<gold><bold>Старт игры через: " + state.countdown + "...</bold></gold>")
+                    .name("<gold>Старт игры через: " + state.countdown + "...</gold>")
                     .build());
         } else {
             long total = state.betP1 + state.betP2;
             if (total > 0) {
                 setItem(31, plugin.getHeadManager().createBuilder("ui.coin_stack")
-                        .name("<gold><bold>Банк игры</bold></gold>")
+                        .name("<gold>Банк игры</gold>")
                         .lore("<gray>Текущий банк: <gold>" + total + " " + plugin.getLoveCoreBridge().currencyName() + "</gold></gray>")
                         .build());
             } else {
                 setItem(31, plugin.getHeadManager().createBuilder("ui.without_bets")
-                        .name("<green><bold>Игра без ставок</bold></green>")
+                        .name("<green>Игра без ставок</green>")
                         .lore("<gray>Дружеская игра на интерес</gray>")
                         .build());
             }
         }
 
         setItem(49, plugin.getHeadManager().createBuilder("ui.cancel")
-                .name("<red><bold>Выйти / Отменить</bold></red>")
+                .name("<red>Выйти / Отменить</red>")
                 .lore("<gray>Закрывает комнату и отменяет игру</gray>")
                 .build(), click -> cancelBetting());
 
         // Left Side: Player 1
         long p1Balance = plugin.getLoveCoreBridge().getBalance(p1);
         setItem(10, ItemBuilder.skull().playerHead(p1.getUniqueId())
-                .name("<gradient:#00C9FF:#92FE9D><bold>" + p1.getName() + "</bold></gradient>")
+                .name("<gradient:#00C9FF:#92FE9D>" + p1.getName() + "</gradient>")
                 .lore(
                         "<gray>Баланс: <gold>" + p1Balance + " " + plugin.getLoveCoreBridge().currencyName() + "</gold></gray>",
-                        "<gray>Ставка: <yellow><bold>" + state.betP1 + " " + plugin.getLoveCoreBridge().currencyName() + "</bold></yellow></gray>",
-                        "<gray>Статус: " + (state.readyP1 ? "<green><bold>ГОТОВ ✔</bold></green>" : "<red><bold>НЕ ГОТОВ</bold></red>") + "</gray>"
+                        "<gray>Ставка: <yellow>" + state.betP1 + " " + plugin.getLoveCoreBridge().currencyName() + "</yellow></gray>",
+                        "<gray>Статус: " + (state.readyP1 ? "<green>ГОТОВ ✔</green>" : "<red>НЕ ГОТОВ</red>") + "</gray>"
                 )
                 .build());
 
         // Right Side: Player 2
         long p2Balance = plugin.getLoveCoreBridge().getBalance(p2);
         setItem(16, ItemBuilder.skull().playerHead(p2.getUniqueId())
-                .name("<gradient:#FF9966:#FF5E62><bold>" + p2.getName() + "</bold></gradient>")
+                .name("<gradient:#FF9966:#FF5E62>" + p2.getName() + "</gradient>")
                 .lore(
                         "<gray>Баланс: <gold>" + p2Balance + " " + plugin.getLoveCoreBridge().currencyName() + "</gold></gray>",
-                        "<gray>Ставка: <yellow><bold>" + state.betP2 + " " + plugin.getLoveCoreBridge().currencyName() + "</bold></yellow></gray>",
-                        "<gray>Статус: " + (state.readyP2 ? "<green><bold>ГОТОВ ✔</bold></green>" : "<red><bold>НЕ ГОТОВ</bold></red>") + "</gray>"
+                        "<gray>Ставка: <yellow>" + state.betP2 + " " + plugin.getLoveCoreBridge().currencyName() + "</yellow></gray>",
+                        "<gray>Статус: " + (state.readyP2 ? "<green>ГОТОВ ✔</green>" : "<red>НЕ ГОТОВ</red>") + "</gray>"
                 )
                 .build());
 
@@ -168,37 +168,37 @@ public class BettingRoomGUI extends AbstractGUI {
 
         // Slot 1: +10
         setItem(s10, plugin.getHeadManager().createBuilder("ui.plus_10")
-                .name("<yellow><bold>+10 " + plugin.getLoveCoreBridge().currencyName() + "</bold></yellow>")
+                .name("<yellow>+10 " + plugin.getLoveCoreBridge().currencyName() + "</yellow>")
                 .lore("<gray>Нажмите, чтобы добавить 10 монет</gray>")
                 .build(), canControl ? click -> addBet(forP1, 10L) : null);
 
         // Slot 2: +100
         setItem(s100, plugin.getHeadManager().createBuilder("ui.plus_100")
-                .name("<yellow><bold>+100 " + plugin.getLoveCoreBridge().currencyName() + "</bold></yellow>")
+                .name("<yellow>+100 " + plugin.getLoveCoreBridge().currencyName() + "</yellow>")
                 .lore("<gray>Нажмите, чтобы добавить 100 монет</gray>")
                 .build(), canControl ? click -> addBet(forP1, 100L) : null);
 
         // Slot 3: +500
         setItem(s500, plugin.getHeadManager().createBuilder("ui.plus_500")
-                .name("<yellow><bold>+500 " + plugin.getLoveCoreBridge().currencyName() + "</bold></yellow>")
+                .name("<yellow>+500 " + plugin.getLoveCoreBridge().currencyName() + "</yellow>")
                 .lore("<gray>Нажмите, чтобы добавить 500 монет</gray>")
                 .build(), canControl ? click -> addBet(forP1, 500L) : null);
 
         // Max / All-in
         setItem(sMax, plugin.getHeadManager().createBuilder("ui.all_in")
-                .name("<gold><bold>Максимальная ставка</bold></gold>")
+                .name("<gold>Максимальная ставка</gold>")
                 .lore("<gray>Поставить всё доступное</gray>")
                 .build(), canControl ? click -> setMaxBet(forP1) : null);
 
         // Reset
         setItem(sReset, plugin.getHeadManager().createBuilder("ui.reset")
-                .name("<red><bold>Сбросить ставку</bold></red>")
+                .name("<red>Сбросить ставку</red>")
                 .build(), canControl ? click -> resetBet(forP1) : null);
 
         // Ready toggle
         String readyHead = isReady ? plugin.getHeadManager().getTexture("ui.confirm_ready") : plugin.getHeadManager().getTexture("ui.confirm");
         setItem(sReady, ItemBuilder.base64Head(readyHead)
-                .name(isReady ? "<green><bold>✔ ВЫ ГОТОВЫ</bold></green>" : "<yellow><bold>ПОДТВЕРДИТЬ СТАВКУ</bold></yellow>")
+                .name(isReady ? "<green>✔ ВЫ ГОТОВЫ</green>" : "<yellow>ПОДТВЕРДИТЬ СТАВКУ</yellow>")
                 .lore("<gray>Статус: " + (isReady ? "<green>Ожидание соперника</green>" : "<red>Нажмите для готовности</red>") + "</gray>")
                 .build(), canControl ? click -> toggleReady(forP1) : null);
     }

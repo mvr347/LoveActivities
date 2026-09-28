@@ -24,7 +24,7 @@ public class BetSelectionGUI extends AbstractGUI {
     }
 
     public BetSelectionGUI(Player player, Player opponent, GameType gameType, String subMode) {
-        super(player, 27, "<gradient:#FF5E62:#FF9966><bold>Выбор режима игры</bold></gradient>");
+        super(player, 27, "<gradient:#FF5E62:#FF9966>Выбор формата игры</gradient>");
         this.opponent = opponent;
         this.gameType = gameType;
         this.subMode = subMode;
@@ -70,18 +70,18 @@ public class BetSelectionGUI extends AbstractGUI {
         }
 
         setItem(4, plugin.getHeadManager().createBuilder("game_icons." + gameType.getIconKey())
-                .name("<yellow><bold>" + displayName + "</bold></yellow>")
+                .name("<yellow>" + displayName + "</yellow>")
                 .lore("<gray>Выберите формат матча</gray>")
                 .build());
 
-        // Slot 11: Play with Bet (Physical coins flow)
+        // Slot 11: Play with Bet (Simultaneous Shared Betting Room)
         setItem(11, plugin.getHeadManager().createBuilder("ui.with_bets")
-                .name("<gold><bold>Играть со ставкой</bold></gold>")
+                .name("<gold>Играть со ставкой</gold>")
                 .lore(
-                        "<gray>Внесите физические монеты из инвентаря.</gray>",
+                        "<gray>Внесите физические монеты в общую комнату ставок.</gray>",
                         "<gray>Победитель забирает весь банк!</gray>",
                         "",
-                        "<yellow>▶ Нажмите для внесения монет</yellow>"
+                        "<yellow>▶ Нажмите для перехода к ставкам</yellow>"
                 )
                 .build(), click -> {
             selectionMade = true;
@@ -89,44 +89,12 @@ public class BetSelectionGUI extends AbstractGUI {
             setSwitchingInventory(true);
             if (waitingGUI != null) waitingGUI.setSwitchingInventory(true);
 
-            SharedBetReviewGUI.SharedPhysicalState state = new SharedBetReviewGUI.SharedPhysicalState();
-
-            // Step 1: P1 deposits, P2 waits
-            WaitingOpponentGUI p2Wait = new WaitingOpponentGUI(opponent, player, gameType, () -> {
-                if (player.isOnline()) player.closeInventory();
-            });
-            p2Wait.open();
-
-            new PhysicalDepositGUI(player, opponent, gameType, null, p1Items -> {
-                state.itemsP1 = p1Items;
-                p2Wait.setSwitchingInventory(true);
-
-                // Step 2: P2 deposits, P1 waits
-                WaitingOpponentGUI p1Wait = new WaitingOpponentGUI(player, opponent, gameType, () -> {
-                    if (opponent.isOnline()) opponent.closeInventory();
-                });
-                p1Wait.open();
-
-                new PhysicalDepositGUI(opponent, player, gameType, null, p2Items -> {
-                    state.itemsP2 = p2Items;
-                    p1Wait.setSwitchingInventory(true);
-
-                    // Step 3: Shared review for both
-                    SharedBetReviewGUI.openForBoth(player, opponent, gameType, subMode, state);
-                }, () -> {
-                    p1Wait.setSwitchingInventory(true);
-                    player.closeInventory();
-                }).open();
-
-            }, () -> {
-                p2Wait.setSwitchingInventory(true);
-                opponent.closeInventory();
-            }).open();
+            SharedBetReviewGUI.openForBoth(player, opponent, gameType, subMode);
         });
 
         // Slot 15: Play without Bet (Friendly)
         setItem(15, plugin.getHeadManager().createBuilder("ui.without_bets")
-                .name("<green><bold>Играть без ставки</bold></green>")
+                .name("<green>Играть без ставки</green>")
                 .lore(
                         "<gray>Дружеская игра на интерес.</gray>",
                         "<gray>Без риска потерять монеты.</gray>",
@@ -144,7 +112,7 @@ public class BetSelectionGUI extends AbstractGUI {
 
         // Slot 22: Back / Cancel Button
         setItem(22, plugin.getHeadManager().createBuilder("ui.back")
-                .name("<red><bold>← Назад / Отмена</bold></red>")
+                .name("<red>← Назад / Отмена</red>")
                 .lore("<gray>Отменить игру и закрыть меню</gray>")
                 .build(), click -> {
             selectionMade = true;

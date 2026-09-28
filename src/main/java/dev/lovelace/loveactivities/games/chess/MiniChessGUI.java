@@ -25,7 +25,7 @@ public class MiniChessGUI extends AbstractGUI {
     private List<MiniChessBoard.Move> currentMoves = List.of();
 
     public MiniChessGUI(Player player, MiniChessGame game, boolean isWhite) {
-        super(player, 54, "<gradient:#FF5E62:#FF9966><bold>Мини-шахматы (6x7)</bold></gradient>");
+        super(player, 54, "<gradient:#FF5E62:#FF9966>Мини-шахматы (6x7)</gradient>");
         this.game = game;
         this.isWhite = isWhite;
     }

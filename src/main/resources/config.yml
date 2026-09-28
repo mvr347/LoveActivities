@@ -47,7 +47,7 @@ npc:
   # Включить диалоговые реплики NPC в чате при игре
   dialogues_enabled: true
   # Формат отображения реплики NPC в чате
-  dialogue_format: "<gradient:#FF9966:#FF5E62><bold>[{npc}]</bold></gradient> <dark_gray>»</dark_gray> <gray>{text}</gray>"
+  dialogue_format: "<gradient:#FF9966:#FF5E62>[{npc}]</gradient> <dark_gray>»</dark_gray> <gray>{text}</gray>"
   # Шанс согласия NPC сыграть по умолчанию (если не переопределен в npcs.yml)
   default_accept_chance: 1.0
 

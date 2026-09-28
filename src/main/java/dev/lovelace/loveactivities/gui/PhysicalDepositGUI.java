@@ -30,7 +30,7 @@ public class PhysicalDepositGUI extends AbstractGUI {
                               List<ItemStack> initialItems,
                               Consumer<List<ItemStack>> onConfirmed,
                               Runnable onCancelled) {
-        super(player, 45, "<gradient:#FF5E62:#FF9966><bold>Внесение ставки (Физические монеты)</bold></gradient>");
+        super(player, 45, "<gradient:#FF5E62:#FF9966>Внесение ставки (Физические монеты)</gradient>");
         this.opponent = opponent;
         this.gameType = gameType;
         this.initialItems = initialItems != null ? new ArrayList<>(initialItems) : new ArrayList<>();
@@ -65,13 +65,13 @@ public class PhysicalDepositGUI extends AbstractGUI {
 
         // Header Slot 0: Player Head
         setItem(0, ItemBuilder.skull().playerHead(player.getUniqueId())
-                .name("<gradient:#00C9FF:#92FE9D><bold>" + player.getName() + "</bold></gradient>")
+                .name("<gradient:#00C9FF:#92FE9D>" + player.getName() + "</gradient>")
                 .lore("<gray>Внесите физическую валюту в 3 слота по центру</gray>")
                 .build());
 
         // Header Slot 4: Game Info
         setItem(4, plugin.getHeadManager().createBuilder("game_icons." + gameType.getIconKey())
-                .name("<yellow><bold>" + gameType.getNameRu() + "</bold></yellow>")
+                .name("<yellow>" + gameType.getNameRu() + "</yellow>")
                 .lore(
                         "<gray>Соперник: <white>" + (opponent != null ? opponent.getName() : "Игрок") + "</white></gray>",
                         "<gray>Перетащите монеты из своего инвентаря в слоты 1, 2, 3</gray>"
@@ -87,7 +87,7 @@ public class PhysicalDepositGUI extends AbstractGUI {
 
         // Slot 38: Cancel Button
         setItem(38, plugin.getHeadManager().createBuilder("ui.cancel")
-                .name("<red><bold>Отменить</bold></red>")
+                .name("<red>Отменить</red>")
                 .lore("<gray>Забрать монеты и отменить игру</gray>")
                 .build(), click -> {
             confirmed = false;
@@ -102,7 +102,7 @@ public class PhysicalDepositGUI extends AbstractGUI {
 
         // Slot 42: Confirm Button
         setItem(42, plugin.getHeadManager().createBuilder("ui.confirm")
-                .name("<green><bold>Подтвердить ставку</bold></green>")
+                .name("<green>Подтвердить ставку</green>")
                 .lore(
                         "<gray>Зафиксировать внесённые монеты</gray>",
                         "<yellow>▶ Нажмите для перехода к подтверждению</yellow>"
@@ -122,7 +122,7 @@ public class PhysicalDepositGUI extends AbstractGUI {
     public void updateStatusDisplay() {
         long total = calculateDepositedValue();
         setItem(31, plugin.getHeadManager().createBuilder("ui.coin_stack")
-                .name("<gold><bold>Внесено: " + CurrencyUtil.formatCoinsShort(total) + "</bold></gold>")
+                .name("<gold>Внесено: " + CurrencyUtil.formatCoinsShort(total) + "</gold>")
                 .lore(
                         "<gray>Состав ставки: <yellow>" + CurrencyUtil.formatCoinsWords(total) + "</yellow></gray>",
                         "<gray>Все монеты в центральных 3 слотах учитываются как ваша ставка.</gray>",

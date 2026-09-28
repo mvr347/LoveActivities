@@ -15,7 +15,7 @@ public class WarGUI extends AbstractGUI {
     private final CardsGame game;
 
     public WarGUI(Player player, CardsGame game) {
-        super(player, 45, "<gradient:#FF5E62:#FF9966><bold>Карточная война (War)</bold></gradient>");
+        super(player, 45, "<gradient:#FF5E62:#FF9966>Карточная война (War)</gradient>");
         this.game = game;
     }
 

@@ -14,7 +14,7 @@ import java.util.List;
 public class SettingsGUI extends AbstractGUI {
 
     public SettingsGUI(Player player) {
-        super(player, 45, "<gradient:#FF5E62:#FF9966><bold>Личные настройки</bold></gradient>");
+        super(player, 45, "<gradient:#FF5E62:#FF9966>Личные настройки</gradient>");
     }
 
     @Override
@@ -42,7 +42,7 @@ public class SettingsGUI extends AbstractGUI {
         // Slot 0 - Player Head (RULE 3)
         setItem(0, ItemBuilder.skull()
                 .playerHead(player.getUniqueId())
-                .name("<gradient:#00C9FF:#92FE9D><bold>" + player.getName() + "</bold></gradient>")
+                .name("<gradient:#00C9FF:#92FE9D>" + player.getName() + "</gradient>")
                 .lore(
                         "<gray>Ваш профиль настроек</gray>",
                         "<dark_gray>Управляйте приватностью и играми</dark_gray>"
@@ -56,9 +56,9 @@ public class SettingsGUI extends AbstractGUI {
         // 19: DND
         String dndTex = settings.isDnd() ? plugin.getHeadManager().getTexture("ui.status_on") : plugin.getHeadManager().getTexture("ui.status_off");
         setItem(19, ItemBuilder.base64Head(dndTex)
-                .name("<yellow><bold>Режим «Не беспокоить»</bold></yellow>")
+                .name("<yellow>Режим «Не беспокоить»</yellow>")
                 .lore(
-                        "<gray>Статус: " + (settings.isDnd() ? "<red><bold>ВКЛЮЧЁН (Блокирует вызовы)</bold></red>" : "<green><bold>ВЫКЛЮЧЁН</bold></green>") + "</gray>",
+                        "<gray>Статус: " + (settings.isDnd() ? "<red>ВКЛЮЧЁН (Блокирует вызовы)</red>" : "<green>ВЫКЛЮЧЁН</green>") + "</gray>",
                         "",
                         "<yellow>▶ Нажмите для переключения</yellow>"
                 )
@@ -72,9 +72,9 @@ public class SettingsGUI extends AbstractGUI {
         // 21: Sounds
         String soundTex = settings.isSounds() ? plugin.getHeadManager().getTexture("ui.status_on") : plugin.getHeadManager().getTexture("ui.status_off");
         setItem(21, ItemBuilder.base64Head(soundTex)
-                .name("<yellow><bold>Звуковые эффекты</bold></yellow>")
+                .name("<yellow>Звуковые эффекты</yellow>")
                 .lore(
-                        "<gray>Статус: " + (settings.isSounds() ? "<green><bold>ВКЛЮЧЕНЫ</bold></green>" : "<red><bold>ВЫКЛЮЧЕНЫ</bold></red>") + "</gray>",
+                        "<gray>Статус: " + (settings.isSounds() ? "<green>ВКЛЮЧЕНЫ</green>" : "<red>ВЫКЛЮЧЕНЫ</red>") + "</gray>",
                         "",
                         "<yellow>▶ Нажмите для переключения</yellow>"
                 )
@@ -87,9 +87,9 @@ public class SettingsGUI extends AbstractGUI {
         // 23: Particles
         String particleTex = settings.isParticles() ? plugin.getHeadManager().getTexture("ui.status_on") : plugin.getHeadManager().getTexture("ui.status_off");
         setItem(23, ItemBuilder.base64Head(particleTex)
-                .name("<yellow><bold>Визуальные частицы</bold></yellow>")
+                .name("<yellow>Визуальные частицы</yellow>")
                 .lore(
-                        "<gray>Статус: " + (settings.isParticles() ? "<green><bold>ВКЛЮЧЕНЫ</bold></green>" : "<red><bold>ВЫКЛЮЧЕНЫ</bold></red>") + "</gray>",
+                        "<gray>Статус: " + (settings.isParticles() ? "<green>ВКЛЮЧЕНЫ</green>" : "<red>ВЫКЛЮЧЕНЫ</red>") + "</gray>",
                         "",
                         "<yellow>▶ Нажмите для переключения</yellow>"
                 )
@@ -101,7 +101,7 @@ public class SettingsGUI extends AbstractGUI {
 
         // 25: Master Toggle All Games
         setItem(25, plugin.getHeadManager().createBuilder("ui.all_games_icon")
-                .name("<gold><bold>Все игры разом</bold></gold>")
+                .name("<gold>Все игры разом</gold>")
                 .lore(
                         "<gray>Включить или отключить все игры сразу.</gray>",
                         "",
@@ -129,9 +129,9 @@ public class SettingsGUI extends AbstractGUI {
 
             String iconTex = plugin.getHeadManager().getTexture("game_icons." + game.getIconKey());
             setItem(slot, ItemBuilder.base64Head(iconTex)
-                    .name("<yellow><bold>" + game.getNameRu() + "</bold></yellow>")
+                    .name("<yellow>" + game.getNameRu() + "</yellow>")
                     .lore(
-                            "<gray>Статус вызовов: " + (disabled ? "<red><bold>ОТКЛЮЧЕНО</bold></red>" : "<green><bold>РАЗРЕШЕНО</bold></green>") + "</gray>",
+                            "<gray>Статус вызовов: " + (disabled ? "<red>ОТКЛЮЧЕНО</red>" : "<green>РАЗРЕШЕНО</green>") + "</gray>",
                             "",
                             "<yellow>▶ Нажмите для переключения</yellow>"
                     )
@@ -144,7 +144,7 @@ public class SettingsGUI extends AbstractGUI {
 
         // Footer Close Button (Slot 44) (RULE 7)
         setItem(44, plugin.getHeadManager().createBuilder("ui.close")
-                .name("<red><bold>Закрыть меню</bold></red>")
+                .name("<red>Закрыть меню</red>")
                 .build(), click -> {
             SoundUtil.playClick(player);
             player.closeInventory();

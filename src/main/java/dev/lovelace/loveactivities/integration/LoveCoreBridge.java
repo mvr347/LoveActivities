@@ -143,4 +143,17 @@ public class LoveCoreBridge {
     public String currencyName() {
         return getEconomy().map(LoveEconomy::currencyName).orElse("монет");
     }
+
+    public boolean hasDisallowedReputation(UUID playerId) {
+        if (playerId == null) return false;
+        try {
+            Optional<dev.lovelace.lovecore.api.social.ReputationOracle> oracle = LoveCore.service(dev.lovelace.lovecore.api.social.ReputationOracle.class);
+            if (oracle.isPresent()) {
+                dev.lovelace.lovecore.api.social.ReputationOracle.Tier tier = oracle.get().tier(playerId);
+                return tier == dev.lovelace.lovecore.api.social.ReputationOracle.Tier.BAD ||
+                        tier == dev.lovelace.lovecore.api.social.ReputationOracle.Tier.OUTCAST;
+            }
+        } catch (Throwable ignored) {}
+        return false;
+    }
 }

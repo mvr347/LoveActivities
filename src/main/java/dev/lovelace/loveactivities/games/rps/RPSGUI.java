@@ -14,7 +14,7 @@ public class RPSGUI extends AbstractGUI {
     private final RPSGame game;
 
     public RPSGUI(Player player, RPSGame game) {
-        super(player, 45, "<gradient:#FF5E62:#FF9966><bold>Камень-Ножницы-Бумага</bold></gradient>");
+        super(player, 45, "<gradient:#FF5E62:#FF9966>Камень-Ножницы-Бумага</gradient>");
         this.game = game;
     }
 

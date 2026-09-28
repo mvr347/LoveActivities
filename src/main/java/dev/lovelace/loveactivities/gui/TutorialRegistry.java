@@ -54,7 +54,7 @@ public class TutorialRegistry {
     public static List<List<String>> getChessPages() {
         return List.of(
                 List.of(
-                        "<yellow><bold>Мини-шахматы (6x7)</bold></yellow>",
+                        "<yellow>Мини-шахматы (6x7)</yellow>",
                         "<gray>Динамичная версия шахмат на расширенной доске 6x7 клеток.</gray>",
                         "<gray>У каждого игрока: Король, Ферзь, 2 Слона, Конь, 2 Ладьи и 7 Пешек.</gray>",
                         "",
@@ -63,7 +63,7 @@ public class TutorialRegistry {
                         "<yellow>• Пешка, дошедшая до противоположного края, становится Ферзем!</yellow>"
                 ),
                 List.of(
-                        "<yellow><bold>Как ходить фигурами</bold></yellow>",
+                        "<yellow>Как ходить фигурами</yellow>",
                         "<gray>1. Нажмите на свою фигуру, чтобы выбрать её.</gray>",
                         "<gray>2. На доске подсветятся доступные ходы:</gray>",
                         "<green>• Зелёные плитки</green> <gray>— свободные клетки для перемещения.</gray>",
@@ -76,7 +76,7 @@ public class TutorialRegistry {
     public static List<List<String>> getBlackjackPages() {
         return List.of(
                 List.of(
-                        "<yellow><bold>Основы Блэкджека (21)</bold></yellow>",
+                        "<yellow>Основы Блэкджека (21)</yellow>",
                         "<gray>Цель игры — набрать сумму очков как можно ближе к 21,</gray>",
                         "<gray>но не превысить это число (иначе сразу перебор и проигрыш).</gray>",
                         "",
@@ -86,7 +86,7 @@ public class TutorialRegistry {
                         "<gray>• Туз даёт 11 очков (или 1 очко, если с 11 получается перебор).</gray>"
                 ),
                 List.of(
-                        "<yellow><bold>Действия игрока</bold></yellow>",
+                        "<yellow>Действия игрока</yellow>",
                         "<green>▶ Взять карту (+1)</green> <gray>— добрать ещё одну карту из колоды.</gray>",
                         "<yellow>▶ Хватит</yellow> <gray>— зафиксировать свои очки и передать ход сопернику.</gray>",
                         "<gold>▶ Удвоить ставку (x2)</gold> <gray>— удвоить ставку, взять ровно 1 карту</gray>",
@@ -100,7 +100,7 @@ public class TutorialRegistry {
     public static List<List<String>> getDiceClassicPages() {
         return List.of(
                 List.of(
-                        "<yellow><bold>Кидание костей (Классика 2D6)</bold></yellow>",
+                        "<yellow>Кидание костей (Классика 2D6)</yellow>",
                         "<gray>Каждый игрок бросает по 2 кубика.</gray>",
                         "<gray>Суммируются выпавшие значения на гранях (от 2 до 12).</gray>",
                         "",
@@ -114,7 +114,7 @@ public class TutorialRegistry {
     public static List<List<String>> getDicePokerPages() {
         return List.of(
                 List.of(
-                        "<yellow><bold>Покер на костях (5 кубиков)</bold></yellow>",
+                        "<yellow>Покер на костях (5 кубиков)</yellow>",
                         "<gray>Каждый игрок бросает 5 кубиков.</gray>",
                         "<gray>После первого броска можно зафиксировать нужные кости</gray>",
                         "<gray>и сделать 1 переброс оставшихся для сбора комбинации.</gray>",
@@ -126,7 +126,7 @@ public class TutorialRegistry {
                         "<gray>4. <gold>Большой стрит</gold> (2-3-4-5-6)</gray>"
                 ),
                 List.of(
-                        "<yellow><bold>Младшие комбинации</bold></yellow>",
+                        "<yellow>Младшие комбинации</yellow>",
                         "<gray>5. <yellow>Малый стрит</yellow> (1-2-3-4-5)</gray>",
                         "<gray>6. <yellow>Сет / Тройка</yellow> (3 одинаковых)</gray>",
                         "<gray>7. <yellow>Две пары</yellow> (2 + 2)</gray>",
@@ -141,7 +141,7 @@ public class TutorialRegistry {
     public static List<List<String>> getPokerPages() {
         return List.of(
                 List.of(
-                        "<yellow><bold>Техасский Холдем (Покер на двоих)</bold></yellow>",
+                        "<yellow>Техасский Холдем (Покер на двоих)</yellow>",
                         "<gray>Каждый игрок получает по 2 карманные карты.</gray>",
                         "<gray>На столе открываются 5 общих карт в 3 этапа:</gray>",
                         "<yellow>• Флоп:</yellow> <gray>первые 3 общие карты</gray>",
@@ -150,7 +150,7 @@ public class TutorialRegistry {
                         "<green>• Вскрытие (Шоудаун):</green> <gray>сравнение лучших 5-карточных рук.</gray>"
                 ),
                 List.of(
-                        "<yellow><bold>Старшинство комбинаций Покера</bold></yellow>",
+                        "<yellow>Старшинство комбинаций Покера</yellow>",
                         "<gray>1. <gold>Роял-Флеш</gold> (10-J-Q-K-A одной масти)</gray>",
                         "<gray>2. <gold>Стрит-Флеш</gold> (5 карт подряд одной масти)</gray>",
                         "<gray>3. <gold>Каре</gold> (4 карты одного ранга)</gray>",
@@ -166,14 +166,14 @@ public class TutorialRegistry {
     public static List<List<String>> getDurakPages() {
         return List.of(
                 List.of(
-                        "<yellow><bold>Основы Дурака (подкидного)</bold></yellow>",
+                        "<yellow>Основы Дурака (подкидного)</yellow>",
                         "<gray>Колода из 36 карт (от шестёрок до тузов).</gray>",
                         "<gray>В начале определяется козырная масть (козырь бьёт любую карту не-козыря).</gray>",
                         "<gray>Игрокам раздаётся по 6 карт. Атакующий ходит с карты в руке,</gray>",
                         "<gray>защищающийся обязан побить её старшей картой той же масти или козырем.</gray>"
                 ),
                 List.of(
-                        "<yellow><bold>Подкидывание и завершение</bold></yellow>",
+                        "<yellow>Подкидывание и завершение</yellow>",
                         "<gray>Атакующий может подкидывать любые карты, достоинство которых</gray>",
                         "<gray>уже присутствует на столе.</gray>",
                         "<green>• Бито:</green> <gray>если защищающийся отбил все карты, кон уходит в сброс,</gray>",
@@ -188,7 +188,7 @@ public class TutorialRegistry {
     public static List<List<String>> getWarPages() {
         return List.of(
                 List.of(
-                        "<yellow><bold>Карточная игра: Пьяница (Война)</bold></yellow>",
+                        "<yellow>Карточная игра: Пьяница (Война)</yellow>",
                         "<gray>Колода делится поровну между двумя игроками.</gray>",
                         "<gray>Каждый раунд игроки одновременно открывают верхнюю карту.</gray>",
                         "<gray>Игрок с более старшей картой забирает обе карты в свой победный банк.</gray>",
@@ -202,7 +202,7 @@ public class TutorialRegistry {
     public static List<List<String>> getGwentPages() {
         return List.of(
                 List.of(
-                        "<yellow><bold>Гвинт (Minecraft Edition)</bold></yellow>",
+                        "<yellow>Гвинт (Minecraft Edition)</yellow>",
                         "<gray>Матч длится до 2 побед в раундах (Best of 3).</gray>",
                         "<gray>Игроки по очереди разыгрывают по 1 карте на поле боя.</gray>",
                         "<gray>Побеждает игрок с наибольшей суммарной силой рядов.</gray>",
@@ -213,7 +213,7 @@ public class TutorialRegistry {
                         "<yellow>• Осадный ряд</yellow> (Иссушитель, Гаст, Ифрит)"
                 ),
                 List.of(
-                        "<yellow><bold>Способности карт</bold></yellow>",
+                        "<yellow>Способности карт</yellow>",
                         "<gold>• Герои (Стив, Дракон, Варден):</gold> <gray>иммунитет к погоде и казни.</gray>",
                         "<gold>• Шпионы (Эндермен, Торговец):</gold> <gray>дают силу врагу, но берут 2 карты.</gray>",
                         "<gold>• Медики (Голем, Ведьма):</gold> <gray>воскрешают отряд из сброса.</gray>",
@@ -228,7 +228,7 @@ public class TutorialRegistry {
     public static List<List<String>> getRpsPages() {
         return List.of(
                 List.of(
-                        "<yellow><bold>Камень, Ножницы, Бумага (КНБ)</bold></yellow>",
+                        "<yellow>Камень, Ножницы, Бумага (КНБ)</yellow>",
                         "<gray>Классическая игра на удачу и интуицию.</gray>",
                         "<gray>Матч длится до 2 побед в раундах (Best of 3).</gray>",
                         "",

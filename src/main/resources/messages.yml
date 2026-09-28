@@ -3,7 +3,7 @@
 # =========================================================
 
 ru:
-  prefix: "<gradient:#FF5E62:#FF9966><bold>LoveActivities</bold></gradient> <dark_gray>»</dark_gray> "
+  prefix: "<gradient:#FF5E62:#FF9966>LoveActivities</gradient> <dark_gray>»</dark_gray> "
 
   # Запросы
   request_sent: "<gray>Вы бросили вызов игроку <gradient:#00C9FF:#92FE9D>{player}</gradient> на игру <yellow>{game}</yellow>!</gray> <click:run_command:'/loveactivities cancel {id}'><hover:show_text:'<red>Нажмите для отмены вызова'><red>[✖ ОТМЕНИТЬ]</red></hover></click>"
@@ -64,7 +64,7 @@ ru:
   admin_stats_line: "<gray>• <yellow>{game}</yellow>: Побед: <green>{wins}</green> | Поражений: <red>{losses}</red> | Выиграно: <gold>{won}</gold> | Проиграно: <gold>{lost}</gold></gray>"
 
 en:
-  prefix: "<gradient:#FF5E62:#FF9966><bold>LoveActivities</bold></gradient> <dark_gray>»</dark_gray> "
+  prefix: "<gradient:#FF5E62:#FF9966>LoveActivities</gradient> <dark_gray>»</dark_gray> "
 
   # Requests
   request_sent: "<gray>You challenged <gradient:#00C9FF:#92FE9D>{player}</gradient> to <yellow>{game}</yellow>!</gray> <click:run_command:'/loveactivities cancel {id}'><hover:show_text:'<red>Click to cancel challenge'><red>[✖ CANCEL]</red></hover></click>"

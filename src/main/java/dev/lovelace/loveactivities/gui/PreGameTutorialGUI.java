@@ -22,7 +22,7 @@ public class PreGameTutorialGUI extends AbstractGUI {
                               Runnable onStartGame,
                               Runnable onOpenTutorial,
                               Runnable onCancelGame) {
-        super(player, 27, "<gradient:#FF5E62:#FF9966><bold>Новая игра: " + gameType.getNameRu() + "</bold></gradient>");
+        super(player, 27, "<gradient:#FF5E62:#FF9966>Новая игра: " + gameType.getNameRu() + "</gradient>");
         this.gameType = gameType;
         this.opponent = opponent;
         this.onStartGame = onStartGame;
@@ -48,17 +48,17 @@ public class PreGameTutorialGUI extends AbstractGUI {
 
         // Header Slot 4: Game Banner
         setItem(4, plugin.getHeadManager().createBuilder("game_icons." + gameType.getIconKey())
-                .name("<yellow><bold>Вы впервые играете в " + gameType.getNameRu() + "!</bold></yellow>")
+                .name("<yellow>Вы впервые играете в " + gameType.getNameRu() + "!</yellow>")
                 .lore(
                         "<gray>Соперник: <white>" + (opponent != null ? opponent.getName() : "Бот") + "</white></gray>",
                         "<gray>Хотите ознакомиться с краткими правилами перед началом?</gray>"
                 )
                 .build());
 
-        // Work Zone (Row 1: 9-17) - NO GLASS (Rule 2 & 6)
+        // Work Zone (Row 1: 9-17)
         // Slot 11: Open Tutorial Button
         setItem(11, plugin.getHeadManager().createBuilder("ui.tutorial")
-                .name("<green><bold>📖 Пройти обучение</bold></green>")
+                .name("<green>📖 Пройти обучение</green>")
                 .lore(
                         "<gray>Открыть правила игры и комбинации.</gray>",
                         "<yellow>▶ Соперник подождёт вас в меню ожидания</yellow>"
@@ -74,7 +74,7 @@ public class PreGameTutorialGUI extends AbstractGUI {
 
         // Slot 15: Skip Tutorial Button
         setItem(15, plugin.getHeadManager().createBuilder("ui.confirm_ready")
-                .name("<gold><bold>▶ Пропустить и начать игру</bold></gold>")
+                .name("<gold>▶ Пропустить и начать игру</gold>")
                 .lore(
                         "<gray>Я уже знаю правила, сразу к игре!</gray>",
                         "<green>▶ Нажмите для немедленного старта</green>"
@@ -90,7 +90,7 @@ public class PreGameTutorialGUI extends AbstractGUI {
 
         // Footer Slot 22: Cancel Match Button
         setItem(22, plugin.getHeadManager().createBuilder("ui.cancel")
-                .name("<red><bold>✖ Отменить игру</bold></red>")
+                .name("<red>✖ Отменить игру</red>")
                 .lore("<gray>Вернуть ставки и закрыть матч</gray>")
                 .build(), click -> {
             SoundUtil.playClick(player);

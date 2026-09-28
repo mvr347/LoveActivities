@@ -23,7 +23,7 @@ public class TutorialGUI extends AbstractGUI {
     }
 
     public TutorialGUI(Player player, GameType gameType, List<List<String>> pages, Runnable onCloseAction) {
-        super(player, (pages != null && pages.size() <= 3) ? 27 : 36, "<gradient:#FF5E62:#FF9966><bold>Обучение: " + gameType.getNameRu() + "</bold></gradient>");
+        super(player, (pages != null && pages.size() <= 3) ? 27 : 36, "<gradient:#FF5E62:#FF9966>Обучение: " + gameType.getNameRu() + "</gradient>");
         this.gameType = gameType;
         this.pages = (pages != null && !pages.isEmpty()) ? pages : List.of(List.of("<gray>Инструкция отсутствует.</gray>"));
         this.onCloseAction = onCloseAction;
@@ -49,15 +49,15 @@ public class TutorialGUI extends AbstractGUI {
 
             // Header Slot 4: Game Icon
             setItem(4, plugin.getHeadManager().createBuilder("game_icons." + gameType.getIconKey())
-                    .name("<yellow><bold>" + gameType.getNameRu() + "</bold></yellow>")
+                    .name("<yellow>" + gameType.getNameRu() + "</yellow>")
                     .lore("<gray>Обучающее руководство</gray>")
                     .build());
 
-            // Work Zone (Row 1: 9-17) - NO GLASS (Rule 2 & 6)
+            // Work Zone (Row 1: 9-17)
             List<String> content = pages.get(page);
             String pageTitle = pages.size() > 1
-                    ? "<gold><bold>Страница " + (page + 1) + " из " + pages.size() + "</bold></gold>"
-                    : "<gold><bold>Правила игры</bold></gold>";
+                    ? "<gold>Страница " + (page + 1) + " из " + pages.size() + "</gold>"
+                    : "<gold>Правила игры</gold>";
 
             setItem(13, plugin.getHeadManager().createBuilder("ui.info")
                     .name(pageTitle)
@@ -68,7 +68,7 @@ public class TutorialGUI extends AbstractGUI {
             // Slot 19: Previous Page
             if (pages.size() > 1 && page > 0) {
                 setItem(19, plugin.getHeadManager().createBuilder("ui.arrow_left")
-                        .name("<yellow><bold>← Предыдущая страница</bold></yellow>")
+                        .name("<yellow>← Предыдущая страница</yellow>")
                         .build(), click -> {
                     page--;
                     SoundUtil.playClick(player);
@@ -78,7 +78,7 @@ public class TutorialGUI extends AbstractGUI {
 
             // Slot 22: Back to Game
             setItem(22, plugin.getHeadManager().createBuilder("ui.back")
-                    .name("<yellow><bold>Вернуться к игре</bold></yellow>")
+                    .name("<yellow>Вернуться к игре</yellow>")
                     .build(), click -> {
                 SoundUtil.playClick(player);
                 setSwitchingInventory(true);
@@ -93,7 +93,7 @@ public class TutorialGUI extends AbstractGUI {
             // Slot 25: Next Page
             if (pages.size() > 1 && page < pages.size() - 1) {
                 setItem(25, plugin.getHeadManager().createBuilder("ui.arrow_right")
-                        .name("<yellow><bold>Следующая страница →</bold></yellow>")
+                        .name("<yellow>Следующая страница →</yellow>")
                         .build(), click -> {
                     page++;
                     SoundUtil.playClick(player);
@@ -113,15 +113,15 @@ public class TutorialGUI extends AbstractGUI {
 
             // Header Slot 4: Game Icon
             setItem(4, plugin.getHeadManager().createBuilder("game_icons." + gameType.getIconKey())
-                    .name("<yellow><bold>" + gameType.getNameRu() + "</bold></yellow>")
+                    .name("<yellow>" + gameType.getNameRu() + "</yellow>")
                     .lore("<gray>Обучающее руководство</gray>")
                     .build());
 
-            // Work Zone (Rows 1 & 2: 9-26) - NO GLASS
+            // Work Zone (Rows 1 & 2: 9-26)
             List<String> content = pages.get(page);
             String pageTitle = pages.size() > 1
-                    ? "<gold><bold>Страница " + (page + 1) + " из " + pages.size() + "</bold></gold>"
-                    : "<gold><bold>Правила игры</bold></gold>";
+                    ? "<gold>Страница " + (page + 1) + " из " + pages.size() + "</gold>"
+                    : "<gold>Правила игры</gold>";
 
             setItem(13, plugin.getHeadManager().createBuilder("ui.info")
                     .name(pageTitle)
@@ -132,7 +132,7 @@ public class TutorialGUI extends AbstractGUI {
             // Slot 28: Previous Page
             if (pages.size() > 1 && page > 0) {
                 setItem(28, plugin.getHeadManager().createBuilder("ui.arrow_left")
-                        .name("<yellow><bold>← Предыдущая страница</bold></yellow>")
+                        .name("<yellow>← Предыдущая страница</yellow>")
                         .build(), click -> {
                     page--;
                     SoundUtil.playClick(player);
@@ -142,7 +142,7 @@ public class TutorialGUI extends AbstractGUI {
 
             // Slot 31: Back to Game
             setItem(31, plugin.getHeadManager().createBuilder("ui.back")
-                    .name("<yellow><bold>Вернуться к игре</bold></yellow>")
+                    .name("<yellow>Вернуться к игре</yellow>")
                     .build(), click -> {
                 SoundUtil.playClick(player);
                 setSwitchingInventory(true);
@@ -157,7 +157,7 @@ public class TutorialGUI extends AbstractGUI {
             // Slot 34: Next Page
             if (pages.size() > 1 && page < pages.size() - 1) {
                 setItem(34, plugin.getHeadManager().createBuilder("ui.arrow_right")
-                        .name("<yellow><bold>Следующая страница →</bold></yellow>")
+                        .name("<yellow>Следующая страница →</yellow>")
                         .build(), click -> {
                     page++;
                     SoundUtil.playClick(player);
