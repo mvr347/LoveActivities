@@ -33,14 +33,27 @@ public class PokerHandEvaluator {
         }
     }
 
-    public record PokerScore(HandRank rank, int tieBreaker, String description) implements Comparable<PokerScore> {
+    public record PokerScore(HandRank rank, long tieBreaker, String description) implements Comparable<PokerScore> {
         @Override
         public int compareTo(PokerScore o) {
             if (this.rank.getScore() != o.rank.getScore()) {
                 return Integer.compare(this.rank.getScore(), o.rank.getScore());
             }
-            return Integer.compare(this.tieBreaker, o.tieBreaker);
+            return Long.compare(this.tieBreaker, o.tieBreaker);
         }
+    }
+
+    /**
+     * Кодирует значения карт в порядке значимости в одно сравнимое число (по основанию 15,
+     * т.к. максимальное значение карты - 14/туз). Без этого два разных набора карт одного ранга
+     * (например, пара тузов с разными кикерами) считались бы равными - см. историю бага.
+     */
+    private static long encodeTiebreaker(List<Integer> valuesInPriorityOrder) {
+        long tie = 0;
+        for (int v : valuesInPriorityOrder) {
+            tie = tie * 15 + v;
+        }
+        return tie;
     }
 
     public static PokerScore evaluate7Cards(List<PlayingCard> cards) {
@@ -98,10 +111,15 @@ public class PokerHandEvaluator {
             return new PokerScore(HandRank.STRAIGHT_FLUSH, straightHigh, "Стрит-Флеш (до " + straightHigh + ")");
         }
 
+        List<Integer> allValuesDesc = new ArrayList<>();
+        for (PlayingCard c : sorted) allValuesDesc.add(c.getValue());
+
         // Four of a Kind (4)
         for (Map.Entry<Integer, Integer> e : freq.entrySet()) {
             if (e.getValue() == 4) {
-                return new PokerScore(HandRank.FOUR_OF_A_KIND, e.getKey() * 100, "Каре (" + e.getKey() + ")");
+                int quadVal = e.getKey();
+                int kicker = allValuesDesc.stream().filter(v -> v != quadVal).findFirst().orElse(0);
+                return new PokerScore(HandRank.FOUR_OF_A_KIND, encodeTiebreaker(List.of(quadVal, kicker)), "Каре (" + quadVal + ")");
             }
         }
 
@@ -113,14 +131,12 @@ public class PokerHandEvaluator {
             else if (e.getValue() == 2) pairVal = e.getKey();
         }
         if (threeVal != -1 && pairVal != -1) {
-            return new PokerScore(HandRank.FULL_HOUSE, threeVal * 100 + pairVal, "Фулл-Хаус (" + threeVal + " и " + pairVal + ")");
+            return new PokerScore(HandRank.FULL_HOUSE, encodeTiebreaker(List.of(threeVal, pairVal)), "Фулл-Хаус (" + threeVal + " и " + pairVal + ")");
         }
 
-        // Flush
+        // Flush (все 5 карт значимы для кикеров)
         if (isFlush) {
-            int tie = 0;
-            for (PlayingCard c : sorted) tie = tie * 15 + c.getValue();
-            return new PokerScore(HandRank.FLUSH, tie, "Флеш (" + sorted.get(0).getSuit().getNameRu() + ")");
+            return new PokerScore(HandRank.FLUSH, encodeTiebreaker(allValuesDesc), "Флеш (" + sorted.get(0).getSuit().getNameRu() + ")");
         }
 
         // Straight
@@ -130,7 +146,12 @@ public class PokerHandEvaluator {
 
         // Three of a Kind
         if (threeVal != -1) {
-            return new PokerScore(HandRank.THREE_OF_A_KIND, threeVal * 100, "Сет / Тройка (" + threeVal + ")");
+            final int tv = threeVal;
+            List<Integer> kickers = allValuesDesc.stream().filter(v -> v != tv).toList();
+            List<Integer> tieValues = new ArrayList<>();
+            tieValues.add(tv);
+            tieValues.addAll(kickers);
+            return new PokerScore(HandRank.THREE_OF_A_KIND, encodeTiebreaker(tieValues), "Сет / Тройка (" + tv + ")");
         }
 
         // Two Pair & One Pair
@@ -141,12 +162,20 @@ public class PokerHandEvaluator {
         pairs.sort(Collections.reverseOrder());
 
         if (pairs.size() >= 2) {
-            return new PokerScore(HandRank.TWO_PAIR, pairs.get(0) * 100 + pairs.get(1), "Две пары (" + pairs.get(0) + " и " + pairs.get(1) + ")");
+            int highPair = pairs.get(0);
+            int lowPair = pairs.get(1);
+            int kicker = allValuesDesc.stream().filter(v -> v != highPair && v != lowPair).findFirst().orElse(0);
+            return new PokerScore(HandRank.TWO_PAIR, encodeTiebreaker(List.of(highPair, lowPair, kicker)), "Две пары (" + highPair + " и " + lowPair + ")");
         } else if (pairs.size() == 1) {
-            return new PokerScore(HandRank.ONE_PAIR, pairs.get(0) * 100 + sorted.get(0).getValue(), "Пара (" + pairs.get(0) + ")");
+            int pv = pairs.get(0);
+            List<Integer> kickers = allValuesDesc.stream().filter(v -> v != pv).toList();
+            List<Integer> tieValues = new ArrayList<>();
+            tieValues.add(pv);
+            tieValues.addAll(kickers);
+            return new PokerScore(HandRank.ONE_PAIR, encodeTiebreaker(tieValues), "Пара (" + pv + ")");
         }
 
-        return new PokerScore(HandRank.HIGH_CARD, sorted.get(0).getValue(), "Старшая карта (" + sorted.get(0).getRank().getNameRu() + ")");
+        return new PokerScore(HandRank.HIGH_CARD, encodeTiebreaker(allValuesDesc), "Старшая карта (" + sorted.get(0).getRank().getNameRu() + ")");
     }
 
     private static boolean isFlush(List<PlayingCard> sorted) {

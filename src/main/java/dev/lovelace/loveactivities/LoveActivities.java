@@ -87,24 +87,40 @@ public class LoveActivities extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new NpcInteractListener(this), this);
 
         // 6. Commands
+        // Each English command name has its own Russian-named command entry in plugin.yml
+        // (not just an alias - see the comment there for why) gated by a separate permission,
+        // both wired to the same executor here.
         GameCommands gameCommands = new GameCommands(this);
         registerCommand("blackjack", gameCommands);
+        registerCommand("блэкджек", gameCommands);
         registerCommand("dice", gameCommands);
+        registerCommand("кости", gameCommands);
         registerCommand("rps", gameCommands);
+        registerCommand("кнб", gameCommands);
         registerCommand("gwent", gameCommands);
+        registerCommand("гвинт", gameCommands);
         registerCommand("cards", gameCommands);
+        registerCommand("карты", gameCommands);
         registerCommand("poker", gameCommands);
+        registerCommand("покер", gameCommands);
         registerCommand("durak", gameCommands);
+        registerCommand("дурак", gameCommands);
         registerCommand("war", gameCommands);
+        registerCommand("война", gameCommands);
         registerCommand("pokerdice", gameCommands);
+        registerCommand("покеркости", gameCommands);
         registerCommand("classicdice", gameCommands);
+        registerCommand("киданиекостей", gameCommands);
         registerCommand("chess", gameCommands);
+        registerCommand("шахматы", gameCommands);
 
         PlayerActivityCommand playerCommand = new PlayerActivityCommand(this);
         registerCommand("loveactivities", playerCommand);
+        registerCommand("активности", playerCommand);
 
         BoardGamesCommand boardGamesCommand = new BoardGamesCommand(this);
         registerCommand("boardgames", boardGamesCommand);
+        registerCommand("настолки", boardGamesCommand);
 
         AdminActivityCommand adminCommand = new AdminActivityCommand(this);
         registerCommand("loveactivitiesadmin", adminCommand);
