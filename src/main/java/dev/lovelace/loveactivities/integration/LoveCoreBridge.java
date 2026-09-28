@@ -141,18 +141,21 @@ public class LoveCoreBridge {
      * Плохая / конфликтная репутация — NPC не играют с таким игроком.
      * OUTCAST и BAD по ReputationOracle; если Oracle нет — пропускаем (разрешаем).
      */
-    public boolean isBadOrConflictReputation(java.util.UUID playerId) {
+    public boolean isBadOrConflictReputation(UUID playerId) {
         if (playerId == null) return false;
         try {
-            return dev.lovelace.lovecore.api.LoveCore.service(
-                    dev.lovelace.lovecore.api.social.ReputationOracle.class
-            ).map(oracle -> {
-                var tier = oracle.tier(playerId);
-                return tier == dev.lovelace.lovecore.api.social.ReputationOracle.Tier.OUTCAST
-                        || tier == dev.lovelace.lovecore.api.social.ReputationOracle.Tier.BAD;
-            }).orElse(false);
+            return LoveCore.service(dev.lovelace.lovecore.api.social.ReputationOracle.class)
+                    .map(oracle -> {
+                        var tier = oracle.tier(playerId);
+                        return tier == dev.lovelace.lovecore.api.social.ReputationOracle.Tier.OUTCAST
+                                || tier == dev.lovelace.lovecore.api.social.ReputationOracle.Tier.BAD;
+                    }).orElse(false);
         } catch (Throwable ignored) {
             return false;
         }
+    }
+
+    public boolean hasDisallowedReputation(UUID playerId) {
+        return isBadOrConflictReputation(playerId);
     }
 }

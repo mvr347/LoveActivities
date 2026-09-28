@@ -15,7 +15,7 @@ public class WaitingOpponentGUI extends AbstractGUI {
     private final Runnable onCancelAction;
 
     public WaitingOpponentGUI(Player player, Player opponent, GameType gameType, Runnable onCancelAction) {
-        super(player, 27, "<gradient:#FF5E62:#FF9966><bold>Ожидание соперника...</bold></gradient>");
+        super(player, 27, "<gradient:#FF5E62:#FF9966>Ожидание соперника...</gradient>");
         this.opponent = opponent;
         this.gameType = gameType;
         this.onCancelAction = onCancelAction;
@@ -33,7 +33,7 @@ public class WaitingOpponentGUI extends AbstractGUI {
 
         // Slot 13: Center Waiting Info
         setItem(13, plugin.getHeadManager().createBuilder("game_icons." + (gameType != null ? gameType.getIconKey() : "blackjack"))
-                .name("<gold><bold>Ожидание выбора режима...</bold></gold>")
+                .name("<gold>Ожидание выбора режима...</gold>")
                 .lore(
                         "<gray>Соперник: <white>" + (opponent != null ? opponent.getName() : "Игрок") + "</white></gray>",
                         "<gray>Игра: <yellow>" + (gameType != null ? gameType.getNameRu() : "Мини-игра") + "</yellow></gray>",
@@ -44,7 +44,7 @@ public class WaitingOpponentGUI extends AbstractGUI {
 
         // Slot 22: Cancel Button
         setItem(22, plugin.getHeadManager().createBuilder("ui.cancel")
-                .name("<red><bold>Отменить вызов</bold></red>")
+                .name("<red>Отменить вызов</red>")
                 .lore("<gray>Выйти из ожидания</gray>")
                 .build(), click -> {
             SoundUtil.playClick(player);

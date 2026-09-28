@@ -18,7 +18,7 @@ public class BlackjackGUI extends AbstractGUI {
     private final BlackjackGame game;
 
     public BlackjackGUI(Player player, BlackjackGame game) {
-        super(player, 54, "<gradient:#FF5E62:#FF9966><bold>Блэкджек (21)</bold></gradient>");
+        super(player, 54, "<gradient:#FF5E62:#FF9966>Блэкджек (21)</gradient>");
         this.game = game;
     }
 

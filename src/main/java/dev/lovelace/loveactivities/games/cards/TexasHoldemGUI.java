@@ -20,7 +20,7 @@ public class TexasHoldemGUI extends AbstractGUI {
     private final CardsGame game;
 
     public TexasHoldemGUI(Player player, CardsGame game) {
-        super(player, 54, "<gradient:#FF5E62:#FF9966><bold>Техасский Холдем (Покер)</bold></gradient>");
+        super(player, 54, "<gradient:#FF5E62:#FF9966>Техасский Холдем (Покер)</gradient>");
         this.game = game;
     }
 

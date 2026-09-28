@@ -23,13 +23,13 @@ public class CurrencyUtil {
     }
 
     public static String getCoinFontImage(String coinKey) {
-        if (coinKey == null) return "<white>%img_coppercoin%</white>";
+        if (coinKey == null) return "<white>%img_copper_coin%</white>";
         return switch (coinKey) {
-            case "netherite_coin" -> "<white>%img_netheritecoin%</white>";
-            case "diamond_coin" -> "<white>%img_diamondcoin%</white>";
-            case "gold_coin" -> "<white>%img_goldcoin%</white>";
-            case "iron_coin" -> "<white>%img_ironcoin%</white>";
-            default -> "<white>%img_coppercoin%</white>";
+            case "netherite_coin" -> "<white>%img_netherite_coin%</white>";
+            case "diamond_coin" -> "<white>%img_diamond_coin%</white>";
+            case "gold_coin" -> "<white>%img_gold_coin%</white>";
+            case "iron_coin" -> "<white>%img_iron_coin%</white>";
+            default -> "<white>%img_copper_coin%</white>";
         };
     }
 
@@ -79,7 +79,7 @@ public class CurrencyUtil {
     }
 
     public static String formatCoinsShort(long amount) {
-        if (amount <= 0) return "<white>%img_coppercoin%</white> 0 монет";
+        if (amount <= 0) return "<white>%img_copper_coin%</white> 0 монет";
         StringBuilder sb = new StringBuilder();
         long remaining = amount;
         for (Map.Entry<String, Long> entry : DENOMINATIONS.entrySet()) {
@@ -169,10 +169,10 @@ public class CurrencyUtil {
 
         // Fallback standard ItemStack
         return switch (coinKey) {
-            case "netherite_coin" -> ItemBuilder.from(Material.NETHERITE_INGOT).amount(amount).name("<dark_gray><bold>Незеритовая монета</bold></dark_gray>").build();
-            case "diamond_coin" -> ItemBuilder.from(Material.DIAMOND).amount(amount).name("<aqua><bold>Алмазная монета</bold></aqua>").build();
-            case "gold_coin" -> ItemBuilder.from(Material.GOLD_INGOT).amount(amount).name("<gold><bold>Золотая монета</bold></gold>").build();
-            case "iron_coin" -> ItemBuilder.from(Material.IRON_INGOT).amount(amount).name("<gray><bold>Железная монета</bold></gray>").build();
+            case "netherite_coin" -> ItemBuilder.from(Material.NETHERITE_INGOT).amount(amount).name("<dark_gray>Незеритовая монета</dark_gray>").build();
+            case "diamond_coin" -> ItemBuilder.from(Material.DIAMOND).amount(amount).name("<aqua>Алмазная монета</aqua>").build();
+            case "gold_coin" -> ItemBuilder.from(Material.GOLD_INGOT).amount(amount).name("<gold>Золотая монета</gold>").build();
+            case "iron_coin" -> ItemBuilder.from(Material.IRON_INGOT).amount(amount).name("<gray>Железная монета</gray>").build();
             default -> ItemBuilder.from(Material.COPPER_INGOT).amount(amount).name("<gold>Медная монета</gold>").build();
         };
     }

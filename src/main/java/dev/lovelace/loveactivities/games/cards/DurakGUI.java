@@ -25,7 +25,7 @@ public class DurakGUI extends AbstractGUI {
     private final Set<Integer> barrierSlots = new HashSet<>();
 
     public DurakGUI(Player player, CardsGame game) {
-        super(player, 54, "<gradient:#FF5E62:#FF9966><bold>Дурак подкидной</bold></gradient>");
+        super(player, 54, "<gradient:#FF5E62:#FF9966>Дурак подкидной</gradient>");
         this.game = game;
     }
 

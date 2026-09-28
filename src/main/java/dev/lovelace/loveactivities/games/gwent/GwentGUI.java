@@ -19,7 +19,7 @@ public class GwentGUI extends AbstractGUI {
     private int handPage = 0;
 
     public GwentGUI(Player player, GwentGame game) {
-        super(player, 54, "<gradient:#FF5E62:#FF9966><bold>Гвинт (Minecraft Edition)</bold></gradient> <dark_gray>[Р" + game.getCurrentRound() + "]</dark_gray>");
+        super(player, 54, "<gradient:#FF5E62:#FF9966>Гвинт (Minecraft Edition)</gradient> <dark_gray>[Р" + game.getCurrentRound() + "]</dark_gray>");
         this.game = game;
     }
 

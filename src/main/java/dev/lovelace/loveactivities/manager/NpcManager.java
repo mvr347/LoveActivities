@@ -153,7 +153,7 @@ public class NpcManager {
         String name = npcName != null ? npcName : SessionManager.NPC_NAME;
         String format = plugin.getConfigManager().getNpcDialogueFormat();
         if (format == null || format.isBlank()) {
-            format = "<gradient:#FF9966:#FF5E62><bold>[{npc}]</bold></gradient> <dark_gray>»</dark_gray> <gray>{text}</gray>";
+            format = "<gradient:#FF9966:#FF5E62>[{npc}]</gradient> <dark_gray>»</dark_gray> <gray>{text}</gray>";
         }
         String formatted = format.replace("{npc}", name).replace("{text}", phrase);
         player.sendMessage(TextUtil.parse(formatted));

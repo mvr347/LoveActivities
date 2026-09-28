@@ -54,6 +54,15 @@ public class NpcInteractListener implements Listener {
             return;
         }
 
+        // Check player reputation via LoveBehavior/LoveCore (Bad or Outcast reputation refused)
+        if (plugin.getLoveCoreBridge().hasDisallowedReputation(player.getUniqueId())) {
+            String refuseBadRep = config.getRandomDialogue("refuse_bad_rep");
+            plugin.getNpcManager().speak(player, config.getCustomName(),
+                    refuseBadRep != null ? refuseBadRep : "Я не играю с людьми с дурной славой. Проваливай!");
+            SoundUtil.playError(player);
+            return;
+        }
+
         if (plugin.getSessionManager().isInGame(player.getUniqueId())) {
             plugin.getNpcManager().speak(player, config.getCustomName(), "Ты уже участвуешь в игре! Закончи сначала текущую партию.");
             SoundUtil.playError(player);
@@ -79,7 +88,7 @@ public class NpcInteractListener implements Listener {
         plugin.getNpcManager().speak(player, config.getCustomName(), greeting != null ? greeting : "Сыграем партию!");
         SoundUtil.playChallenge(player);
 
-        // Start session
-        plugin.getSessionManager().startNpcSession(player, config.getGameType(), config.getDefaultBet(), config.getCustomName(), config);
+        // Open Confirmation GUI before starting session
+        new dev.lovelace.loveactivities.gui.NpcConfirmationGUI(player, config).open();
     }
 }

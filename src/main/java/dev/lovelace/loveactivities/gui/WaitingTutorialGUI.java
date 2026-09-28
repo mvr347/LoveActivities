@@ -18,7 +18,7 @@ public class WaitingTutorialGUI extends AbstractGUI {
     public WaitingTutorialGUI(Player player, Player student, GameType gameType,
                               Runnable onOpenTutorialForMe,
                               Runnable onCancelGame) {
-        super(player, 45, "<gradient:#FF5E62:#FF9966><bold>Ожидание: " + gameType.getNameRu() + "</bold></gradient>");
+        super(player, 45, "<gradient:#FF5E62:#FF9966>Ожидание: " + gameType.getNameRu() + "</gradient>");
         this.student = student;
         this.gameType = gameType;
         this.onOpenTutorialForMe = onOpenTutorialForMe;
@@ -37,7 +37,7 @@ public class WaitingTutorialGUI extends AbstractGUI {
 
         // Header Slot 4: Info
         setItem(4, plugin.getHeadManager().createBuilder("game_icons." + gameType.getIconKey())
-                .name("<gold><bold>" + gameType.getNameRu() + " — Ожидание старта</bold></gold>")
+                .name("<gold>" + gameType.getNameRu() + " — Ожидание старта</gold>")
                 .lore(
                         "<gray>Игрок <yellow>" + (student != null ? student.getName() : "Соперник") + "</yellow> проходит обучение.</gray>",
                         "<gray>Игра начнется автоматически, как только соперник закончит чтение.</gray>"
@@ -46,7 +46,7 @@ public class WaitingTutorialGUI extends AbstractGUI {
 
         // Slot 20: Read tutorial too
         setItem(20, plugin.getHeadManager().createBuilder("ui.tutorial")
-                .name("<yellow><bold>📖 Тоже почитать правила</bold></yellow>")
+                .name("<yellow>📖 Тоже почитать правила</yellow>")
                 .lore(
                         "<gray>Пока соперник изучает игру, вы тоже можете освежить правила.</gray>",
                         "<green>▶ Нажмите для просмотра правил</green>"
@@ -61,7 +61,7 @@ public class WaitingTutorialGUI extends AbstractGUI {
 
         // Slot 24: Cancel Match
         setItem(24, plugin.getHeadManager().createBuilder("ui.cancel")
-                .name("<red><bold>✖ Отменить игру</bold></red>")
+                .name("<red>✖ Отменить игру</red>")
                 .lore(
                         "<gray>Не хотите ждать? Отмените игру и верните все ставки.</gray>",
                         "<red>▶ Нажмите для отмены</red>"

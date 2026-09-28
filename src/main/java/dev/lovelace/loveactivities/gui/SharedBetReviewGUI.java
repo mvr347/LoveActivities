@@ -4,6 +4,7 @@ import dev.lovelace.loveactivities.api.GameType;
 import dev.lovelace.loveactivities.util.CurrencyUtil;
 import dev.lovelace.loveactivities.util.ItemBuilder;
 import dev.lovelace.loveactivities.util.SoundUtil;
+import dev.lovelace.loveactivities.util.TextUtil;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -18,68 +19,145 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class SharedBetReviewGUI extends AbstractGUI {
 
+    public static final int[] SLOTS_P1 = {19, 20, 21};
+    public static final int[] SLOTS_P2 = {23, 24, 25};
+    public static final int SLOT_P1_READY = 29;
+    public static final int SLOT_P2_READY = 33;
+    public static final int SLOT_STATUS = 31;
+    public static final int SLOT_CANCEL = 49;
+
     private final Player challenger;
     private final Player target;
     private final GameType gameType;
     private final String subMode;
 
     public static class SharedPhysicalState {
-        public List<ItemStack> itemsP1 = new ArrayList<>();
-        public List<ItemStack> itemsP2 = new ArrayList<>();
         public boolean readyP1 = false;
         public boolean readyP2 = false;
         public int countdown = 3;
         public BukkitTask countdownTask = null;
-        public AtomicBoolean gameStarted = new AtomicBoolean(false);
-        public AtomicBoolean cancelled = new AtomicBoolean(false);
+        public final AtomicBoolean gameStarted = new AtomicBoolean(false);
+        public final AtomicBoolean cancelled = new AtomicBoolean(false);
     }
 
     private final SharedPhysicalState state;
-    private SharedBetReviewGUI opponentView;
 
-    public SharedBetReviewGUI(Player viewer, Player challenger, Player target, GameType gameType, SharedPhysicalState state) {
-        this(viewer, challenger, target, gameType, null, state);
-    }
-
-    public SharedBetReviewGUI(Player viewer, Player challenger, Player target, GameType gameType, String subMode, SharedPhysicalState state) {
-        super(viewer, 54, "<gradient:#FF5E62:#FF9966><bold>Согласование ставок</bold></gradient>");
+    public SharedBetReviewGUI(Player challenger, Player target, GameType gameType, String subMode) {
+        super(challenger, 54, "<gradient:#FF5E62:#FF9966>Комната ставок</gradient>");
         this.challenger = challenger;
         this.target = target;
         this.gameType = gameType;
         this.subMode = subMode;
-        this.state = state;
+        this.state = new SharedPhysicalState();
     }
 
-    public static void openForBoth(Player p1, Player p2, GameType gameType, SharedPhysicalState state) {
-        openForBoth(p1, p2, gameType, null, state);
+    public static void openForBoth(Player p1, Player p2, GameType gameType) {
+        openForBoth(p1, p2, gameType, null);
     }
 
-    public static void openForBoth(Player p1, Player p2, GameType gameType, String subMode, SharedPhysicalState state) {
-        SharedBetReviewGUI guiP1 = new SharedBetReviewGUI(p1, p1, p2, gameType, subMode, state);
-        SharedBetReviewGUI guiP2 = new SharedBetReviewGUI(p2, p1, p2, gameType, subMode, state);
-        guiP1.opponentView = guiP2;
-        guiP2.opponentView = guiP1;
+    public static void openForBoth(Player p1, Player p2, GameType gameType, String subMode) {
+        SharedBetReviewGUI sharedGui = new SharedBetReviewGUI(p1, p2, gameType, subMode);
+        sharedGui.initializeItems();
 
-        guiP1.open();
-        guiP2.open();
+        p1.openInventory(sharedGui.getInventory());
+        p2.openInventory(sharedGui.getInventory());
+    }
+
+    public Player getChallenger() {
+        return challenger;
+    }
+
+    public Player getTarget() {
+        return target;
+    }
+
+    public SharedPhysicalState getState() {
+        return state;
+    }
+
+    public boolean isP1DepositSlot(int slot) {
+        return slot == 19 || slot == 20 || slot == 21;
+    }
+
+    public boolean isP2DepositSlot(int slot) {
+        return slot == 23 || slot == 24 || slot == 25;
+    }
+
+    public boolean isDepositSlot(int slot) {
+        return isP1DepositSlot(slot) || isP2DepositSlot(slot);
     }
 
     @Override
     public void initializeItems() {
-        inventory.clear();
-        clickActions.clear();
-
         ItemStack border = ItemBuilder.from(Material.GRAY_STAINED_GLASS_PANE).name(Component.empty()).build();
+        ItemStack divider = ItemBuilder.from(Material.BLACK_STAINED_GLASS_PANE).name(Component.empty()).build();
+
         for (int i = 0; i < 54; i++) {
-            inventory.setItem(i, border);
+            if (isDepositSlot(i)) {
+                // Deposit slots are interactive; leave untouched if already set or empty
+                if (inventory.getItem(i) == null) {
+                    inventory.setItem(i, null);
+                }
+            } else if (i == 13 || i == 22) {
+                inventory.setItem(i, divider);
+            } else {
+                inventory.setItem(i, border);
+            }
         }
 
-        boolean isP1 = player.getUniqueId().equals(challenger.getUniqueId());
-        long valP1 = state.itemsP1.stream().mapToLong(CurrencyUtil::getCoinValue).sum();
-        long valP2 = state.itemsP2.stream().mapToLong(CurrencyUtil::getCoinValue).sum();
-        long totalPot = valP1 + valP2;
+        // Labels above deposit slots
+        setItem(11, plugin.getHeadManager().createBuilder("ui.coin_stack")
+                .name("<aqua>Слоты ставки: " + challenger.getName() + "</aqua>")
+                .lore("<gray>Внесите монеты в 3 слота ниже</gray>")
+                .build());
 
+        setItem(15, plugin.getHeadManager().createBuilder("ui.coin_stack")
+                .name("<gold>Слоты ставки: " + target.getName() + "</gold>")
+                .lore("<gray>Внесите монеты в 3 слота ниже</gray>")
+                .build());
+
+        // Cancel button in footer
+        setItem(SLOT_CANCEL, plugin.getHeadManager().createBuilder("ui.cancel")
+                .name("<red>Отказаться от матча</red>")
+                .lore(
+                        "<gray>Вернуть все внесённые монеты</gray>",
+                        "<gray>и отменить игру для обоих игроков.</gray>",
+                        "",
+                        "<red>▶ Нажмите для отмены</red>"
+                )
+                .build(), click -> cancelAndReturnAll());
+
+        updateStatusDisplays();
+    }
+
+    public long calculateP1Value() {
+        long sum = 0L;
+        for (int slot : SLOTS_P1) {
+            ItemStack item = inventory.getItem(slot);
+            if (item != null && item.getType() != Material.AIR) {
+                sum += CurrencyUtil.getCoinValue(item);
+            }
+        }
+        return sum;
+    }
+
+    public long calculateP2Value() {
+        long sum = 0L;
+        for (int slot : SLOTS_P2) {
+            ItemStack item = inventory.getItem(slot);
+            if (item != null && item.getType() != Material.AIR) {
+                sum += CurrencyUtil.getCoinValue(item);
+            }
+        }
+        return sum;
+    }
+
+    public void updateStatusDisplays() {
+        long valP1 = calculateP1Value();
+        long valP2 = calculateP2Value();
+        long totalPot = valP1 + valP2;
         boolean isCounting = state.countdownTask != null;
+        boolean betsEqual = valP1 == valP2;
 
         String gName = gameType.getNameRu();
         if ("poker".equalsIgnoreCase(subMode)) gName = "Покер";
@@ -88,65 +166,93 @@ public class SharedBetReviewGUI extends AbstractGUI {
         else if ("dice_poker".equalsIgnoreCase(subMode)) gName = "Покер на костях";
         else if ("dice_classic".equalsIgnoreCase(subMode)) gName = "Кидание костей";
 
-        // Slot 4: Game & Bank Info
+        // Slot 0: Challenger Head
+        setItem(0, ItemBuilder.skull().playerHead(challenger.getUniqueId())
+                .name("<aqua>" + challenger.getName() + "</aqua>")
+                .lore(
+                        "<gray>Внесено: <yellow>" + CurrencyUtil.formatCoinsShort(valP1) + "</yellow></gray>",
+                        "<gray>Статус: " + (state.readyP1 ? "<green>ГОТОВ ✔</green>" : "<red>НЕ ГОТОВ</red>") + "</gray>"
+                )
+                .build());
+
+        // Slot 8: Target Head
+        setItem(8, ItemBuilder.skull().playerHead(target.getUniqueId())
+                .name("<gold>" + target.getName() + "</gold>")
+                .lore(
+                        "<gray>Внесено: <yellow>" + CurrencyUtil.formatCoinsShort(valP2) + "</yellow></gray>",
+                        "<gray>Статус: " + (state.readyP2 ? "<green>ГОТОВ ✔</green>" : "<red>НЕ ГОТОВ</red>") + "</gray>"
+                )
+                .build());
+
+        // Slot 4: Game & Pot Info
         List<String> headerLore = new ArrayList<>();
-        if (totalPot > 0) {
-            headerLore.add("<gray>Игрок 1 (" + challenger.getName() + "): <yellow>" + CurrencyUtil.formatCoinsWords(valP1) + "</yellow></gray>");
-            headerLore.add("<gray>Игрок 2 (" + target.getName() + "): <yellow>" + CurrencyUtil.formatCoinsWords(valP2) + "</yellow></gray>");
-        } else {
-            headerLore.add("<gray>Режим: <white>Без ставки</white></gray>");
-        }
+        headerLore.add("<gray>Игрок 1 (" + challenger.getName() + "): <yellow>" + CurrencyUtil.formatCoinsWords(valP1) + "</yellow></gray>");
+        headerLore.add("<gray>Игрок 2 (" + target.getName() + "): <yellow>" + CurrencyUtil.formatCoinsWords(valP2) + "</yellow></gray>");
         headerLore.add("");
-        headerLore.add(isCounting ? "<gold><bold>⏳ ИДЁТ ОТСЧЁТ СТАРТА...</bold></gold>" : "<yellow>Оба игрока должны подтвердить готовность</yellow>");
+        if (isCounting) {
+            headerLore.add("<gold>⏳ ИДЁТ ОТСЧЁТ СТАРТА...</gold>");
+        } else if (!betsEqual) {
+            headerLore.add("<red>⚠ Ставки игроков должны быть равны!</red>");
+        } else if (state.readyP1 && !state.readyP2) {
+            headerLore.add("<yellow>Ожидание готовности " + target.getName() + "...</yellow>");
+        } else if (!state.readyP1 && state.readyP2) {
+            headerLore.add("<yellow>Ожидание готовности " + challenger.getName() + "...</yellow>");
+        } else {
+            headerLore.add("<yellow>Оба игрока должны подтвердить готовность</yellow>");
+        }
 
         String titleHeader = totalPot > 0
-                ? "<gold><bold>" + gName + " — Общий банк: " + CurrencyUtil.formatCoinsShort(totalPot) + "</bold></gold>"
-                : "<gold><bold>" + gName + " — Без ставок</bold></gold>";
+                ? "<gold>" + gName + " — Общий банк: " + CurrencyUtil.formatCoinsShort(totalPot) + "</gold>"
+                : "<gold>" + gName + " — Без ставок</gold>";
 
         setItem(4, plugin.getHeadManager().createBuilder("game_icons." + gameType.getIconKey())
                 .name(titleHeader)
                 .lore(headerLore.toArray(new String[0]))
                 .build());
 
-        // Left Side: Player 1 (Challenger)
-        setItem(10, ItemBuilder.skull().playerHead(challenger.getUniqueId())
-                .name("<gradient:#00C9FF:#92FE9D><bold>" + challenger.getName() + "</bold></gradient>")
-                .lore(
-                        "<gray>Внесено: <yellow><bold>" + CurrencyUtil.formatCoinsShort(valP1) + "</bold></yellow></gray>",
-                        "<gray>Статус: " + (state.readyP1 ? "<green><bold>ГОТОВ ✔</bold></green>" : "<red><bold>НЕ ГОТОВ</bold></red>") + "</gray>"
-                )
-                .build());
-
-        // P1 Items Preview (Slots 19, 20, 21)
-        int[] p1Slots = {19, 20, 21};
-        for (int i = 0; i < 3; i++) {
-            if (i < state.itemsP1.size()) {
-                inventory.setItem(p1Slots[i], state.itemsP1.get(i).clone());
+        // Slot 29: P1 Ready Button
+        String p1ReadyTex = state.readyP1 ? "ui.confirm_ready" : "ui.confirm";
+        List<String> p1Lore = new ArrayList<>();
+        if (!state.readyP1) {
+            p1Lore.add("<gray>Нажмите, когда выставите ставку.</gray>");
+            if (!betsEqual) {
+                p1Lore.add("<red>⚠ Ставки должны совпадать!</red>");
             } else {
-                inventory.setItem(p1Slots[i], ItemBuilder.from(Material.AIR).build());
+                p1Lore.add("<yellow>▶ Нажмите для подтверждения готовности</yellow>");
             }
+        } else {
+            p1Lore.add("<gray>Ставка подтверждена.</gray>");
+            p1Lore.add("<gray>Ожидание соперника...</gray>");
+            p1Lore.add("<red>▶ Клик для снятия готовности</red>");
         }
 
-        // Right Side: Player 2 (Target)
-        setItem(16, ItemBuilder.skull().playerHead(target.getUniqueId())
-                .name("<gradient:#FF9966:#FF5E62><bold>" + target.getName() + "</bold></gradient>")
-                .lore(
-                        "<gray>Внесено: <yellow><bold>" + CurrencyUtil.formatCoinsShort(valP2) + "</bold></yellow></gray>",
-                        "<gray>Статус: " + (state.readyP2 ? "<green><bold>ГОТОВ ✔</bold></green>" : "<red><bold>НЕ ГОТОВ</bold></red>") + "</gray>"
-                )
+        setItem(SLOT_P1_READY, plugin.getHeadManager().createBuilder(p1ReadyTex)
+                .name(state.readyP1 ? "<green>Готов ✔</green>" : "<yellow>Не готов</yellow>")
+                .lore(p1Lore.toArray(new String[0]))
                 .build());
 
-        // P2 Items Preview (Slots 23, 24, 25)
-        int[] p2Slots = {23, 24, 25};
-        for (int i = 0; i < 3; i++) {
-            if (i < state.itemsP2.size()) {
-                inventory.setItem(p2Slots[i], state.itemsP2.get(i).clone());
+        // Slot 33: P2 Ready Button
+        String p2ReadyTex = state.readyP2 ? "ui.confirm_ready" : "ui.confirm";
+        List<String> p2Lore = new ArrayList<>();
+        if (!state.readyP2) {
+            p2Lore.add("<gray>Нажмите, когда выставите ставку.</gray>");
+            if (!betsEqual) {
+                p2Lore.add("<red>⚠ Ставки должны совпадать!</red>");
             } else {
-                inventory.setItem(p2Slots[i], ItemBuilder.from(Material.AIR).build());
+                p2Lore.add("<yellow>▶ Нажмите для подтверждения готовности</yellow>");
             }
+        } else {
+            p2Lore.add("<gray>Ставка подтверждена.</gray>");
+            p2Lore.add("<gray>Ожидание соперника...</gray>");
+            p2Lore.add("<red>▶ Клик для снятия готовности</red>");
         }
 
-        // Center / Action controls
+        setItem(SLOT_P2_READY, plugin.getHeadManager().createBuilder(p2ReadyTex)
+                .name(state.readyP2 ? "<green>Готов ✔</green>" : "<yellow>Не готов</yellow>")
+                .lore(p2Lore.toArray(new String[0]))
+                .build());
+
+        // Slot 31: Center Status / Countdown Button
         if (isCounting) {
             String countHead = switch (state.countdown) {
                 case 3 -> plugin.getHeadManager().getTexture("ui.countdown_3");
@@ -155,50 +261,51 @@ public class SharedBetReviewGUI extends AbstractGUI {
                 default -> plugin.getHeadManager().getTexture("ui.coin_stack");
             };
 
-            setItem(31, ItemBuilder.base64Head(countHead)
-                    .name("<gold><bold>Старт игры через: " + state.countdown + "...</bold></gold>")
+            setItem(SLOT_STATUS, ItemBuilder.base64Head(countHead)
+                    .name("<gold>Старт игры через: " + state.countdown + "...</gold>")
                     .lore("<red>▶ Нажмите, чтобы отменить отсчёт</red>")
-                    .build(), click -> {
-                cancelCountdown();
-                state.readyP1 = false;
-                state.readyP2 = false;
-                SoundUtil.playClick(player);
-                syncViews();
-            });
+                    .build());
         } else {
-            boolean myReady = isP1 ? state.readyP1 : state.readyP2;
-
-            // Slot 29: Edit my bet
-            setItem(29, plugin.getHeadManager().createBuilder("ui.all_games_icon")
-                    .name("<yellow><bold>✏ Изменить мою ставку</bold></yellow>")
-                    .lore("<gray>Вернуться в меню внесения монет</gray>")
-                    .build(), click -> editMyBet(isP1));
-
-            // Slot 31: Individual Ready confirmation button
-            String readyTex = myReady ? plugin.getHeadManager().getTexture("ui.confirm_ready") : plugin.getHeadManager().getTexture("ui.confirm");
-            setItem(31, ItemBuilder.base64Head(readyTex)
-                    .name(myReady ? "<green><bold>✔ ВЫ ГОТОВЫ</bold></green>" : "<yellow><bold>ПОДТВЕРДИТЬ СТАВКУ</bold></yellow>")
+            setItem(SLOT_STATUS, plugin.getHeadManager().createBuilder("ui.all_games_icon")
+                    .name("<yellow>Согласование ставок</yellow>")
                     .lore(
-                            myReady ? "<gray>Ожидание подтверждения соперника...</gray>" : "<green>▶ Нажмите для готовности к старту</green>",
-                            myReady ? "<red>▶ Клик для снятия готовности</red>" : ""
+                            "<gray>Ставка P1: <yellow>" + CurrencyUtil.formatCoinsShort(valP1) + "</yellow></gray>",
+                            "<gray>Ставка P2: <yellow>" + CurrencyUtil.formatCoinsShort(valP2) + "</yellow></gray>",
+                            betsEqual ? "<green>✔ Ставки равны</green>" : "<red>✘ Ставки не равны</red>"
                     )
-                    .build(), click -> toggleReady(isP1));
-
-            // Slot 33: Cancel Match
-            setItem(33, plugin.getHeadManager().createBuilder("ui.cancel")
-                    .name("<red><bold>✖ Отменить игру</bold></red>")
-                    .lore("<gray>Вернуть все монеты и закрыть меню</gray>")
-                    .build(), click -> cancelAndReturnAll());
+                    .build());
         }
     }
 
-    private void toggleReady(boolean forP1) {
-        if (forP1) {
-            state.readyP1 = !state.readyP1;
-        } else {
-            state.readyP2 = !state.readyP2;
+    public void onP1SlotsChanged() {
+        if (state.readyP1) {
+            state.readyP1 = false;
         }
-        SoundUtil.playClick(player);
+        cancelCountdown();
+        updateStatusDisplays();
+    }
+
+    public void onP2SlotsChanged() {
+        if (state.readyP2) {
+            state.readyP2 = false;
+        }
+        cancelCountdown();
+        updateStatusDisplays();
+    }
+
+    public void toggleReadyP1() {
+        long valP1 = calculateP1Value();
+        long valP2 = calculateP2Value();
+
+        if (!state.readyP1 && valP1 != valP2) {
+            SoundUtil.playError(challenger);
+            challenger.sendMessage(TextUtil.parse("<red>Ставки игроков должны быть равны! (" +
+                    CurrencyUtil.formatCoinsShort(valP1) + " ≠ " + CurrencyUtil.formatCoinsShort(valP2) + ")</red>"));
+            return;
+        }
+
+        state.readyP1 = !state.readyP1;
+        SoundUtil.playClick(challenger);
 
         if (state.readyP1 && state.readyP2) {
             startCountdown();
@@ -206,35 +313,38 @@ public class SharedBetReviewGUI extends AbstractGUI {
             cancelCountdown();
         }
 
-        syncViews();
+        updateStatusDisplays();
     }
 
-    private void editMyBet(boolean forP1) {
+    public void toggleReadyP2() {
+        long valP1 = calculateP1Value();
+        long valP2 = calculateP2Value();
+
+        if (!state.readyP2 && valP1 != valP2) {
+            SoundUtil.playError(target);
+            target.sendMessage(TextUtil.parse("<red>Ставки игроков должны быть равны! (" +
+                    CurrencyUtil.formatCoinsShort(valP2) + " ≠ " + CurrencyUtil.formatCoinsShort(valP1) + ")</red>"));
+            return;
+        }
+
+        state.readyP2 = !state.readyP2;
+        SoundUtil.playClick(target);
+
+        if (state.readyP1 && state.readyP2) {
+            startCountdown();
+        } else {
+            cancelCountdown();
+        }
+
+        updateStatusDisplays();
+    }
+
+    public void cancelCountdownByUser(Player who) {
         cancelCountdown();
         state.readyP1 = false;
         state.readyP2 = false;
-
-        Player editor = forP1 ? challenger : target;
-        Player other = forP1 ? target : challenger;
-        List<ItemStack> currentItems = forP1 ? state.itemsP1 : state.itemsP2;
-
-        setSwitchingInventory(true);
-        if (opponentView != null) opponentView.setSwitchingInventory(true);
-
-        // Other player sees WaitingOpponentGUI
-        WaitingOpponentGUI waiting = new WaitingOpponentGUI(other, editor, gameType, this::cancelAndReturnAll);
-        waiting.open();
-
-        // Editor opens PhysicalDepositGUI
-        new PhysicalDepositGUI(editor, other, gameType, currentItems, updatedItems -> {
-            if (forP1) {
-                state.itemsP1 = updatedItems;
-            } else {
-                state.itemsP2 = updatedItems;
-            }
-            waiting.setSwitchingInventory(true);
-            openForBoth(challenger, target, gameType, state);
-        }, this::cancelAndReturnAll).open();
+        SoundUtil.playClick(who);
+        updateStatusDisplays();
     }
 
     private void startCountdown() {
@@ -245,10 +355,10 @@ public class SharedBetReviewGUI extends AbstractGUI {
             if (state.cancelled.get() || state.gameStarted.get()) return;
 
             if (state.countdown > 0) {
-                SoundUtil.playCountdownTick(challenger);
-                SoundUtil.playCountdownTick(target);
+                if (challenger.isOnline()) SoundUtil.playCountdownTick(challenger);
+                if (target.isOnline()) SoundUtil.playCountdownTick(target);
                 state.countdown--;
-                syncViews();
+                updateStatusDisplays();
             } else {
                 if (state.countdownTask != null) {
                     state.countdownTask.cancel();
@@ -270,15 +380,25 @@ public class SharedBetReviewGUI extends AbstractGUI {
     private void executeGameStart() {
         if (!state.gameStarted.compareAndSet(false, true)) return;
 
-        long valP1 = state.itemsP1.stream().mapToLong(CurrencyUtil::getCoinValue).sum();
-        long valP2 = state.itemsP2.stream().mapToLong(CurrencyUtil::getCoinValue).sum();
+        long valP1 = calculateP1Value();
+        long valP2 = calculateP2Value();
         long agreedBet = Math.min(valP1, valP2);
 
-        SoundUtil.playCountdownStart(challenger);
-        SoundUtil.playCountdownStart(target);
+        // Clear deposit slots so coins are not refunded on close
+        for (int slot : SLOTS_P1) {
+            inventory.setItem(slot, null);
+        }
+        for (int slot : SLOTS_P2) {
+            inventory.setItem(slot, null);
+        }
 
-        this.setSwitchingInventory(true);
-        if (this.opponentView != null) this.opponentView.setSwitchingInventory(true);
+        if (challenger.isOnline()) SoundUtil.playCountdownStart(challenger);
+        if (target.isOnline()) SoundUtil.playCountdownStart(target);
+
+        setSwitchingInventory(true);
+
+        challenger.closeInventory();
+        target.closeInventory();
 
         plugin.getSessionManager().createAndStartSession(challenger, target, gameType, subMode, agreedBet, valP1, valP2);
     }
@@ -287,28 +407,35 @@ public class SharedBetReviewGUI extends AbstractGUI {
         if (!state.cancelled.compareAndSet(false, true)) return;
         cancelCountdown();
 
-        // Return P1 items
-        for (ItemStack item : state.itemsP1) {
-            if (challenger.isOnline()) {
-                Map<Integer, ItemStack> leftover = challenger.getInventory().addItem(item);
-                for (ItemStack drop : leftover.values()) challenger.getWorld().dropItemNaturally(challenger.getLocation(), drop);
-            } else {
-                challenger.getWorld().dropItemNaturally(challenger.getLocation(), item);
+        // 1. Return P1 items
+        for (int slot : SLOTS_P1) {
+            ItemStack item = inventory.getItem(slot);
+            if (item != null && item.getType() != Material.AIR) {
+                inventory.setItem(slot, null);
+                if (challenger.isOnline()) {
+                    Map<Integer, ItemStack> leftover = challenger.getInventory().addItem(item);
+                    for (ItemStack drop : leftover.values()) challenger.getWorld().dropItemNaturally(challenger.getLocation(), drop);
+                } else {
+                    challenger.getWorld().dropItemNaturally(challenger.getLocation(), item);
+                }
             }
         }
-        state.itemsP1.clear();
 
-        // Return P2 items
-        for (ItemStack item : state.itemsP2) {
-            if (target.isOnline()) {
-                Map<Integer, ItemStack> leftover = target.getInventory().addItem(item);
-                for (ItemStack drop : leftover.values()) target.getWorld().dropItemNaturally(target.getLocation(), drop);
-            } else {
-                target.getWorld().dropItemNaturally(target.getLocation(), item);
+        // 2. Return P2 items
+        for (int slot : SLOTS_P2) {
+            ItemStack item = inventory.getItem(slot);
+            if (item != null && item.getType() != Material.AIR) {
+                inventory.setItem(slot, null);
+                if (target.isOnline()) {
+                    Map<Integer, ItemStack> leftover = target.getInventory().addItem(item);
+                    for (ItemStack drop : leftover.values()) target.getWorld().dropItemNaturally(target.getLocation(), drop);
+                } else {
+                    target.getWorld().dropItemNaturally(target.getLocation(), item);
+                }
             }
         }
-        state.itemsP2.clear();
 
+        // 3. Close and notify
         if (challenger.isOnline()) {
             challenger.closeInventory();
             plugin.getLocaleManager().send(challenger, "request_cancelled", Map.of("player", target.getName()));
@@ -316,13 +443,6 @@ public class SharedBetReviewGUI extends AbstractGUI {
         if (target.isOnline()) {
             target.closeInventory();
             plugin.getLocaleManager().send(target, "request_cancelled", Map.of("player", challenger.getName()));
-        }
-    }
-
-    private void syncViews() {
-        this.initializeItems();
-        if (this.opponentView != null) {
-            this.opponentView.initializeItems();
         }
     }
 

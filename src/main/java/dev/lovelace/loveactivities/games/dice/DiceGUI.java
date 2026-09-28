@@ -14,7 +14,7 @@ public class DiceGUI extends AbstractGUI {
     private final DiceGame game;
 
     public DiceGUI(Player player, DiceGame game) {
-        super(player, 54, "<gradient:#FF5E62:#FF9966><bold>Кости</bold></gradient> <dark_gray>[" + game.getMode().getNameRu() + "]</dark_gray>");
+        super(player, 54, "<gradient:#FF5E62:#FF9966>Кости</gradient> <dark_gray>[" + game.getMode().getNameRu() + "]</dark_gray>");
         this.game = game;
     }
 
