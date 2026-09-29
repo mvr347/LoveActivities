@@ -99,13 +99,19 @@ public class SessionManager {
         java.util.concurrent.atomic.AtomicBoolean handled = new java.util.concurrent.atomic.AtomicBoolean(false);
         Runnable cancelAction = () -> {
             if (!handled.compareAndSet(false, true)) return;
-            if (potStudent > 0 && student.isOnline()) {
+            // give(UUID, ...) queues the payout for an offline player, so the refund must not be gated on
+            // isOnline(): the stake is already charged, and the one who left is exactly who needs it back.
+            if (potStudent > 0) {
                 plugin.getLoveCoreBridge().give(student.getUniqueId(), potStudent);
-                plugin.getLocaleManager().send(student, "bet_refunded", Map.of("amount", String.valueOf(potStudent), "currency", plugin.getLoveCoreBridge().currencyName()));
+                if (student.isOnline()) {
+                    plugin.getLocaleManager().send(student, "bet_refunded", Map.of("amount", String.valueOf(potStudent), "currency", plugin.getLoveCoreBridge().currencyName()));
+                }
             }
-            if (otherPlayer != null && otherPlayer.isOnline() && !isNpc(otherPlayer.getUniqueId()) && potOther > 0) {
+            if (otherPlayer != null && !isNpc(otherPlayer.getUniqueId()) && potOther > 0) {
                 plugin.getLoveCoreBridge().give(otherPlayer.getUniqueId(), potOther);
-                plugin.getLocaleManager().send(otherPlayer, "bet_refunded", Map.of("amount", String.valueOf(potOther), "currency", plugin.getLoveCoreBridge().currencyName()));
+                if (otherPlayer.isOnline()) {
+                    plugin.getLocaleManager().send(otherPlayer, "bet_refunded", Map.of("amount", String.valueOf(potOther), "currency", plugin.getLoveCoreBridge().currencyName()));
+                }
             }
             if (student.isOnline()) student.closeInventory();
             if (otherPlayer != null && otherPlayer.isOnline()) otherPlayer.closeInventory();
@@ -129,8 +135,10 @@ public class SessionManager {
     private void executeDirectStart(Player p1, Player p2, GameType gameType, String subMode, long agreedBet, long potP1, long potP2) {
         Runnable startLogic = () -> {
             if (!p1.isOnline() || (p2 != null && !isNpc(p2.getUniqueId()) && !p2.isOnline())) {
-                if (potP1 > 0 && p1.isOnline()) plugin.getLoveCoreBridge().give(p1.getUniqueId(), potP1);
-                if (potP2 > 0 && p2 != null && p2.isOnline() && !isNpc(p2.getUniqueId())) plugin.getLoveCoreBridge().give(p2.getUniqueId(), potP2);
+                // Not gated on isOnline(): give(UUID, ...) queues for an offline player, and the one who
+                // disconnected is exactly the one whose already-charged stake would otherwise vanish.
+                if (potP1 > 0) plugin.getLoveCoreBridge().give(p1.getUniqueId(), potP1);
+                if (potP2 > 0 && p2 != null && !isNpc(p2.getUniqueId())) plugin.getLoveCoreBridge().give(p2.getUniqueId(), potP2);
                 return;
             }
             GameSession session = switch (gameType) {
