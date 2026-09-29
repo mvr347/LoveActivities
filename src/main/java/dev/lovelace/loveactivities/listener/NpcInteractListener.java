@@ -26,6 +26,8 @@ public class NpcInteractListener implements Listener {
     // run handleNpcClick() twice for one click - double-charging the bet and starting two sessions.
     private final Map<UUID, Long> lastNpcInteract = new ConcurrentHashMap<>();
     private static final long DEBOUNCE_MILLIS = 250L;
+    private static final int PRUNE_THRESHOLD = 256;
+    private static final long PRUNE_AGE_MILLIS = 60_000L;
 
     public NpcInteractListener(LoveActivities plugin) {
         this.plugin = plugin;
@@ -50,6 +52,12 @@ public class NpcInteractListener implements Listener {
 
         long now = System.currentTimeMillis();
         Long last = lastNpcInteract.put(player.getUniqueId(), now);
+        // The map only needs the last quarter-second, but it used to keep one entry per player who
+        // ever clicked an NPC for the whole uptime. Drop stale entries once it grows past a
+        // few hundred, so the sweep is rare and costs nothing on a normal click.
+        if (lastNpcInteract.size() > PRUNE_THRESHOLD) {
+            lastNpcInteract.values().removeIf(t -> now - t > PRUNE_AGE_MILLIS);
+        }
         if (last != null && now - last < DEBOUNCE_MILLIS) {
             return;
         }
