@@ -58,6 +58,9 @@ public class SettingsGUI extends AbstractGUI {
         setItem(19, ItemBuilder.base64Head(dndTex)
                 .name("<yellow>Режим «Не беспокоить»</yellow>")
                 .lore(
+                        "<gray>Никто не сможет вызвать вас на игру,</gray>",
+                        "<gray>пока режим включён. Сами вы играть можете.</gray>",
+                        "",
                         "<gray>Статус: " + (settings.isDnd() ? "<red>ВКЛЮЧЁН (Блокирует вызовы)</red>" : "<green>ВЫКЛЮЧЁН</green>") + "</gray>",
                         "",
                         "<yellow>▶ Нажмите для переключения</yellow>"
@@ -118,9 +121,15 @@ public class SettingsGUI extends AbstractGUI {
             initializeItems();
         });
 
-        // Per-Game Blacklist Toggles (Row 3: 29, 30, 31, 32, 33)
-        GameType[] games = {GameType.BLACKJACK, GameType.DICE, GameType.RPS, GameType.GWENT, GameType.CARDS};
-        int[] gameSlots = {29, 30, 31, 32, 33};
+        // Per-game blacklist toggles: every game the plugin has, centred in row 3 (slots 28-34, up to 7).
+        GameType[] all = GameType.values();
+        int count = Math.min(all.length, 7);
+        GameType[] games = java.util.Arrays.copyOf(all, count);
+        int firstSlot = 28 + (7 - count) / 2;
+        int[] gameSlots = new int[count];
+        for (int i = 0; i < count; i++) {
+            gameSlots[i] = firstSlot + i;
+        }
 
         for (int i = 0; i < games.length; i++) {
             GameType game = games[i];

@@ -24,7 +24,7 @@ public class NpcActivityConfig {
 
     public NpcActivityConfig(UUID entityUuid, String customName, GameType gameType, long defaultBet, long maxBet, boolean playsBets) {
         this.entityUuid = entityUuid;
-        this.customName = customName != null ? customName : "NPC Игрок";
+        this.customName = dev.lovelace.loveactivities.util.NpcNames.normalize(customName);
         this.gameType = gameType != null ? gameType : GameType.BLACKJACK;
         this.defaultBet = Math.max(0L, defaultBet);
         this.maxBet = Math.max(0L, maxBet);
@@ -108,7 +108,7 @@ public class NpcActivityConfig {
     }
 
     public void setCustomName(String customName) {
-        this.customName = customName;
+        this.customName = dev.lovelace.loveactivities.util.NpcNames.normalize(customName);
     }
 
     public GameType getGameType() {
