@@ -20,7 +20,7 @@ public class NpcConfirmationGUI extends AbstractGUI {
     private long currentBet;
 
     public NpcConfirmationGUI(Player player, NpcActivityConfig npcConfig) {
-        super(player, 27, "<gradient:#FF9966:#FF5E62>Игра с " + npcConfig.getCustomName() + "</gradient>");
+        super(player, 27, "<white>Игра с </white>" + npcConfig.getCustomName());
         this.npcConfig = npcConfig;
         if (!npcConfig.isPlaysBets()) {
             this.currentBet = 0L;
@@ -49,7 +49,7 @@ public class NpcConfirmationGUI extends AbstractGUI {
         long playerBalance = plugin.getLoveCoreBridge().getBalance(player);
 
         List<String> infoLore = new ArrayList<>();
-        infoLore.add("<gray>Соперник: <white>" + npcConfig.getCustomName() + "</white></gray>");
+        infoLore.add("<gray>Соперник: </gray>" + npcConfig.getCustomName());
         if (npcConfig.isPlaysBets()) {
             infoLore.add("<gray>Текущая ставка: <gold>" + (currentBet > 0 ? CurrencyUtil.formatCoinsWords(currentBet) : "Без ставки") + "</gold></gray>");
             infoLore.add("<gray>Лимит ставки NPC: <gold>" + (npcConfig.getMaxBet() > 0 ? CurrencyUtil.formatCoinsWords(npcConfig.getMaxBet()) : "Без ограничений") + "</gold></gray>");

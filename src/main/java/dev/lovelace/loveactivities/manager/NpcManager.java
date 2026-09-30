@@ -3,6 +3,8 @@ package dev.lovelace.loveactivities.manager;
 import dev.lovelace.loveactivities.LoveActivities;
 import dev.lovelace.loveactivities.api.GameType;
 import dev.lovelace.loveactivities.util.SoundUtil;
+import dev.lovelace.loveactivities.config.ConfigManager;
+import dev.lovelace.loveactivities.util.NpcNames;
 import dev.lovelace.loveactivities.util.TextUtil;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
@@ -139,11 +141,26 @@ public class NpcManager {
 
         NpcActivityConfig npc = new NpcActivityConfig(entity.getUniqueId(), name, gameType, bet, maxBet, playsBets);
         npcMap.put(entity.getUniqueId(), npc);
+        applyVisibleName(entity, npc.getCustomName());
         save();
     }
 
     public void bindNpc(Entity entity, GameType gameType, long bet, String customName) {
         bindNpc(entity, gameType, bet, 0L, true, customName);
+    }
+
+    /**
+     * Shows the green name above an ordinary entity. Citizens NPCs are skipped: their name belongs to
+     * Citizens ({@code /npc rename &aName}) and would be overwritten anyway.
+     */
+    private void applyVisibleName(Entity entity, String storedName) {
+        if (entity.hasMetadata("NPC") || entity instanceof Player) return;
+        try {
+            entity.customName(TextUtil.parse(storedName));
+            entity.setCustomNameVisible(true);
+        } catch (Throwable t) {
+            plugin.getLogger().warning("Не удалось показать имя NPC над сущностью: " + t.getMessage());
+        }
     }
 
     public boolean unbindNpc(UUID entityUuid) {
@@ -164,10 +181,10 @@ public class NpcManager {
         if (player == null || !player.isOnline() || phrase == null || phrase.isBlank()) return;
         if (!plugin.getConfigManager().isNpcDialoguesEnabled()) return;
 
-        String name = npcName != null ? npcName : SessionManager.NPC_NAME;
+        String name = NpcNames.normalize(npcName != null ? npcName : SessionManager.NPC_NAME);
         String format = plugin.getConfigManager().getNpcDialogueFormat();
         if (format == null || format.isBlank()) {
-            format = "<gradient:#FF9966:#FF5E62>[{npc}]</gradient> <dark_gray>»</dark_gray> <gray>{text}</gray>";
+            format = ConfigManager.DEFAULT_DIALOGUE_FORMAT;
         }
         String formatted = format.replace("{npc}", name).replace("{text}", phrase);
         player.sendMessage(TextUtil.parse(formatted));

@@ -73,13 +73,24 @@ public class ConfigManager {
         this.connectionTimeoutMs = config.getInt("database.connection_timeout_ms", 10000);
 
         this.npcDialoguesEnabled = config.getBoolean("npc.dialogues_enabled", true);
-        this.npcDialogueFormat = config.getString("npc.dialogue_format", "<gradient:#FF9966:#FF5E62><bold>[{npc}]</bold></gradient> <dark_gray>»</dark_gray> <gray>{text}</gray>");
+        String format = config.getString("npc.dialogue_format", DEFAULT_DIALOGUE_FORMAT);
+        // Servers that kept the old default (gradient and brackets around the name) get the new plain one.
+        if (LEGACY_DIALOGUE_FORMATS.contains(format)) {
+            format = DEFAULT_DIALOGUE_FORMAT;
+        }
+        this.npcDialogueFormat = format;
         this.npcDefaultAcceptChance = config.getDouble("npc.default_accept_chance", 1.0);
 
         this.betsLogFile = config.getString("logging.bets_log_file", "bets.log");
     }
 
     private boolean npcDialoguesEnabled;
+    /** {npc} already carries its own &a colour (see NpcNames), so the format adds none. */
+    public static final String DEFAULT_DIALOGUE_FORMAT = "{npc} <dark_gray>»</dark_gray> <gray>{text}</gray>";
+    private static final java.util.Set<String> LEGACY_DIALOGUE_FORMATS = java.util.Set.of(
+            "<gradient:#FF9966:#FF5E62>[{npc}]</gradient> <dark_gray>»</dark_gray> <gray>{text}</gray>",
+            "<gradient:#FF9966:#FF5E62><bold>[{npc}]</bold></gradient> <dark_gray>»</dark_gray> <gray>{text}</gray>");
+
     private String npcDialogueFormat;
     private double npcDefaultAcceptChance;
 
