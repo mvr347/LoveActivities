@@ -1,6 +1,7 @@
 package dev.lovelace.loveactivities.gui;
 
 import dev.lovelace.loveactivities.LoveActivities;
+import dev.lovelace.loveactivities.util.CurrencyUtil;
 import dev.lovelace.loveactivities.api.GameType;
 import dev.lovelace.loveactivities.util.ItemBuilder;
 import dev.lovelace.loveactivities.util.SoundUtil;
@@ -86,7 +87,7 @@ public class BettingRoomGUI extends AbstractGUI {
                 .lore(
                         "<gray>Нажимайте на слоты монет, чтобы внести ставку.</gray>",
                         "<gray>Списание после подтверждения обоих.</gray>",
-                        "<yellow>Мин: <gold>" + plugin.getConfigManager().getMinBet() + "</gold> | Макс: <gold>" + plugin.getConfigManager().getMaxBet(gameType) + "</gold></yellow>"
+                        "<yellow>Мин: <gold>" + CurrencyUtil.formatCoinsShort(plugin.getConfigManager().getMinBet()) + "</gold> | Макс: <gold>" + CurrencyUtil.formatCoinsShort(plugin.getConfigManager().getMaxBet(gameType)) + "</gold></yellow>"
                 ).build());
 
         if (state.countdownTask != null) {
