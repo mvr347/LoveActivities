@@ -20,6 +20,9 @@ public class ConfigManager {
     private long minBet;
     private long maxBetGlobal;
     private List<Long> quickAmounts;
+    private long pokerMinRaise = 100L;
+    private long npcBetStepSmall = 100L;
+    private long npcBetStepLarge = 2_000L;
     private final Map<GameType, Long> gameMaxBets = new EnumMap<>(GameType.class);
 
     private boolean soundsEnabled;
@@ -48,19 +51,29 @@ public class ConfigManager {
         this.betCountdownSeconds = config.getInt("gameplay.bet_countdown_seconds", 3);
         this.preGameTutorial = config.getBoolean("gameplay.pre_game_tutorial", false);
 
-        this.minBet = config.getLong("betting.min_bet", 1L);
-        this.maxBetGlobal = config.getLong("betting.max_bet_global", 1000000L);
+        this.minBet = money(config, "betting.min_bet", 1L);
+        this.maxBetGlobal = money(config, "betting.max_bet_global", 1_000_000L);
+        this.pokerMinRaise = Math.max(1L, money(config, "betting.poker_min_raise", 100L));
+        this.npcBetStepSmall = Math.max(1L, money(config, "betting.npc_bet_step_small", 100L));
+        this.npcBetStepLarge = Math.max(this.npcBetStepSmall, money(config, "betting.npc_bet_step_large", 2_000L));
 
-        List<Long> quick = config.getLongList("betting.quick_amounts");
+        List<Long> quick = new ArrayList<>();
+        List<?> rawQuick = config.getList("betting.quick_amounts");
+        if (rawQuick != null) {
+            for (Object o : rawQuick) {
+                long v = parseMoney(o, -1L);
+                if (v > 0) quick.add(v);
+            }
+        }
         if (quick.isEmpty()) {
-            this.quickAmounts = List.of(1L, 5L, 10L, 50L, 100L, 500L, 1000L);
+            this.quickAmounts = List.of(100L, 500L, 2_000L, 10_000L);
         } else {
             this.quickAmounts = Collections.unmodifiableList(quick);
         }
 
         this.gameMaxBets.clear();
         for (GameType game : GameType.values()) {
-            long max = config.getLong("betting.limits." + game.getId(), this.maxBetGlobal);
+            long max = money(config, "betting.limits." + game.getId(), this.maxBetGlobal);
             this.gameMaxBets.put(game, max);
         }
 
@@ -140,6 +153,38 @@ public class ConfigManager {
 
     public long getMaxBet(GameType game) {
         return gameMaxBets.getOrDefault(game, maxBetGlobal);
+    }
+
+    public long getPokerMinRaise() {
+        return pokerMinRaise;
+    }
+
+    public long getNpcBetStepSmall() {
+        return npcBetStepSmall;
+    }
+
+    public long getNpcBetStepLarge() {
+        return npcBetStepLarge;
+    }
+
+    /** Money value: a number (copper units) or a string like "3i 50c" (LoveCore parser); bad value -> default + log. */
+    private long money(FileConfiguration config, String path, long def) {
+        Object raw = config.get(path);
+        return raw == null ? def : parseMoney(raw, def);
+    }
+
+    private long parseMoney(Object raw, long def) {
+        if (raw instanceof Number n) return n.longValue();
+        try {
+            // LoveCore is a soft dependency: its parser class may be absent, hence Throwable below
+            java.util.List<dev.lovelace.lovecore.api.economy.Denomination> dens =
+                    dev.lovelace.lovecore.api.LoveCore.service(dev.lovelace.lovecore.api.economy.LoveEconomy.class)
+                            .map(dev.lovelace.lovecore.api.economy.LoveEconomy::allDenominations).orElse(null);
+            return dev.lovelace.lovecore.api.economy.MoneyParser.parse(String.valueOf(raw), dens);
+        } catch (Throwable t) {
+            plugin.getLogger().warning("Cannot parse money value '" + raw + "' (" + t.getMessage() + ") - using " + def);
+            return def;
+        }
     }
 
     public List<Long> getQuickAmounts() {

@@ -126,17 +126,21 @@ public class NpcConfirmationGUI extends AbstractGUI {
         if (npcConfig.isPlaysBets()) {
             long maxAllowed = (npcConfig.getMaxBet() > 0) ? Math.min(npcConfig.getMaxBet(), playerBalance) : playerBalance;
 
-            // Slot 19: -50
-            setItem(19, plugin.getHeadManager().createBuilder("ui.minus")
-                    .name("<red>-50 монет</red>")
-                    .lore("<gray>Уменьшить ставку на 50</gray>")
-                    .build(), click -> adjustBet(-50, maxAllowed));
+            // Step sizes come from betting.npc_bet_step_small / _large (money values, copper units)
+            long stepSmall = plugin.getConfigManager().getNpcBetStepSmall();
+            long stepLarge = plugin.getConfigManager().getNpcBetStepLarge();
 
-            // Slot 20: -10
+            // Slot 19: -large
+            setItem(19, plugin.getHeadManager().createBuilder("ui.minus")
+                    .name("<red>-" + CurrencyUtil.formatCoinsShort(stepLarge) + "</red>")
+                    .lore("<gray>Уменьшить ставку</gray>")
+                    .build(), click -> adjustBet(-stepLarge, maxAllowed));
+
+            // Slot 20: -small
             setItem(20, plugin.getHeadManager().createBuilder("ui.minus")
-                    .name("<red>-10 монет</red>")
-                    .lore("<gray>Уменьшить ставку на 10</gray>")
-                    .build(), click -> adjustBet(-10, maxAllowed));
+                    .name("<red>-" + CurrencyUtil.formatCoinsShort(stepSmall) + "</red>")
+                    .lore("<gray>Уменьшить ставку</gray>")
+                    .build(), click -> adjustBet(-stepSmall, maxAllowed));
 
             // Slot 21: Min (0)
             setItem(21, plugin.getHeadManager().createBuilder("ui.status_waiting")
@@ -148,24 +152,24 @@ public class NpcConfirmationGUI extends AbstractGUI {
                 initializeItems();
             });
 
-            // Slot 23: +10
+            // Slot 23: +small
             setItem(23, plugin.getHeadManager().createBuilder("ui.plus")
-                    .name("<green>+10 монет</green>")
-                    .lore("<gray>Увеличить ставку на 10</gray>")
-                    .build(), click -> adjustBet(10, maxAllowed));
+                    .name("<green>+" + CurrencyUtil.formatCoinsShort(stepSmall) + "</green>")
+                    .lore("<gray>Увеличить ставку</gray>")
+                    .build(), click -> adjustBet(stepSmall, maxAllowed));
 
-            // Slot 24: +50
+            // Slot 24: +large
             setItem(24, plugin.getHeadManager().createBuilder("ui.plus")
-                    .name("<green>+50 монет</green>")
-                    .lore("<gray>Увеличить ставку на 50</gray>")
-                    .build(), click -> adjustBet(50, maxAllowed));
+                    .name("<green>+" + CurrencyUtil.formatCoinsShort(stepLarge) + "</green>")
+                    .lore("<gray>Увеличить ставку</gray>")
+                    .build(), click -> adjustBet(stepLarge, maxAllowed));
 
             // Slot 25: Max
             setItem(25, plugin.getHeadManager().createBuilder("ui.confirm_arrow")
                     .name("<gold>Максимальная ставка</gold>")
                     .lore(
-                            "<gray>Установить максимальную ставку: <gold>" + maxAllowed + "</gold></gray>",
-                            npcConfig.getMaxBet() > 0 ? "<gray>Лимит NPC: <yellow>" + npcConfig.getMaxBet() + "</yellow></gray>" : "<gray>По балансу игрока</gray>"
+                            "<gray>Установить максимальную ставку: <gold>" + CurrencyUtil.formatCoinsShort(maxAllowed) + "</gold></gray>",
+                            npcConfig.getMaxBet() > 0 ? "<gray>Лимит NPC: <yellow>" + CurrencyUtil.formatCoinsShort(npcConfig.getMaxBet()) + "</yellow></gray>" : "<gray>По балансу игрока</gray>"
                     )
                     .build(), click -> {
                 currentBet = Math.max(0L, maxAllowed);

@@ -669,7 +669,7 @@ public class CardsGame implements GameSession {
         updateLastActionTime();
 
         boolean isP1 = player.getUniqueId().equals(player1);
-        long addition = Math.max(10L, pokerPot / 10);
+        long addition = Math.max(plugin.getConfigManager().getPokerMinRaise(), pokerPot / 10);
         pokerPot += addition;
 
         if (isP1) {
@@ -822,7 +822,7 @@ public class CardsGame implements GameSession {
             // Bot decides action
             if (botScore.rank().getScore() >= 4 && Math.random() < 0.40) {
                 // Raise if strong
-                pokerPot += Math.max(10L, pokerPot / 10);
+                pokerPot += Math.max(plugin.getConfigManager().getPokerMinRaise(), pokerPot / 10);
                 pokerP2Acted = true;
                 pokerP1Acted = false;
                 pokerP1Turn = true;

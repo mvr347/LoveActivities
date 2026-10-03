@@ -1,5 +1,8 @@
 package dev.lovelace.loveactivities.util;
 
+import dev.lovelace.lovecore.api.LoveCore;
+import dev.lovelace.lovecore.api.economy.Denomination;
+import dev.lovelace.lovecore.api.economy.LoveEconomy;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -11,26 +14,54 @@ import java.util.*;
 
 public class CurrencyUtil {
 
-    private static final Map<String, Long> DENOMINATIONS = new LinkedHashMap<>();
+    /**
+     * Last-resort table used only when LoveCore is not installed (it is a soft dependency).
+     * With LoveCore present, denominations always come from {@link LoveEconomy} - this is the single
+     * source of truth (2026-10-03: the old copy 1000/100/50/10/1 priced deposits by the wrong values).
+     */
+    private static final Map<String, Long> FALLBACK = new LinkedHashMap<>();
 
     static {
-        // Highest to lowest for change calculation
-        DENOMINATIONS.put("netherite_coin", 1000L);
-        DENOMINATIONS.put("diamond_coin", 100L);
-        DENOMINATIONS.put("gold_coin", 50L);
-        DENOMINATIONS.put("iron_coin", 10L);
-        DENOMINATIONS.put("copper_coin", 1L);
+        FALLBACK.put("netherite_coin", 100_000L);
+        FALLBACK.put("diamond_coin", 20_000L);
+        FALLBACK.put("gold_coin", 2_000L);
+        FALLBACK.put("iron_coin", 100L);
+        FALLBACK.put("copper_coin", 1L);
     }
 
+    private static LoveEconomy economy() {
+        try {
+            return LoveCore.service(LoveEconomy.class).orElse(null);
+        } catch (Throwable t) {
+            return null; // LoveCore API absent at runtime
+        }
+    }
+
+    private static String keyOf(Denomination den) {
+        String id = den.itemId().toLowerCase();
+        int colon = id.indexOf(':');
+        return colon >= 0 ? id.substring(colon + 1) : id;
+    }
+
+    /** Coin key -> value, highest first. {@code includeHidden}: also denominations hidden from splitting (netherite). */
+    private static Map<String, Long> denominations(boolean includeHidden) {
+        LoveEconomy eco = economy();
+        if (eco == null) {
+            Map<String, Long> m = new LinkedHashMap<>(FALLBACK);
+            if (!includeHidden) m.remove("netherite_coin");
+            return m;
+        }
+        List<Denomination> list = new ArrayList<>(includeHidden ? eco.allDenominations() : eco.denominations());
+        list.sort(Comparator.comparingLong(Denomination::value).reversed());
+        Map<String, Long> m = new LinkedHashMap<>();
+        for (Denomination d : list) m.put(keyOf(d), d.value());
+        return m;
+    }
+
+    /** Glyph tag is the denomination id, so a renamed or added coin needs no code change. */
     public static String getCoinFontImage(String coinKey) {
-        if (coinKey == null) return "<white>%img_copper_coin%</white>";
-        return switch (coinKey) {
-            case "netherite_coin" -> "<white>%img_netherite_coin%</white>";
-            case "diamond_coin" -> "<white>%img_diamond_coin%</white>";
-            case "gold_coin" -> "<white>%img_gold_coin%</white>";
-            case "iron_coin" -> "<white>%img_iron_coin%</white>";
-            default -> "<white>%img_copper_coin%</white>";
-        };
+        if (coinKey == null || coinKey.isBlank()) return "<white>%img_copper_coin%</white>";
+        return "<white>%img_" + coinKey + "%</white>";
     }
 
     public static String getCoinNameRu(String coinKey) {
@@ -46,6 +77,18 @@ public class CurrencyUtil {
 
     public static String getCoinKey(ItemStack item) {
         if (item == null || item.getType() == Material.AIR) return null;
+
+        LoveEconomy eco = economy();
+        if (eco != null) {
+            long unit = eco.valueOf(item);
+            if (unit <= 0) return null; // LoveCore decides what is money; no name/material guessing
+            for (Map.Entry<String, Long> e : denominations(true).entrySet()) {
+                if (e.getValue() == unit) return e.getKey();
+            }
+            return null;
+        }
+
+        Map<String, Long> DENOMINATIONS = denominations(true);
 
         String iaId = getItemsAdderId(item);
         if (iaId != null) {
@@ -82,7 +125,7 @@ public class CurrencyUtil {
         if (amount <= 0) return "<white>%img_copper_coin%</white> 0 монет";
         StringBuilder sb = new StringBuilder();
         long remaining = amount;
-        for (Map.Entry<String, Long> entry : DENOMINATIONS.entrySet()) {
+        for (Map.Entry<String, Long> entry : denominations(false).entrySet()) {
             long count = remaining / entry.getValue();
             if (count > 0) {
                 remaining %= entry.getValue();
@@ -97,7 +140,7 @@ public class CurrencyUtil {
         if (amount <= 0) return "0 монет";
         StringBuilder sb = new StringBuilder();
         long remaining = amount;
-        for (Map.Entry<String, Long> entry : DENOMINATIONS.entrySet()) {
+        for (Map.Entry<String, Long> entry : denominations(false).entrySet()) {
             long count = remaining / entry.getValue();
             if (count > 0) {
                 remaining %= entry.getValue();
@@ -128,11 +171,13 @@ public class CurrencyUtil {
     }
 
     public static long getUnitCoinValue(ItemStack item) {
-        String key = getCoinKey(item);
-        if (key != null && DENOMINATIONS.containsKey(key)) {
-            return DENOMINATIONS.get(key);
+        LoveEconomy eco = economy();
+        if (eco != null && item != null && item.getType() != Material.AIR) {
+            return Math.max(0L, eco.valueOf(item));
         }
-        return 0L;
+        String key = getCoinKey(item);
+        Long value = key == null ? null : denominations(true).get(key);
+        return value == null ? 0L : value;
     }
 
     private static String getItemsAdderId(ItemStack item) {
@@ -182,7 +227,7 @@ public class CurrencyUtil {
         if (amount <= 0) return list;
 
         long remaining = amount;
-        for (Map.Entry<String, Long> entry : DENOMINATIONS.entrySet()) {
+        for (Map.Entry<String, Long> entry : denominations(false).entrySet()) {
             String coinKey = entry.getKey();
             long value = entry.getValue();
 
@@ -201,6 +246,11 @@ public class CurrencyUtil {
 
     public static void giveCoinsToPlayer(Player player, long amount) {
         if (player == null || !player.isOnline() || amount <= 0) return;
+        LoveEconomy eco = economy();
+        if (eco != null) {
+            eco.give(player, amount);
+            return;
+        }
         List<ItemStack> items = convertAmountToCoins(amount);
         for (ItemStack item : items) {
             Map<Integer, ItemStack> leftover = player.getInventory().addItem(item);
