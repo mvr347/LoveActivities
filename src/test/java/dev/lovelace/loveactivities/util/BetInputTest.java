@@ -45,4 +45,12 @@ class BetInputTest {
         assertEquals(0, none.bet());
         assertFalse(none.add());
     }
+
+    @Test
+    void setMaxSetsBetToLimit() {
+        BetInput in = new BetInput(COINS, 500, 100);
+        assertTrue(in.setMax());
+        assertEquals(500, in.bet());
+        assertFalse(in.setMax(), "already at maximum");
+    }
 }
