@@ -22,7 +22,7 @@ public class PreGameTutorialGUI extends AbstractGUI {
                               Runnable onStartGame,
                               Runnable onOpenTutorial,
                               Runnable onCancelGame) {
-        super(player, 27, "<gradient:#FF5E62:#FF9966>Новая игра: " + gameType.getNameRu() + "</gradient>");
+        super(player, 5, "<gradient:#FF5E62:#FF9966>Новая игра: " + gameType.getNameRu() + "</gradient>");
         this.gameType = gameType;
         this.opponent = opponent;
         this.onStartGame = onStartGame;
@@ -37,17 +37,13 @@ public class PreGameTutorialGUI extends AbstractGUI {
 
         ItemStack glass = ItemBuilder.from(Material.GRAY_STAINED_GLASS_PANE).name(Component.empty()).build();
 
-        // Header: Row 0 (0-8)
-        for (int i = 0; i <= 8; i++) {
-            inventory.setItem(i, glass);
-        }
-        // Footer: Row 2 (18-26)
-        for (int i = 18; i <= 26; i++) {
+        // Hopper: [ game banner ] [ tutorial ] [ glass ] [ skip ] [ cancel ]
+        for (int i = 0; i < 5; i++) {
             inventory.setItem(i, glass);
         }
 
-        // Header Slot 4: Game Banner
-        setItem(4, plugin.getHeadManager().createBuilder("game_icons." + gameType.getIconKey())
+        // Slot 0: Game Banner
+        setItem(0, plugin.getHeadManager().createBuilder("game_icons." + gameType.getIconKey())
                 .name("<yellow>Вы впервые играете в " + gameType.getNameRu() + "!</yellow>")
                 .lore(
                         "<gray>Соперник: <white>" + (opponent != null ? opponent.getName() : "Бот") + "</white></gray>",
@@ -55,9 +51,8 @@ public class PreGameTutorialGUI extends AbstractGUI {
                 )
                 .build());
 
-        // Work Zone (Row 1: 9-17)
-        // Slot 11: Open Tutorial Button
-        setItem(11, plugin.getHeadManager().createBuilder("ui.tutorial")
+        // Slot 1: Open Tutorial Button
+        setItem(1, plugin.getHeadManager().createBuilder("ui.tutorial")
                 .name("<green>📖 Пройти обучение</green>")
                 .lore(
                         "<gray>Открыть правила игры и комбинации.</gray>",
@@ -72,8 +67,8 @@ public class PreGameTutorialGUI extends AbstractGUI {
             }
         });
 
-        // Slot 15: Skip Tutorial Button
-        setItem(15, plugin.getHeadManager().createBuilder("ui.confirm_ready")
+        // Slot 3: Skip Tutorial Button
+        setItem(3, plugin.getHeadManager().createBuilder("ui.confirm_ready")
                 .name("<gold>▶ Пропустить и начать игру</gold>")
                 .lore(
                         "<gray>Я уже знаю правила, сразу к игре!</gray>",
@@ -88,8 +83,8 @@ public class PreGameTutorialGUI extends AbstractGUI {
             }
         });
 
-        // Footer Slot 22: Cancel Match Button
-        setItem(22, plugin.getHeadManager().createBuilder("ui.cancel")
+        // Slot 4: Cancel Match Button
+        setItem(4, plugin.getHeadManager().createBuilder("ui.cancel")
                 .name("<red>✖ Отменить игру</red>")
                 .lore("<gray>Вернуть ставки и закрыть матч</gray>")
                 .build(), click -> {

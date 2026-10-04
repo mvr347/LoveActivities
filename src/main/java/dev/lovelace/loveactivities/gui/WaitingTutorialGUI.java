@@ -18,7 +18,7 @@ public class WaitingTutorialGUI extends AbstractGUI {
     public WaitingTutorialGUI(Player player, Player student, GameType gameType,
                               Runnable onOpenTutorialForMe,
                               Runnable onCancelGame) {
-        super(player, 45, "<gradient:#FF5E62:#FF9966>Ожидание: " + gameType.getNameRu() + "</gradient>");
+        super(player, 5, "<gradient:#FF5E62:#FF9966>Ожидание: " + gameType.getNameRu() + "</gradient>");
         this.student = student;
         this.gameType = gameType;
         this.onOpenTutorialForMe = onOpenTutorialForMe;
@@ -31,12 +31,12 @@ public class WaitingTutorialGUI extends AbstractGUI {
         clickActions.clear();
 
         ItemStack border = ItemBuilder.from(Material.GRAY_STAINED_GLASS_PANE).name(Component.empty()).build();
-        for (int i = 0; i < 45; i++) {
+        for (int i = 0; i < 5; i++) {
             inventory.setItem(i, border);
         }
 
-        // Header Slot 4: Info
-        setItem(4, plugin.getHeadManager().createBuilder("game_icons." + gameType.getIconKey())
+        // Hopper: [ info ] [ read tutorial ] [ glass ] [ glass ] [ cancel ]
+        setItem(0, plugin.getHeadManager().createBuilder("game_icons." + gameType.getIconKey())
                 .name("<gold>" + gameType.getNameRu() + " — Ожидание старта</gold>")
                 .lore(
                         "<gray>Игрок <yellow>" + (student != null ? student.getName() : "Соперник") + "</yellow> проходит обучение.</gray>",
@@ -44,8 +44,8 @@ public class WaitingTutorialGUI extends AbstractGUI {
                 )
                 .build());
 
-        // Slot 20: Read tutorial too
-        setItem(20, plugin.getHeadManager().createBuilder("ui.tutorial")
+        // Slot 1: Read tutorial too
+        setItem(1, plugin.getHeadManager().createBuilder("ui.tutorial")
                 .name("<yellow>📖 Тоже почитать правила</yellow>")
                 .lore(
                         "<gray>Пока соперник изучает игру, вы тоже можете освежить правила.</gray>",
@@ -59,8 +59,8 @@ public class WaitingTutorialGUI extends AbstractGUI {
             }
         });
 
-        // Slot 24: Cancel Match
-        setItem(24, plugin.getHeadManager().createBuilder("ui.cancel")
+        // Slot 4: Cancel Match
+        setItem(4, plugin.getHeadManager().createBuilder("ui.cancel")
                 .name("<red>✖ Отменить игру</red>")
                 .lore(
                         "<gray>Не хотите ждать? Отмените игру и верните все ставки.</gray>",
