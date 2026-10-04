@@ -59,6 +59,8 @@ public class GwentGame implements GameSession {
     private boolean p1Passed = false;
     private boolean p2Passed = false;
     private boolean isPlayer1Turn = true;
+    /** Who opened the current round: a draw hands the opening to the other player. */
+    private boolean roundStarterP1 = true;
     private final Set<UUID> viewingTutorial = new HashSet<>();
 
     private GwentGUI guiP1;
@@ -428,28 +430,153 @@ public class GwentGame implements GameSession {
         if (!dev.lovelace.loveactivities.manager.SessionManager.isNpc(player2) || state != GameState.PLAYING) return;
 
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            if (state != GameState.PLAYING || isPlayer1Turn || p2Passed) return;
+            synchronized (this) {
+                if (state != GameState.PLAYING || isPlayer1Turn || p2Passed) return;
 
-            if (handP2.isEmpty()) {
-                p2Passed = true;
-                if (p1Passed) evaluateRound();
-                else switchTurn();
-                return;
+                // The human is reading the tutorial: the bot waits instead of playing a whole round meanwhile.
+                if (!viewingTutorial.isEmpty()) {
+                    triggerBotGwentTurn();
+                    return;
+                }
+
+                if (handP2.isEmpty()) {
+                    botPass();
+                    return;
+                }
+
+                int p1Power = calculateTotalPower(true);
+                int p2Power = calculateTotalPower(false);
+
+                // Human passed and the bot is already ahead: nothing more to gain.
+                if (p1Passed && p2Power > p1Power) {
+                    botPass();
+                    return;
+                }
+                // Comfortably ahead and not richer in cards: keep the cards for the next round.
+                if (!p1Passed && p2Power >= p1Power + 15 && handP2.size() <= handP1.size()) {
+                    botPass();
+                    return;
+                }
+                // Round 1 is lost anyway and the bot is poorer in cards: concede it and save the hand.
+                if (!p1Passed && currentRound == 1 && p1Power >= p2Power + 20 && handP2.size() + 1 < handP1.size()) {
+                    botPass();
+                    return;
+                }
+
+                int chosenIdx = chooseBotCard(p1Power, p2Power);
+                if (chosenIdx < 0) {
+                    // Only cards that would hurt: pass instead of throwing them away.
+                    botPass();
+                    return;
+                }
+                actionPlayCard(null, chosenIdx);
             }
-
-            int p1Power = calculateTotalPower(true);
-            int p2Power = calculateTotalPower(false);
-
-            if (p1Passed && p2Power > p1Power) {
-                p2Passed = true;
-                evaluateRound();
-                return;
-            }
-
-            // Choose best card from handP2
-            int chosenIdx = 0;
-            actionPlayCard(null, chosenIdx);
         }, 20L);
+    }
+
+    private void botPass() {
+        updateLastActionTime();
+        p2Passed = true;
+        if (p1Passed) evaluateRound();
+        else switchTurn();
+    }
+
+    /** Best card of the bot's hand by a simple value estimate; -1 if every card would do harm. */
+    private int chooseBotCard(int p1Power, int p2Power) {
+        int best = -1;
+        double bestScore = -1;
+        for (int i = 0; i < handP2.size(); i++) {
+            double score = scoreBotCard(handP2.get(i));
+            if (score > bestScore) {
+                bestScore = score;
+                best = i;
+            }
+        }
+        // A harmful pick is still better than losing the round by passing early when the bot is behind.
+        if (best < 0 && p1Passed && p2Power <= p1Power && !handP2.isEmpty()) {
+            for (int i = 0; i < handP2.size(); i++) {
+                if (handP2.get(i).isUnit()) return i;
+            }
+        }
+        return best;
+    }
+
+    /** Positive = worth playing, negative = harmful or wasted. */
+    private double scoreBotCard(GwentCard card) {
+        return switch (card.getAbility()) {
+            case SPY -> deckP2.size() >= 2 ? 6 : 2;
+            case MEDIC -> card.getBaseStrength() + (graveyardP2.stream().anyMatch(GwentCard::isUnit) ? 5 : 0);
+            case SCORCH -> {
+                int max = -1;
+                for (List<GwentCard> row : List.of(meleeP1, rangedP1, siegeP1, meleeP2, rangedP2, siegeP2)) {
+                    for (GwentCard c : row) if (!c.isHero()) max = Math.max(max, c.getBaseStrength());
+                }
+                if (max < 0) yield -1;
+                int enemy = 0, own = 0;
+                for (List<GwentCard> row : List.of(meleeP1, rangedP1, siegeP1)) {
+                    for (GwentCard c : row) if (!c.isHero() && c.getBaseStrength() == max) enemy += c.getBaseStrength();
+                }
+                for (List<GwentCard> row : List.of(meleeP2, rangedP2, siegeP2)) {
+                    for (GwentCard c : row) if (!c.isHero() && c.getBaseStrength() == max) own += c.getBaseStrength();
+                }
+                int gain = enemy - own + (card.isUnit() ? card.getBaseStrength() : 0);
+                yield gain >= 6 ? gain : -1;
+            }
+            case HORN -> {
+                boolean already = switch (card.getRow()) {
+                    case MELEE -> hornMeleeP2;
+                    case RANGED -> hornRangedP2;
+                    case SIEGE -> hornSiegeP2;
+                    default -> true;
+                };
+                int rowPower = switch (card.getRow()) {
+                    case MELEE -> calculateRowPower(meleeP2, false);
+                    case RANGED -> calculateRowPower(rangedP2, false);
+                    case SIEGE -> calculateRowPower(siegeP2, false);
+                    default -> 0;
+                };
+                yield already || rowPower < 8 ? -1 : rowPower;
+            }
+            case DECOY -> -1;
+            case FROST, FOG, RAIN -> {
+                List<GwentCard> enemyRow = switch (card.getAbility()) {
+                    case FROST -> meleeP1;
+                    case FOG -> rangedP1;
+                    default -> siegeP1;
+                };
+                List<GwentCard> ownRow = switch (card.getAbility()) {
+                    case FROST -> meleeP2;
+                    case FOG -> rangedP2;
+                    default -> siegeP2;
+                };
+                boolean active = switch (card.getAbility()) {
+                    case FROST -> frost;
+                    case FOG -> fog;
+                    default -> rain;
+                };
+                int enemyLoss = 0, ownLoss = 0;
+                for (GwentCard c : enemyRow) if (!c.isHero()) enemyLoss += getCalculatedCardPower(c, true) - 1;
+                for (GwentCard c : ownRow) if (!c.isHero()) ownLoss += getCalculatedCardPower(c, false) - 1;
+                int gain = enemyLoss - ownLoss;
+                yield active || gain < 6 ? -1 : gain;
+            }
+            case CLEAR -> {
+                int ownLoss = 0, enemyLoss = 0;
+                if (frost) { ownLoss += rowLoss(meleeP2, false); enemyLoss += rowLoss(meleeP1, true); }
+                if (fog) { ownLoss += rowLoss(rangedP2, false); enemyLoss += rowLoss(rangedP1, true); }
+                if (rain) { ownLoss += rowLoss(siegeP2, false); enemyLoss += rowLoss(siegeP1, true); }
+                int gain = ownLoss - enemyLoss;
+                yield gain >= 6 ? gain : -1;
+            }
+            default -> card.isUnit() ? card.getBaseStrength() : -1;
+        };
+    }
+
+    /** Power a row loses to weather right now (base strength vs. 1 per non-hero card). */
+    private int rowLoss(List<GwentCard> row, boolean isP1) {
+        int loss = 0;
+        for (GwentCard c : row) if (!c.isHero()) loss += c.getBaseStrength() - 1;
+        return loss;
     }
 
     private void evaluateRound() {
@@ -512,6 +639,13 @@ public class GwentGame implements GameSession {
         p2Passed = false;
         currentRound++;
 
+        // The winner of the finished round opens the next one; after a draw the starter alternates.
+        // (Before this the turn simply stayed with whoever ended the round, so a round could open on the bot's
+        // turn with nothing scheduled - the bot never moved and the AFK timer then lost the game for it.)
+        boolean p1StartsNext = p1Power > p2Power || (p1Power == p2Power && !roundStarterP1);
+        roundStarterP1 = p1StartsNext;
+        isPlayer1Turn = p1StartsNext;
+
         // Draw new cards for new round (2 cards for R2, 1 card for R3)
         int drawCount = (currentRound == 2) ? 2 : 1;
         for (int i = 0; i < drawCount && !deckP1.isEmpty(); i++) handP1.add(deckP1.remove(0));
@@ -525,7 +659,20 @@ public class GwentGame implements GameSession {
             return;
         }
 
+        // A starter with an empty hand has nothing to play: he passes at once, the other side continues.
+        if (isPlayer1Turn && handP1.isEmpty()) {
+            p1Passed = true;
+            isPlayer1Turn = false;
+        } else if (!isPlayer1Turn && handP2.isEmpty()) {
+            p2Passed = true;
+            isPlayer1Turn = true;
+        }
+        updateLastActionTime();
         syncViews();
+
+        if (dev.lovelace.loveactivities.manager.SessionManager.isNpc(player2) && !isPlayer1Turn && !p2Passed) {
+            triggerBotGwentTurn();
+        }
     }
 
     public void resign(Player player) {

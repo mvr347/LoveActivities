@@ -102,21 +102,24 @@ public class SettingsGUI extends AbstractGUI {
             initializeItems();
         });
 
-        // 25: Master Toggle All Games
+        // 25: Master toggle for all games: one button, one rule. Any game off -> turn all on; all on -> turn all off.
+        long blockedGames = java.util.Arrays.stream(GameType.values()).filter(settings::isGameBlacklisted).count();
+        boolean allOn = blockedGames == 0;
+        boolean allOff = blockedGames == GameType.values().length;
+        String state = allOn ? "<green>ВСЕ ВКЛЮЧЕНЫ</green>"
+                : allOff ? "<red>ВСЕ ВЫКЛЮЧЕНЫ</red>"
+                : "<yellow>ЧАСТИЧНО (" + (GameType.values().length - blockedGames) + "/" + GameType.values().length + ")</yellow>";
         setItem(25, plugin.getHeadManager().createBuilder("ui.all_games_icon")
                 .name("<gold>Все игры разом</gold>")
                 .lore(
-                        "<gray>Включить или отключить все игры сразу.</gray>",
+                        "<gray>Статус: " + state + "</gray>",
                         "",
-                        "<green>▶ ЛКМ — Включить все игры</green>",
-                        "<red>▶ ПКМ — Отключить все игры</red>"
+                        allOn ? "<red>▶ Нажмите — выключить все игры</red>"
+                                : "<green>▶ Нажмите — включить все игры</green>"
                 )
                 .build(), click -> {
-            if (click.isLeftClick()) {
-                plugin.getSettingsManager().setAllGamesBlacklisted(player.getUniqueId(), false);
-            } else {
-                plugin.getSettingsManager().setAllGamesBlacklisted(player.getUniqueId(), true);
-            }
+            // allOn -> blacklist everything; otherwise clear the blacklist (also repaints every per-game button below)
+            plugin.getSettingsManager().setAllGamesBlacklisted(player.getUniqueId(), allOn);
             SoundUtil.playClick(player);
             initializeItems();
         });
