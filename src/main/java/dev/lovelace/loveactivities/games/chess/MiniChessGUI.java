@@ -235,9 +235,15 @@ public class MiniChessGUI extends AbstractGUI {
             statusLore.add(TextUtil.parse("<gray>Цель: Поставить мат или захватить Короля!</gray>"));
         }
 
+        if (game.getBet() > 0) {
+            for (String line : dev.lovelace.loveactivities.util.BetLore.lines(game.getBet() * 2)) {
+                statusLore.add(TextUtil.parse(line));
+            }
+        }
+
         String clockTex = LoveActivities.getInstance().getHeadManager().getTexture("ui.clock");
         String headerTitle = (game.getBet() > 0)
-                ? "<gradient:#FF9966:#FF5E62><bold>Банк: " + (game.getBet() * 2) + " монет</bold></gradient> <dark_gray>•</dark_gray> " + timerColor + remaining + "с" + (remaining <= 5 ? " ⚠" : "")
+                ? "<gradient:#FF9966:#FF5E62><bold>Ставки</bold></gradient> <dark_gray>•</dark_gray> " + timerColor + remaining + "с" + (remaining <= 5 ? " ⚠" : "")
                 : "<gradient:#FF9966:#FF5E62><bold>Таймер хода</bold></gradient> <dark_gray>•</dark_gray> " + timerColor + remaining + "с" + (remaining <= 5 ? " ⚠" : "");
 
         setItem(9, ItemBuilder.base64Head(clockTex)

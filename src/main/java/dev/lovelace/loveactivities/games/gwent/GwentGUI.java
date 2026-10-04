@@ -1,6 +1,7 @@
 package dev.lovelace.loveactivities.games.gwent;
 
 import dev.lovelace.loveactivities.gui.AbstractGUI;
+import dev.lovelace.loveactivities.util.BetLore;
 import dev.lovelace.loveactivities.util.ItemBuilder;
 import dev.lovelace.loveactivities.util.SoundUtil;
 import dev.lovelace.loveactivities.util.TextUtil;
@@ -73,9 +74,7 @@ public class GwentGUI extends AbstractGUI {
         gameLore.add("<red><bold>" + oppName + "</bold></red> <gray>— сила <white>" + oppTotalPower + "</white>, раундов <gold>" + oppRounds
                 + "/2</gold>, карт <aqua>" + oppHandSize + "</aqua>" + (oppPassed ? " <red>(пас)</red>" : "") + "</gray>");
         gameLore.add("");
-        gameLore.add(game.getBet() > 0
-                ? "<gray>Банк: <gold>" + (game.getBet() * 2) + " " + plugin.getLoveCoreBridge().currencyName() + "</gold></gray>"
-                : "<gray>Режим: <white>без ставки</white></gray>");
+        gameLore.addAll(BetLore.lines(game.getBet() * 2));
         gameLore.add("");
         gameLore.add(myPassed ? "<red>Вы спасовали</red>"
                 : (myTurn ? "<green>Ваш ход</green> <dark_gray>•</dark_gray> " + timerColor + remaining + "с</gray>"

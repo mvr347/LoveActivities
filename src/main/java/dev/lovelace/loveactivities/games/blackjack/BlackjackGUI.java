@@ -4,6 +4,7 @@ import dev.lovelace.loveactivities.gui.AbstractGUI;
 import dev.lovelace.loveactivities.manager.SessionManager;
 import dev.lovelace.loveactivities.util.CardItemBuilder;
 import dev.lovelace.loveactivities.util.ItemBuilder;
+import dev.lovelace.loveactivities.util.BetLore;
 import dev.lovelace.loveactivities.util.SoundUtil;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -65,13 +66,12 @@ public class BlackjackGUI extends AbstractGUI {
         }
 
         if (game.getBet() > 0) {
-            timerItem.lore(
-                    "<gray>Банк: <gold>" + (game.getBet() * 2) + " " + plugin.getLoveCoreBridge().currencyName() + "</gold></gray>",
+            timerItem.lore(BetLore.withRest(game.getBet() * 2,
                     "<gray>Цель — набрать ближе к 21.</gray>",
                     "",
                     isP1Turn ? "<yellow>Сейчас ходит: <white>" + (p1 != null ? p1.getName() : "Игрок 1") + "</white></yellow>" :
                                "<yellow>Сейчас ходит: <white>" + (isNpc ? SessionManager.NPC_NAME : (p2 != null ? p2.getName() : "Игрок 2")) + "</white></yellow>"
-            );
+            ));
         } else {
             timerItem.lore(
                     "<gray>Режим: <white>Без ставки</white></gray>",

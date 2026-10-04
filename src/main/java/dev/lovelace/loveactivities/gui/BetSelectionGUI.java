@@ -4,6 +4,7 @@ import dev.lovelace.loveactivities.LoveActivities;
 import dev.lovelace.loveactivities.api.GameType;
 import dev.lovelace.loveactivities.util.Hints;
 import dev.lovelace.loveactivities.util.ItemBuilder;
+import dev.lovelace.loveactivities.util.MenuLayout;
 import dev.lovelace.loveactivities.util.SoundUtil;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -25,7 +26,7 @@ public class BetSelectionGUI extends AbstractGUI {
     }
 
     public BetSelectionGUI(Player player, Player opponent, GameType gameType, String subMode) {
-        super(player, 5, "<gradient:#FF5E62:#FF9966>Выбор формата игры</gradient>");
+        super(player, MenuLayout.SIZE, "<gradient:#FF5E62:#FF9966>Выбор формата игры</gradient>");
         this.opponent = opponent;
         this.gameType = gameType;
         this.subMode = subMode;
@@ -51,9 +52,9 @@ public class BetSelectionGUI extends AbstractGUI {
         inventory.clear();
         clickActions.clear();
 
-        // Hopper (5 slots): [ game info ] [ with bet ] [ glass ] [ without bet ] [ cancel ]
+        // 9 slots: [ game info ] . [ with bet ] . [ without bet ] . [ cancel ] .
         ItemStack border = ItemBuilder.from(Material.GRAY_STAINED_GLASS_PANE).name(Component.empty()).build();
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < MenuLayout.SIZE; i++) {
             inventory.setItem(i, border);
         }
 
@@ -76,12 +77,12 @@ public class BetSelectionGUI extends AbstractGUI {
                 .lore("<gray>Выберите формат матча</gray>")
                 .build());
 
-        // Slot 1: Play with Bet (Simultaneous Shared Betting Room)
-        setItem(1, plugin.getHeadManager().createBuilder("ui.with_bets")
+        // Slot 2: Play with Bet (Simultaneous Shared Betting Room)
+        setItem(MenuLayout.controlSlots(3)[0], plugin.getHeadManager().createBuilder("ui.with_bets")
                 .name("<gold>Играть со ставкой</gold>")
                 .lore(
                         "<gray>Внесите физические монеты в общую комнату ставок.</gray>",
-                        "<gray>Победитель забирает весь банк!</gray>",
+                        "<gray>Победитель забирает все ставки!</gray>",
                         "",
                         Hints.act("ЛКМ", "перейти к ставкам")
                 )
@@ -94,8 +95,8 @@ public class BetSelectionGUI extends AbstractGUI {
             SharedBetReviewGUI.openForBoth(player, opponent, gameType, subMode);
         });
 
-        // Slot 3: Play without Bet (Friendly)
-        setItem(3, plugin.getHeadManager().createBuilder("ui.without_bets")
+        // Slot 4: Play without Bet (Friendly)
+        setItem(MenuLayout.controlSlots(3)[1], plugin.getHeadManager().createBuilder("ui.without_bets")
                 .name("<green>Играть без ставки</green>")
                 .lore(
                         "<gray>Дружеская игра на интерес.</gray>",
@@ -112,8 +113,8 @@ public class BetSelectionGUI extends AbstractGUI {
             plugin.getSessionManager().createAndStartSession(player, opponent, gameType, subMode, 0L);
         });
 
-        // Slot 4: Cancel Button
-        setItem(4, plugin.getHeadManager().createBuilder("ui.back")
+        // Slot 6: Cancel Button
+        setItem(MenuLayout.controlSlots(3)[2], plugin.getHeadManager().createBuilder("ui.back")
                 .name("<red>Отмена</red>")
                 .lore("<gray>Отменить игру и закрыть меню</gray>")
                 .build(), click -> {

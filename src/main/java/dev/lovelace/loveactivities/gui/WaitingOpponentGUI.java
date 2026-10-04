@@ -2,6 +2,7 @@ package dev.lovelace.loveactivities.gui;
 
 import dev.lovelace.loveactivities.api.GameType;
 import dev.lovelace.loveactivities.util.ItemBuilder;
+import dev.lovelace.loveactivities.util.MenuLayout;
 import dev.lovelace.loveactivities.util.SoundUtil;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -15,7 +16,7 @@ public class WaitingOpponentGUI extends AbstractGUI {
     private final Runnable onCancelAction;
 
     public WaitingOpponentGUI(Player player, Player opponent, GameType gameType, Runnable onCancelAction) {
-        super(player, 5, "<gradient:#FF5E62:#FF9966>Ожидание соперника...</gradient>");
+        super(player, MenuLayout.SIZE, "<gradient:#FF5E62:#FF9966>Ожидание соперника...</gradient>");
         this.opponent = opponent;
         this.gameType = gameType;
         this.onCancelAction = onCancelAction;
@@ -27,12 +28,12 @@ public class WaitingOpponentGUI extends AbstractGUI {
         clickActions.clear();
 
         ItemStack border = ItemBuilder.from(Material.GRAY_STAINED_GLASS_PANE).name(Component.empty()).build();
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < MenuLayout.SIZE; i++) {
             inventory.setItem(i, border);
         }
 
-        // Slot 2: Waiting info (hopper: glass, glass, info, glass, cancel)
-        setItem(2, plugin.getHeadManager().createBuilder("game_icons." + (gameType != null ? gameType.getIconKey() : "blackjack"))
+        // Slot 0: description
+        setItem(0, plugin.getHeadManager().createBuilder("game_icons." + (gameType != null ? gameType.getIconKey() : "blackjack"))
                 .name("<gold>Ожидание выбора режима...</gold>")
                 .lore(
                         "<gray>Соперник: <white>" + (opponent != null ? opponent.getName() : "Игрок") + "</white></gray>",
@@ -42,8 +43,8 @@ public class WaitingOpponentGUI extends AbstractGUI {
                 )
                 .build());
 
-        // Slot 4: Cancel Button
-        setItem(4, plugin.getHeadManager().createBuilder("ui.cancel")
+        // Slot 4: Cancel Button (the only button, centred)
+        setItem(MenuLayout.controlSlots(1)[0], plugin.getHeadManager().createBuilder("ui.cancel")
                 .name("<red>Отменить вызов</red>")
                 .lore("<gray>Выйти из ожидания</gray>")
                 .build(), click -> {

@@ -3,6 +3,7 @@ package dev.lovelace.loveactivities.games.cards;
 import dev.lovelace.loveactivities.gui.AbstractGUI;
 import dev.lovelace.loveactivities.manager.SessionManager;
 import dev.lovelace.loveactivities.util.CardItemBuilder;
+import dev.lovelace.loveactivities.util.BetLore;
 import dev.lovelace.loveactivities.util.CurrencyUtil;
 import dev.lovelace.loveactivities.util.ItemBuilder;
 import dev.lovelace.loveactivities.util.SoundUtil;
@@ -71,7 +72,7 @@ public class TexasHoldemGUI extends AbstractGUI {
         long remaining = Math.max(0L, plugin.getConfigManager().getAfkTurnTimeoutSeconds() - elapsed);
         boolean hasPot = game.getPokerPot() > 0;
         String potTitlePrefix = hasPot
-                ? "Банк: " + CurrencyUtil.formatCoinsShort(game.getPokerPot())
+                ? "Ставки"
                 : "Таймер хода";
 
         ItemBuilder timerItem;
@@ -91,7 +92,7 @@ public class TexasHoldemGUI extends AbstractGUI {
         List<String> loreList = new ArrayList<>();
         loreList.add("<gray>Этап: <yellow><bold>" + game.getPokerStageName() + "</bold></yellow></gray>");
         if (hasPot) {
-            loreList.add("<gray>Банк: <gold>" + CurrencyUtil.formatCoinsWords(game.getPokerPot()) + "</gold></gray>");
+            loreList.addAll(BetLore.lines(game.getPokerPot()));
         } else {
             loreList.add("<gray>Режим: <green>Без ставок</green></gray>");
         }
@@ -178,7 +179,7 @@ public class TexasHoldemGUI extends AbstractGUI {
             setItem(52, plugin.getHeadManager().createBuilder("ui.coin_stack")
                     .name("<gold><bold>ПОВЫСИТЬ СТАВКУ (+10%)</bold></gold>")
                     .lore(
-                            "<gray>Увеличить общий банк на 10%.</gray>",
+                            "<gray>Увеличить общие ставки на 10%.</gray>",
                             myTurn ? "<gold>▶ Нажмите для повышения</gold>" : "<red>Сейчас не ваш ход</red>"
                     )
                     .build(), click -> {
