@@ -4,6 +4,7 @@ import dev.lovelace.loveactivities.gui.AbstractGUI;
 import dev.lovelace.loveactivities.manager.SessionManager;
 import dev.lovelace.loveactivities.util.CardItemBuilder;
 import dev.lovelace.loveactivities.util.ItemBuilder;
+import dev.lovelace.loveactivities.util.BetLore;
 import dev.lovelace.loveactivities.util.ParticleUtil;
 import dev.lovelace.loveactivities.util.SoundUtil;
 import net.kyori.adventure.text.Component;
@@ -106,10 +107,9 @@ public class DurakGUI extends AbstractGUI {
         }
 
         if (game.getBet() > 0) {
-            timerItem.lore(
-                    "<gray>Банк: <gold>" + (game.getBet() * 2) + " " + plugin.getLoveCoreBridge().currencyName() + "</gold></gray>",
+            timerItem.lore(BetLore.withRest(game.getBet() * 2,
                     isMyAttack ? "<green>▶ Ваш ход: атакуйте!</green>" : "<yellow>▶ Отбивайте атаки!</yellow>"
-            );
+            ));
         } else {
             timerItem.lore(
                     "<gray>Режим: <white>Без ставки</white></gray>",

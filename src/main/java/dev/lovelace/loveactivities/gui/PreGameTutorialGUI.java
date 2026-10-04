@@ -2,6 +2,7 @@ package dev.lovelace.loveactivities.gui;
 
 import dev.lovelace.loveactivities.api.GameType;
 import dev.lovelace.loveactivities.util.ItemBuilder;
+import dev.lovelace.loveactivities.util.MenuLayout;
 import dev.lovelace.loveactivities.util.SoundUtil;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -22,7 +23,7 @@ public class PreGameTutorialGUI extends AbstractGUI {
                               Runnable onStartGame,
                               Runnable onOpenTutorial,
                               Runnable onCancelGame) {
-        super(player, 5, "<gradient:#FF5E62:#FF9966>Новая игра: " + gameType.getNameRu() + "</gradient>");
+        super(player, MenuLayout.SIZE, "<gradient:#FF5E62:#FF9966>Новая игра: " + gameType.getNameRu() + "</gradient>");
         this.gameType = gameType;
         this.opponent = opponent;
         this.onStartGame = onStartGame;
@@ -37,8 +38,8 @@ public class PreGameTutorialGUI extends AbstractGUI {
 
         ItemStack glass = ItemBuilder.from(Material.GRAY_STAINED_GLASS_PANE).name(Component.empty()).build();
 
-        // Hopper: [ game banner ] [ tutorial ] [ glass ] [ skip ] [ cancel ]
-        for (int i = 0; i < 5; i++) {
+        // 9 slots: [ banner ] . [ tutorial ] . [ skip ] . [ cancel ] .
+        for (int i = 0; i < MenuLayout.SIZE; i++) {
             inventory.setItem(i, glass);
         }
 
@@ -51,8 +52,8 @@ public class PreGameTutorialGUI extends AbstractGUI {
                 )
                 .build());
 
-        // Slot 1: Open Tutorial Button
-        setItem(1, plugin.getHeadManager().createBuilder("ui.tutorial")
+        // Slot 2: Open Tutorial Button
+        setItem(MenuLayout.controlSlots(3)[0], plugin.getHeadManager().createBuilder("ui.tutorial")
                 .name("<green>📖 Пройти обучение</green>")
                 .lore(
                         "<gray>Открыть правила игры и комбинации.</gray>",
@@ -67,8 +68,8 @@ public class PreGameTutorialGUI extends AbstractGUI {
             }
         });
 
-        // Slot 3: Skip Tutorial Button
-        setItem(3, plugin.getHeadManager().createBuilder("ui.confirm_ready")
+        // Slot 4: Skip Tutorial Button
+        setItem(MenuLayout.controlSlots(3)[1], plugin.getHeadManager().createBuilder("ui.confirm_ready")
                 .name("<gold>▶ Пропустить и начать игру</gold>")
                 .lore(
                         "<gray>Я уже знаю правила, сразу к игре!</gray>",
@@ -83,8 +84,8 @@ public class PreGameTutorialGUI extends AbstractGUI {
             }
         });
 
-        // Slot 4: Cancel Match Button
-        setItem(4, plugin.getHeadManager().createBuilder("ui.cancel")
+        // Slot 6: Cancel Match Button
+        setItem(MenuLayout.controlSlots(3)[2], plugin.getHeadManager().createBuilder("ui.cancel")
                 .name("<red>✖ Отменить игру</red>")
                 .lore("<gray>Вернуть ставки и закрыть матч</gray>")
                 .build(), click -> {

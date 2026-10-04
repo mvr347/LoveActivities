@@ -2,6 +2,7 @@ package dev.lovelace.loveactivities.games.rps;
 
 import dev.lovelace.loveactivities.gui.AbstractGUI;
 import dev.lovelace.loveactivities.util.ItemBuilder;
+import dev.lovelace.loveactivities.util.BetLore;
 import dev.lovelace.loveactivities.util.SoundUtil;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -53,10 +54,9 @@ public class RPSGUI extends AbstractGUI {
         }
 
         if (game.getBet() > 0) {
-            timerItem.lore(
-                    "<gray>Банк: <gold>" + (game.getBet() * 2) + " " + plugin.getLoveCoreBridge().currencyName() + "</gold></gray>",
+            timerItem.lore(BetLore.withRest(game.getBet() * 2,
                     "<gray>Счёт: <yellow>" + (p1 != null ? p1.getName() : "P1") + " [" + game.getScoreP1() + "]</yellow> : <yellow>[" + game.getScoreP2() + "] " + (p2 != null ? p2.getName() : "P2") + "</yellow></gray>"
-            );
+            ));
         } else {
             timerItem.lore(
                     "<gray>Режим: <white>Без ставки</white></gray>",

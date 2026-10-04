@@ -201,8 +201,11 @@ public class SharedBetReviewGUI extends AbstractGUI {
             headerLore.add("<yellow>Оба игрока должны подтвердить готовность</yellow>");
         }
 
+        if (totalPot > 0) {
+            headerLore.addAll(dev.lovelace.loveactivities.util.BetLore.lines(totalPot));
+        }
         String titleHeader = totalPot > 0
-                ? "<gold>" + gName + " — Общий банк: " + CurrencyUtil.formatCoinsShort(totalPot) + "</gold>"
+                ? "<gold>" + gName + " — Ставки</gold>"
                 : "<gold>" + gName + " — Без ставок</gold>";
 
         setItem(4, plugin.getHeadManager().createBuilder("game_icons." + gameType.getIconKey())

@@ -680,14 +680,14 @@ public class CardsGame implements GameSession {
             pokerP1Acted = false;
         }
 
-        player.sendActionBar(TextUtil.parse("<gold><bold>▲ Вы повысили банк на +" + addition + " монет (Банк: " + pokerPot + ")</bold></gold>"));
-        player.sendMessage(TextUtil.parse("<gold>▲ Вы повысили банк на <yellow>+" + addition + "</yellow> монет! (Текущий банк: <yellow>" + pokerPot + "</yellow>)</gold>"));
+        player.sendActionBar(TextUtil.parse("<gold><bold>▲ Вы повысили ставки на +" + addition + " монет (Ставки: " + pokerPot + ")</bold></gold>"));
+        player.sendMessage(TextUtil.parse("<gold>▲ Вы повысили ставки на <yellow>+" + addition + "</yellow> монет! (Текущие ставки: <yellow>" + pokerPot + "</yellow>)</gold>"));
         SoundUtil.playSuccess(player);
 
         Player opp = Bukkit.getPlayer(getOpponent(player.getUniqueId()));
         if (opp != null && !isNpcMatch()) {
-            opp.sendMessage(TextUtil.parse("<gold>Соперник повысил банк на <yellow>+" + addition + "</yellow> монет! (Банк: <yellow>" + pokerPot + "</yellow>)</gold>"));
-            opp.sendActionBar(TextUtil.parse("<gold>▲ Соперник повысил ставку (Банк: " + pokerPot + ")</gold>"));
+            opp.sendMessage(TextUtil.parse("<gold>Соперник повысил ставки на <yellow>+" + addition + "</yellow> монет! (Ставки: <yellow>" + pokerPot + "</yellow>)</gold>"));
+            opp.sendActionBar(TextUtil.parse("<gold>▲ Соперник повысил ставку (Ставки: " + pokerPot + ")</gold>"));
             SoundUtil.playChallenge(opp);
         }
 

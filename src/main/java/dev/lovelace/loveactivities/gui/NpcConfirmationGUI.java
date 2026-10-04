@@ -2,9 +2,11 @@ package dev.lovelace.loveactivities.gui;
 
 import dev.lovelace.loveactivities.manager.NpcActivityConfig;
 import dev.lovelace.loveactivities.util.BetInput;
+import dev.lovelace.loveactivities.util.BetLore;
 import dev.lovelace.loveactivities.util.CurrencyUtil;
 import dev.lovelace.loveactivities.util.Hints;
 import dev.lovelace.loveactivities.util.ItemBuilder;
+import dev.lovelace.loveactivities.util.MenuLayout;
 import dev.lovelace.loveactivities.util.SoundUtil;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -18,24 +20,19 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Confirmation against a bot: a 5-slot hopper menu with the same stake picker as the LoveShop price menu.
- * <pre>[ game info ] [ stake ] [ start ] [ max stake ] [ decline ]</pre>
- * Stake button: <b>Shift</b> switches the coin, <b>left click</b> adds one, <b>right click</b> takes one away.
- * Without bets the stake and max slots show a note / glass instead.
+ * Confirmation against a bot: a 9-slot menu (gui_gen header row). Slot 0 describes the game, the buttons are
+ * centred in slots 2-7: <pre>[ description ] [ stake ] [ accept ] [ decline ]</pre>
+ * Stake button: <b>Shift</b> switches the coin, <b>left click</b> adds one, <b>right click</b> takes one away;
+ * the most the stake can reach is the player's balance / the NPC's limit (there is no "maximum" button).
+ * An NPC that plays without bets has no stake button at all.
  */
 public class NpcConfirmationGUI extends AbstractGUI {
-
-    private static final int SLOT_INFO = 0;
-    private static final int SLOT_BET = 1;
-    private static final int SLOT_START = 2;
-    private static final int SLOT_MAX = 3;
-    private static final int SLOT_DECLINE = 4;
 
     private final NpcActivityConfig npcConfig;
     private final BetInput input;
 
     public NpcConfirmationGUI(Player player, NpcActivityConfig npcConfig) {
-        super(player, 5, "<white>Игра с </white>" + npcConfig.getCustomName());
+        super(player, MenuLayout.SIZE, "<white>Игра с </white>" + npcConfig.getCustomName());
         this.npcConfig = npcConfig;
         long balance = plugin.getLoveCoreBridge().getBalance(player);
         long limit = npcConfig.isPlaysBets()
@@ -52,7 +49,7 @@ public class NpcConfirmationGUI extends AbstractGUI {
         clickActions.clear();
 
         ItemStack glass = ItemBuilder.from(Material.GRAY_STAINED_GLASS_PANE).name(Component.empty()).build();
-        for (int i = 0; i < 5; i++) inventory.setItem(i, glass);
+        for (int i = 0; i < MenuLayout.SIZE; i++) inventory.setItem(i, glass);
 
         String iconKey = npcConfig.getGameType() != null ? npcConfig.getGameType().getIconKey() : "chess";
         String gameName = npcConfig.getGameType() != null ? npcConfig.getGameType().getNameRu() : "Мини-игра";
@@ -63,67 +60,45 @@ public class NpcConfirmationGUI extends AbstractGUI {
         if (npcConfig.isPlaysBets()) {
             infoLore.add("<dark_gray>▪</dark_gray> <gray>Ваш баланс: <yellow>" + balance + " "
                     + plugin.getLoveCoreBridge().currencyName() + "</yellow></gray>");
-            infoLore.add("<dark_gray>▪</dark_gray> <gray>Лимит соперника: <gold>"
-                    + (npcConfig.getMaxBet() > 0 ? CurrencyUtil.formatCoinsShort(npcConfig.getMaxBet()) : "без ограничений") + "</gold></gray>");
         } else {
-            infoLore.add("<dark_gray>▪</dark_gray> <gray>Ставки выключены — дружеская игра.</gray>");
+            infoLore.add("<dark_gray>▪</dark_gray> <gray>Ставок нет — дружеская игра.</gray>");
         }
-        setItem(SLOT_INFO, plugin.getHeadManager().createBuilder("game_icons." + iconKey)
+        setItem(0, plugin.getHeadManager().createBuilder("game_icons." + iconKey)
                 .name("<yellow>Партия: " + gameName + "</yellow>")
                 .lore(infoLore.toArray(new String[0]))
                 .build());
 
+        // Buttons, centred: [stake] accept decline (the stake button only when the NPC plays with bets)
+        int count = npcConfig.isPlaysBets() ? 3 : 2;
+        int[] slots = MenuLayout.controlSlots(count);
+        int next = 0;
+
         if (npcConfig.isPlaysBets()) {
             List<String> betLore = new ArrayList<>();
-            betLore.add("<dark_gray>▪</dark_gray> <gray>Текущая ставка:</gray>");
-            if (input.bet() > 0) {
-                for (String line : CurrencyUtil.formatCoinLines(input.bet())) betLore.add(line);
-            } else {
-                betLore.add("<gray>Без ставки</gray>");
-            }
+            betLore.addAll(BetLore.lines(input.bet()));
             betLore.add("<dark_gray>▪</dark_gray> <gray>Номинал: </gray>" + CurrencyUtil.coinGlyphForValue(input.activeUnit()));
             betLore.add("");
             betLore.add(Hints.coinPicker());
-            setItem(SLOT_BET, plugin.getHeadManager().createBuilder("ui.coin_stack")
+            setItem(slots[next++], plugin.getHeadManager().createBuilder("ui.coin_stack")
                     .name("<gold>Ставка</gold>")
                     .lore(betLore.toArray(new String[0]))
                     .build(), this::clickBet);
-
-            setItem(SLOT_MAX, plugin.getHeadManager().createBuilder("ui.confirm_arrow")
-                    .name("<gold>Максимальная ставка</gold>")
-                    .lore(
-                            "<dark_gray>▪</dark_gray> <gray>Установить:</gray>",
-                            CurrencyUtil.formatCoinLines(input.max()).get(0),
-                            "",
-                            Hints.act("ЛКМ", "выбрать")
-                    )
-                    .build(), click -> {
-                input.setMax();
-                SoundUtil.playClick(player);
-                initializeItems();
-            });
-        } else {
-            setItem(SLOT_BET, plugin.getHeadManager().createBuilder("ui.without_bets")
-                    .name("<green>Без ставки</green>")
-                    .lore("<gray>Этот соперник играет без денег.</gray>")
-                    .build());
         }
 
         List<String> startLore = new ArrayList<>();
         if (input.bet() > 0) {
-            startLore.add("<dark_gray>▪</dark_gray> <gray>Ставка будет удержана в банк матча:</gray>");
-            startLore.addAll(CurrencyUtil.formatCoinLines(input.bet()));
+            startLore.add("<gray>Ставка будет удержана до конца партии.</gray>");
         } else {
             startLore.add("<gray>Дружеская игра без ставки.</gray>");
         }
         startLore.add("");
-        startLore.add(Hints.act("ЛКМ", "начать"));
-        setItem(SLOT_START, plugin.getHeadManager().createBuilder("ui.confirm_ready")
-                .name("<green>Начать партию</green>")
+        startLore.add(Hints.act("ЛКМ", "принять"));
+        setItem(slots[next++], plugin.getHeadManager().createBuilder("ui.confirm_ready")
+                .name("<green>Принять</green>")
                 .lore(startLore.toArray(new String[0]))
                 .build(), click -> start());
 
-        setItem(SLOT_DECLINE, plugin.getHeadManager().createBuilder("ui.cancel")
+        setItem(slots[next], plugin.getHeadManager().createBuilder("ui.cancel")
                 .name("<red>Отказаться</red>")
                 .lore(Hints.act("ЛКМ", "закрыть меню"))
                 .build(), click -> {

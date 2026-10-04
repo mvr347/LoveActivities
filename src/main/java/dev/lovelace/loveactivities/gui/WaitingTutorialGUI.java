@@ -2,6 +2,7 @@ package dev.lovelace.loveactivities.gui;
 
 import dev.lovelace.loveactivities.api.GameType;
 import dev.lovelace.loveactivities.util.ItemBuilder;
+import dev.lovelace.loveactivities.util.MenuLayout;
 import dev.lovelace.loveactivities.util.SoundUtil;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -18,7 +19,7 @@ public class WaitingTutorialGUI extends AbstractGUI {
     public WaitingTutorialGUI(Player player, Player student, GameType gameType,
                               Runnable onOpenTutorialForMe,
                               Runnable onCancelGame) {
-        super(player, 5, "<gradient:#FF5E62:#FF9966>Ожидание: " + gameType.getNameRu() + "</gradient>");
+        super(player, MenuLayout.SIZE, "<gradient:#FF5E62:#FF9966>Ожидание: " + gameType.getNameRu() + "</gradient>");
         this.student = student;
         this.gameType = gameType;
         this.onOpenTutorialForMe = onOpenTutorialForMe;
@@ -31,11 +32,11 @@ public class WaitingTutorialGUI extends AbstractGUI {
         clickActions.clear();
 
         ItemStack border = ItemBuilder.from(Material.GRAY_STAINED_GLASS_PANE).name(Component.empty()).build();
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < MenuLayout.SIZE; i++) {
             inventory.setItem(i, border);
         }
 
-        // Hopper: [ info ] [ read tutorial ] [ glass ] [ glass ] [ cancel ]
+        // 9 slots: [ info ] . . [ read tutorial ] . [ cancel ] . . .
         setItem(0, plugin.getHeadManager().createBuilder("game_icons." + gameType.getIconKey())
                 .name("<gold>" + gameType.getNameRu() + " — Ожидание старта</gold>")
                 .lore(
@@ -44,8 +45,8 @@ public class WaitingTutorialGUI extends AbstractGUI {
                 )
                 .build());
 
-        // Slot 1: Read tutorial too
-        setItem(1, plugin.getHeadManager().createBuilder("ui.tutorial")
+        // Slot 3: Read tutorial too
+        setItem(MenuLayout.controlSlots(2)[0], plugin.getHeadManager().createBuilder("ui.tutorial")
                 .name("<yellow>📖 Тоже почитать правила</yellow>")
                 .lore(
                         "<gray>Пока соперник изучает игру, вы тоже можете освежить правила.</gray>",
@@ -59,8 +60,8 @@ public class WaitingTutorialGUI extends AbstractGUI {
             }
         });
 
-        // Slot 4: Cancel Match
-        setItem(4, plugin.getHeadManager().createBuilder("ui.cancel")
+        // Slot 5: Cancel Match
+        setItem(MenuLayout.controlSlots(2)[1], plugin.getHeadManager().createBuilder("ui.cancel")
                 .name("<red>✖ Отменить игру</red>")
                 .lore(
                         "<gray>Не хотите ждать? Отмените игру и верните все ставки.</gray>",

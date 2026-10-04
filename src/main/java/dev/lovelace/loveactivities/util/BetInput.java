@@ -62,8 +62,4 @@ public final class BetInput {
     public void reset() {
         bet = 0L;
     }
-
-    public void setMax() {
-        bet = max;
-    }
 }

@@ -2,6 +2,7 @@ package dev.lovelace.loveactivities.games.dice;
 
 import dev.lovelace.loveactivities.gui.AbstractGUI;
 import dev.lovelace.loveactivities.util.ItemBuilder;
+import dev.lovelace.loveactivities.util.BetLore;
 import dev.lovelace.loveactivities.util.SoundUtil;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -57,12 +58,11 @@ public class DiceGUI extends AbstractGUI {
         }
 
         if (game.getBet() > 0) {
-            timerItem.lore(
-                    "<gray>Банк: <gold>" + (game.getBet() * 2) + " " + plugin.getLoveCoreBridge().currencyName() + "</gold></gray>",
+            timerItem.lore(BetLore.withRest(game.getBet() * 2,
                     "",
                     isP1Turn ? "<yellow>Бросает: <white>" + (p1 != null ? p1.getName() : "Игрок 1") + "</white></yellow>" :
                                "<yellow>Бросает: <white>" + (p2 != null ? p2.getName() : "Игрок 2") + "</white></yellow>"
-            );
+            ));
         } else {
             timerItem.lore(
                     "<gray>Режим: <white>Без ставки</white></gray>",
