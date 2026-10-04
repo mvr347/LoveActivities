@@ -130,7 +130,7 @@ public class CurrencyUtil {
             if (count > 0) {
                 remaining %= entry.getValue();
                 if (sb.length() > 0) sb.append(" ");
-                sb.append(getCoinFontImage(entry.getKey())).append(" x").append(count);
+                sb.append(getCoinFontImage(entry.getKey())).append(" <white>x").append(count).append("</white>");
             }
         }
         return sb.toString();
@@ -144,10 +144,10 @@ public class CurrencyUtil {
             long count = remaining / entry.getValue();
             if (count > 0) {
                 remaining %= entry.getValue();
-                lines.add(getCoinFontImage(entry.getKey()) + " x" + count);
+                lines.add(getCoinFontImage(entry.getKey()) + " <white>x" + count + "</white>");
             }
         }
-        if (lines.isEmpty()) lines.add("<white>%img_copper_coin%</white> x0");
+        if (lines.isEmpty()) lines.add("<white>%img_copper_coin%</white> <white>x0</white>");
         return lines;
     }
 
@@ -173,7 +173,7 @@ public class CurrencyUtil {
             if (count > 0) {
                 remaining %= entry.getValue();
                 if (sb.length() > 0) sb.append(" ");
-                sb.append(getCoinFontImage(entry.getKey())).append(" ").append(getCoinNameRu(entry.getKey())).append(" x").append(count);
+                sb.append(getCoinFontImage(entry.getKey())).append(" ").append(getCoinNameRu(entry.getKey())).append(" <white>x").append(count).append("</white>");
             }
         }
         return sb.toString();
