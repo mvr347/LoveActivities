@@ -136,6 +136,34 @@ public class CurrencyUtil {
         return sb.toString();
     }
 
+    /** The same amount, one line per coin type (a column): {@code glyph xN}. Zero gives a single "0 монет" line. */
+    public static List<String> formatCoinLines(long amount) {
+        List<String> lines = new ArrayList<>();
+        long remaining = Math.max(0L, amount);
+        for (Map.Entry<String, Long> entry : denominations(false).entrySet()) {
+            long count = remaining / entry.getValue();
+            if (count > 0) {
+                remaining %= entry.getValue();
+                lines.add(getCoinFontImage(entry.getKey()) + " x" + count);
+            }
+        }
+        if (lines.isEmpty()) lines.add("<white>%img_copper_coin%</white> x0");
+        return lines;
+    }
+
+    /** Values of the coins a stake can be built from, smallest first (the picker steps). */
+    public static long[] coinValuesAscending() {
+        return denominations(false).values().stream().mapToLong(Long::longValue).sorted().toArray();
+    }
+
+    /** Glyph of the coin worth {@code value}; the copper one for an unknown value. */
+    public static String coinGlyphForValue(long value) {
+        for (Map.Entry<String, Long> entry : denominations(false).entrySet()) {
+            if (entry.getValue() == value) return getCoinFontImage(entry.getKey());
+        }
+        return getCoinFontImage(null);
+    }
+
     public static String formatCoinsWords(long amount) {
         if (amount <= 0) return "0 монет";
         StringBuilder sb = new StringBuilder();

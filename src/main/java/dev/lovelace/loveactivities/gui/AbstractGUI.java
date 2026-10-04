@@ -39,7 +39,14 @@ public abstract class AbstractGUI implements InventoryHolder {
         this.player = player;
         this.size = size;
         this.title = title;
-        this.inventory = Bukkit.createInventory(this, size, title);
+        this.inventory = create(size, title);
+    }
+
+    /** 5 slots means a hopper menu (the confirmation menus); everything else is a chest of that size. */
+    private Inventory create(int slots, Component name) {
+        return slots == 5
+                ? Bukkit.createInventory(this, org.bukkit.event.inventory.InventoryType.HOPPER, name)
+                : Bukkit.createInventory(this, slots, name);
     }
 
     public abstract void initializeItems();

@@ -2,6 +2,7 @@ package dev.lovelace.loveactivities.gui;
 
 import dev.lovelace.loveactivities.LoveActivities;
 import dev.lovelace.loveactivities.api.GameType;
+import dev.lovelace.loveactivities.util.Hints;
 import dev.lovelace.loveactivities.util.ItemBuilder;
 import dev.lovelace.loveactivities.util.SoundUtil;
 import net.kyori.adventure.text.Component;
@@ -24,7 +25,7 @@ public class BetSelectionGUI extends AbstractGUI {
     }
 
     public BetSelectionGUI(Player player, Player opponent, GameType gameType, String subMode) {
-        super(player, 27, "<gradient:#FF5E62:#FF9966>Выбор формата игры</gradient>");
+        super(player, 5, "<gradient:#FF5E62:#FF9966>Выбор формата игры</gradient>");
         this.opponent = opponent;
         this.gameType = gameType;
         this.subMode = subMode;
@@ -50,12 +51,13 @@ public class BetSelectionGUI extends AbstractGUI {
         inventory.clear();
         clickActions.clear();
 
+        // Hopper (5 slots): [ game info ] [ with bet ] [ glass ] [ without bet ] [ cancel ]
         ItemStack border = ItemBuilder.from(Material.GRAY_STAINED_GLASS_PANE).name(Component.empty()).build();
-        for (int i = 0; i < 27; i++) {
+        for (int i = 0; i < 5; i++) {
             inventory.setItem(i, border);
         }
 
-        // Slot 4: Game Info
+        // Slot 0: Game Info
         String displayName = gameType.getNameRu();
         if ("poker".equalsIgnoreCase(subMode)) {
             displayName = "Покер";
@@ -69,19 +71,19 @@ public class BetSelectionGUI extends AbstractGUI {
             displayName = "Кидание костей";
         }
 
-        setItem(4, plugin.getHeadManager().createBuilder("game_icons." + gameType.getIconKey())
+        setItem(0, plugin.getHeadManager().createBuilder("game_icons." + gameType.getIconKey())
                 .name("<yellow>" + displayName + "</yellow>")
                 .lore("<gray>Выберите формат матча</gray>")
                 .build());
 
-        // Slot 11: Play with Bet (Simultaneous Shared Betting Room)
-        setItem(11, plugin.getHeadManager().createBuilder("ui.with_bets")
+        // Slot 1: Play with Bet (Simultaneous Shared Betting Room)
+        setItem(1, plugin.getHeadManager().createBuilder("ui.with_bets")
                 .name("<gold>Играть со ставкой</gold>")
                 .lore(
                         "<gray>Внесите физические монеты в общую комнату ставок.</gray>",
                         "<gray>Победитель забирает весь банк!</gray>",
                         "",
-                        "<yellow>▶ Нажмите для перехода к ставкам</yellow>"
+                        Hints.act("ЛКМ", "перейти к ставкам")
                 )
                 .build(), click -> {
             selectionMade = true;
@@ -92,14 +94,14 @@ public class BetSelectionGUI extends AbstractGUI {
             SharedBetReviewGUI.openForBoth(player, opponent, gameType, subMode);
         });
 
-        // Slot 15: Play without Bet (Friendly)
-        setItem(15, plugin.getHeadManager().createBuilder("ui.without_bets")
+        // Slot 3: Play without Bet (Friendly)
+        setItem(3, plugin.getHeadManager().createBuilder("ui.without_bets")
                 .name("<green>Играть без ставки</green>")
                 .lore(
                         "<gray>Дружеская игра на интерес.</gray>",
                         "<gray>Без риска потерять монеты.</gray>",
                         "",
-                        "<green>▶ Нажмите для мгновенного старта</green>"
+                        Hints.act("ЛКМ", "начать сразу")
                 )
                 .build(), click -> {
             selectionMade = true;
@@ -110,9 +112,9 @@ public class BetSelectionGUI extends AbstractGUI {
             plugin.getSessionManager().createAndStartSession(player, opponent, gameType, subMode, 0L);
         });
 
-        // Slot 22: Back / Cancel Button
-        setItem(22, plugin.getHeadManager().createBuilder("ui.back")
-                .name("<red>← Назад / Отмена</red>")
+        // Slot 4: Cancel Button
+        setItem(4, plugin.getHeadManager().createBuilder("ui.back")
+                .name("<red>Отмена</red>")
                 .lore("<gray>Отменить игру и закрыть меню</gray>")
                 .build(), click -> {
             selectionMade = true;

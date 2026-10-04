@@ -52,36 +52,49 @@ public class GwentGUI extends AbstractGUI {
         int oppTotalPower = game.calculateTotalPower(!isP1);
         boolean myTurn = game.isPlayerTurn(player);
 
-        // Header Slot 0: Player Head & Info (You)
-        setItem(0, ItemBuilder.skull().playerHead(player.getUniqueId())
-                .name("<gradient:#00C9FF:#92FE9D><bold>Вы (" + player.getName() + ")</bold></gradient> <dark_gray>•</dark_gray> <green><bold>[Сила: " + myTotalPower + "]</bold></green>")
-                .lore(
-                        "<gray>Ваша общая сила: <green><bold>" + myTotalPower + "</bold></green></gray>",
-                        "<gray>Выиграно раундов: <gold>" + (isP1 ? game.getRoundsWonP1() : game.getRoundsWonP2()) + "/2</gold></gray>",
-                        "<gray>Карт в руке: <aqua>" + (isP1 ? game.getHandP1().size() : game.getHandP2().size()) + "</aqua></gray>",
-                        "<gray>Статус: " + ((isP1 ? game.isP1Passed() : game.isP2Passed()) ? "<red>ПАСОВАН</red>" : (myTurn ? "<green>Ваш ход</green>" : "<yellow>Ожидание</yellow>")) + "</gray>"
-                )
+        // Slot 0: the game itself - score, strength and status of both sides, bank and the AFK timer
+        int myRounds = isP1 ? game.getRoundsWonP1() : game.getRoundsWonP2();
+        int oppRounds = isP1 ? game.getRoundsWonP2() : game.getRoundsWonP1();
+        int myHandSize = (isP1 ? game.getHandP1() : game.getHandP2()).size();
+        int oppHandSize = (isP1 ? game.getHandP2() : game.getHandP1()).size();
+        boolean myPassed = isP1 ? game.isP1Passed() : game.isP2Passed();
+        boolean oppPassed = isP1 ? game.isP2Passed() : game.isP1Passed();
+        String oppName = opp != null ? opp.getName() : "Соперник";
+
+        long elapsed = (System.currentTimeMillis() - game.getLastActionTime()) / 1000L;
+        long remaining = Math.max(0L, plugin.getConfigManager().getAfkTurnTimeoutSeconds() - elapsed);
+        String timerColor = remaining > 15 ? "<green>" : (remaining > 5 ? "<yellow>" : "<red>");
+
+        List<String> gameLore = new ArrayList<>();
+        gameLore.add("<gray>Раунд: <white>" + game.getCurrentRound() + "/3</white></gray>");
+        gameLore.add("");
+        gameLore.add("<green><bold>Вы</bold></green> <gray>— сила <white>" + myTotalPower + "</white>, раундов <gold>" + myRounds
+                + "/2</gold>, карт <aqua>" + myHandSize + "</aqua>" + (myPassed ? " <red>(пас)</red>" : "") + "</gray>");
+        gameLore.add("<red><bold>" + oppName + "</bold></red> <gray>— сила <white>" + oppTotalPower + "</white>, раундов <gold>" + oppRounds
+                + "/2</gold>, карт <aqua>" + oppHandSize + "</aqua>" + (oppPassed ? " <red>(пас)</red>" : "") + "</gray>");
+        gameLore.add("");
+        gameLore.add(game.getBet() > 0
+                ? "<gray>Банк: <gold>" + (game.getBet() * 2) + " " + plugin.getLoveCoreBridge().currencyName() + "</gold></gray>"
+                : "<gray>Режим: <white>без ставки</white></gray>");
+        gameLore.add("");
+        gameLore.add(myPassed ? "<red>Вы спасовали</red>"
+                : (myTurn ? "<green>Ваш ход</green> <dark_gray>•</dark_gray> " + timerColor + remaining + "с</gray>"
+                        : "<yellow>Ход соперника...</yellow>"));
+
+        setItem(0, plugin.getHeadManager().createBuilder("game_icons.gwent")
+                .name("<gradient:#00C9FF:#92FE9D><bold>Гвинт</bold></gradient> <dark_gray>•</dark_gray> <green>" + myTotalPower
+                        + "</green> <gray>:</gray> <red>" + oppTotalPower + "</red>")
+                .lore(gameLore.toArray(new String[0]))
                 .build());
 
-        // Header Slot 2: Opponent Head & Info
-        setItem(2, ItemBuilder.skull().playerHead(opp != null ? opp.getUniqueId() : null)
-                .name("<gradient:#FF9966:#FF5E62><bold>" + (opp != null ? opp.getName() : "Соперник") + "</bold></gradient> <dark_gray>•</dark_gray> <red><bold>[Сила: " + oppTotalPower + "]</bold></red>")
-                .lore(
-                        "<gray>Сила врага: <red><bold>" + oppTotalPower + "</bold></red></gray>",
-                        "<gray>Выиграно раундов: <gold>" + (isP1 ? game.getRoundsWonP2() : game.getRoundsWonP1()) + "/2</gold></gray>",
-                        "<gray>Карт в руке: <aqua>" + (isP1 ? game.getHandP2().size() : game.getHandP1().size()) + "</aqua></gray>",
-                        "<gray>Статус: " + ((isP1 ? game.isP2Passed() : game.isP1Passed()) ? "<red>ПАСОВАН</red>" : "<green>В игре</green>") + "</gray>"
-                )
-                .build());
-
-        // Header Slot 3: Active Weather
+        // Slot 4 (top centre): Active Weather
         String weatherName = "<green>Ясно</green>";
         String weatherKey = "gwent.weather_clear";
         if (game.isFrost()) { weatherName = "<aqua>Мороз (Ближний ряд = 1)</aqua>"; weatherKey = "gwent.weather_frost"; }
         else if (game.isFog()) { weatherName = "<gray>Туман (Дальний ряд = 1)</gray>"; weatherKey = "gwent.weather_fog"; }
         else if (game.isRain()) { weatherName = "<blue>Ливень (Осадный ряд = 1)</blue>"; weatherKey = "gwent.weather_rain"; }
 
-        setItem(3, plugin.getHeadManager().createBuilder(weatherKey)
+        setItem(4, plugin.getHeadManager().createBuilder(weatherKey)
                 .name("<yellow><bold>Погода на поле</bold></yellow>")
                 .lore(
                         "<gray>Текущее состояние: " + weatherName + "</gray>",
@@ -91,36 +104,6 @@ public class GwentGUI extends AbstractGUI {
                         "<dark_gray>• Ливень: осадный ряд = 1</dark_gray>"
                 )
                 .build());
-
-        // Header Slot 4: Match Status / Bank with 3-phase AFK timer
-        long elapsed = (System.currentTimeMillis() - game.getLastActionTime()) / 1000L;
-        long remaining = Math.max(0L, plugin.getConfigManager().getAfkTurnTimeoutSeconds() - elapsed);
-
-        ItemBuilder timerItem;
-        if (remaining > 15) {
-            timerItem = plugin.getHeadManager().createBuilder("game_icons.gwent")
-                    .name("<gradient:#00C9FF:#92FE9D><bold>Раунд " + game.getCurrentRound() + " / 3</bold></gradient> <dark_gray>•</dark_gray> <green>" + remaining + "с</green>");
-        } else if (remaining > 5) {
-            timerItem = plugin.getHeadManager().createBuilder("ui.timer_yellow")
-                    .name("<gradient:#FF9966:#FF5E62><bold>Раунд " + game.getCurrentRound() + " / 3</bold></gradient> <dark_gray>•</dark_gray> <yellow>⏳ " + remaining + "с</yellow>");
-        } else {
-            boolean blink = (System.currentTimeMillis() / 500) % 2 == 0;
-            String blinkTex = blink ? plugin.getHeadManager().getTexture("ui.cancel") : plugin.getHeadManager().getTexture("ui.surrender");
-            timerItem = ItemBuilder.base64Head(blinkTex)
-                    .name("<red><bold>⚠ ВРЕМЯ НА ИСХОДЕ: " + remaining + "с ⚠</bold></red>");
-        }
-
-        List<String> timerLore = new ArrayList<>();
-        timerLore.add("<gray>Счёт: <green>" + myTotalPower + "</green> против <red>" + oppTotalPower + "</red></gray>");
-        if (game.getBet() > 0) {
-            timerLore.add("<gray>Банк: <gold>" + (game.getBet() * 2) + " " + plugin.getLoveCoreBridge().currencyName() + "</gold></gray>");
-        } else {
-            timerLore.add("<gray>Режим: <white>Без ставки</white></gray>");
-        }
-        timerLore.add("");
-        timerLore.add(myTurn ? "<green>▶ Сейчас ваш ход!</green>" : "<red>⏳ Ход соперника...</red>");
-        timerItem.lore(timerLore.toArray(new String[0]));
-        setItem(4, timerItem.build());
 
         // Header Slot 6: Pass Button
         setItem(6, plugin.getHeadManager().createBuilder("gwent.pass_round")
