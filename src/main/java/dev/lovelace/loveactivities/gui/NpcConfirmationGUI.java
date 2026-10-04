@@ -58,8 +58,7 @@ public class NpcConfirmationGUI extends AbstractGUI {
         List<String> infoLore = new ArrayList<>();
         infoLore.add("<dark_gray>▪</dark_gray> <gray>Соперник: </gray>" + npcConfig.getCustomName());
         if (npcConfig.isPlaysBets()) {
-            infoLore.add("<dark_gray>▪</dark_gray> <gray>Ваш баланс: <yellow>" + balance + " "
-                    + plugin.getLoveCoreBridge().currencyName() + "</yellow></gray>");
+            infoLore.add("<dark_gray>▪</dark_gray> <gray>Ваш баланс: </gray>" + CurrencyUtil.formatCoinsShort(balance));
         } else {
             infoLore.add("<dark_gray>▪</dark_gray> <gray>Ставок нет — дружеская игра.</gray>");
         }
@@ -68,17 +67,23 @@ public class NpcConfirmationGUI extends AbstractGUI {
                 .lore(infoLore.toArray(new String[0]))
                 .build());
 
-        // Buttons, centred: [stake] accept decline (the stake button only when the NPC plays with bets)
+        // Buttons shifted +1 to the right: 3 buttons -> [3, 5, 7], 2 buttons -> [4, 6]
         int count = npcConfig.isPlaysBets() ? 3 : 2;
-        int[] slots = MenuLayout.controlSlots(count);
+        int[] baseSlots = MenuLayout.controlSlots(count);
+        int[] slots = new int[count];
+        for (int i = 0; i < count; i++) {
+            slots[i] = Math.min(MenuLayout.SIZE - 2, baseSlots[i] + 1);
+        }
         int next = 0;
 
         if (npcConfig.isPlaysBets()) {
             List<String> betLore = new ArrayList<>();
             betLore.addAll(BetLore.lines(input.bet()));
             betLore.add("<dark_gray>▪</dark_gray> <gray>Номинал: </gray>" + CurrencyUtil.coinGlyphForValue(input.activeUnit()));
+            betLore.add("<dark_gray>▪</dark_gray> <gray>Ваш баланс: </gray>" + CurrencyUtil.formatCoinsShort(balance));
+            betLore.add("<dark_gray>▪</dark_gray> <gray>Макс. ставка: </gray>" + CurrencyUtil.formatCoinsShort(input.max()));
             betLore.add("");
-            betLore.add(Hints.coinPicker());
+            betLore.add(Hints.join(Hints.act("Shift", "сменить"), Hints.op("ЛКМ", "+"), Hints.op("ПКМ", "\u2212"), Hints.act("СКМ", "макс")));
             setItem(slots[next++], plugin.getHeadManager().createBuilder("ui.coin_stack")
                     .name("<gold>Ставка</gold>")
                     .lore(betLore.toArray(new String[0]))
@@ -109,7 +114,9 @@ public class NpcConfirmationGUI extends AbstractGUI {
 
     private void clickBet(ClickType click) {
         boolean changed;
-        if (click.isShiftClick()) {
+        if (click == ClickType.MIDDLE || (click.isShiftClick() && click.isRightClick())) {
+            changed = input.setMax();
+        } else if (click.isShiftClick()) {
             input.cycle();
             changed = true;
         } else if (click.isRightClick()) {

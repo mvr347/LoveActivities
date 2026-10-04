@@ -62,4 +62,12 @@ public final class BetInput {
     public void reset() {
         bet = 0L;
     }
+
+    /** Sets the stake to the maximum allowed. @return false if already at maximum */
+    public boolean setMax() {
+        long next = max;
+        boolean changed = next != bet;
+        bet = next;
+        return changed;
+    }
 }
