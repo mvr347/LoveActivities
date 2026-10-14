@@ -8,6 +8,7 @@ import dev.lovelace.loveactivities.gui.AbstractGUI;
 import dev.lovelace.loveactivities.gui.TutorialGUI;
 import dev.lovelace.loveactivities.manager.SessionManager;
 import dev.lovelace.loveactivities.util.SoundUtil;
+import dev.lovelace.loveactivities.util.Notify;
 import dev.lovelace.loveactivities.util.TextUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -213,9 +214,9 @@ public class MiniChessGame implements GameSession {
             Player inCheckPlayer = Bukkit.getPlayer(whiteTurn ? player1 : player2);
             if (inCheckPlayer != null) {
                 SoundUtil.playError(inCheckPlayer);
-                inCheckPlayer.sendActionBar(TextUtil.parse("<red><bold>⚠ ВАШЕМУ КОРОЛЮ ОБЪЯВЛЕН ШАХ! ⚠</bold></red>"));
+                Notify.actionBar(inCheckPlayer, TextUtil.parse("<red><bold>⚠ ВАШЕМУ КОРОЛЮ ОБЪЯВЛЕН ШАХ! ⚠</bold></red>"));
             }
-            player.sendActionBar(TextUtil.parse("<yellow><bold>⚔ Вы объявили ШАХ королю соперника!</bold></yellow>"));
+            Notify.actionBar(player, TextUtil.parse("<yellow><bold>⚔ Вы объявили ШАХ королю соперника!</bold></yellow>"));
         }
 
         syncViews();
@@ -295,7 +296,7 @@ public class MiniChessGame implements GameSession {
 
             if (isCheck && p1 != null) {
                 SoundUtil.playError(p1);
-                p1.sendActionBar(TextUtil.parse("<red><bold>⚠ БОТ ОБЪЯВИЛ ШАХ ВАШЕМУ КОРОЛЮ! ⚠</bold></red>"));
+                Notify.actionBar(p1, TextUtil.parse("<red><bold>⚠ БОТ ОБЪЯВИЛ ШАХ ВАШЕМУ КОРОЛЮ! ⚠</bold></red>"));
             }
 
             syncViews();
@@ -329,14 +330,12 @@ public class MiniChessGame implements GameSession {
 
             int diff = blackScore - whiteScore;
             if (diff >= 2) {
-                player.sendActionBar(TextUtil.parse("<yellow>Бот отклонил предложение: «У меня позиционное преимущество!»</yellow>"));
-                player.sendMessage(TextUtil.parse("<yellow>Бот отклонил предложение ничьей: «У меня позиционное преимущество!»</yellow>"));
+                Notify.actionBar(player, TextUtil.parse("<yellow>Бот отклонил предложение: «У меня позиционное преимущество!»</yellow>"));
                 SoundUtil.playError(player);
                 return;
             }
 
-            player.sendMessage(TextUtil.parse("<green>Бот согласился на ничью!</green>"));
-            player.sendActionBar(TextUtil.parse("<green><bold>🤝 Бот принял предложение ничьей!</bold></green>"));
+            Notify.actionBar(player, TextUtil.parse("<green><bold>🤝 Бот принял предложение ничьей!</bold></green>"));
             SoundUtil.playWin(player);
             Bukkit.getScheduler().runTaskLater(plugin, this::endWithDraw, 20L);
             return;
@@ -345,10 +344,10 @@ public class MiniChessGame implements GameSession {
         if (drawOfferedBy != null && !drawOfferedBy.equals(sender)) {
             Player opp = Bukkit.getPlayer(drawOfferedBy);
             if (opp != null) {
-                opp.sendMessage(TextUtil.parse("<green>Соперник согласился на ничью!</green>"));
+                Notify.event(opp, TextUtil.parse("<green>Соперник согласился на ничью!</green>"));
                 SoundUtil.playWin(opp);
             }
-            player.sendMessage(TextUtil.parse("<green>Вы согласились на ничью!</green>"));
+            Notify.event(player, TextUtil.parse("<green>Вы согласились на ничью!</green>"));
             SoundUtil.playWin(player);
             endWithDraw();
         } else {
@@ -356,11 +355,10 @@ public class MiniChessGame implements GameSession {
             Player opp = Bukkit.getPlayer(getOpponent(sender));
             if (opp != null) {
                 opp.sendMessage(TextUtil.parse("<yellow>Соперник предложил ничью! Нажмите кнопку «Принять ничью», чтобы согласиться.</yellow>"));
-                opp.sendActionBar(TextUtil.parse("<yellow><bold>🤝 Соперник предложил ничью!</bold></yellow>"));
+                Notify.actionBar(opp, TextUtil.parse("<yellow><bold>🤝 Соперник предложил ничью!</bold></yellow>"));
                 SoundUtil.playClick(opp);
             }
-            player.sendMessage(TextUtil.parse("<green>Вы предложили ничью сопернику.</green>"));
-            player.sendActionBar(TextUtil.parse("<gray>Предложение ничьей отправлено сопернику...</gray>"));
+            Notify.actionBar(player, TextUtil.parse("<gray>Предложение ничьей отправлено сопернику...</gray>"));
             SoundUtil.playClick(player);
             syncViews();
         }
