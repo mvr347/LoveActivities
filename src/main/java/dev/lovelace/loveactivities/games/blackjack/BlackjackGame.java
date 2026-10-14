@@ -8,6 +8,7 @@ import dev.lovelace.loveactivities.gui.AbstractGUI;
 import dev.lovelace.loveactivities.gui.TutorialGUI;
 import dev.lovelace.loveactivities.manager.SessionManager;
 import dev.lovelace.loveactivities.util.SoundUtil;
+import dev.lovelace.loveactivities.util.Notify;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -118,10 +119,10 @@ public class BlackjackGame implements GameSession {
             syncViews();
             if (p1 != null) {
                 if (BlackjackDeck.isBlackjack(handP1)) {
-                    p1.sendActionBar(dev.lovelace.loveactivities.util.TextUtil.parse("<gold><bold>★ БЛЭКДЖЕК! 21 ОЧКО! ★</bold></gold>"));
+                    Notify.actionBar(p1, dev.lovelace.loveactivities.util.TextUtil.parse("<gold><bold>★ БЛЭКДЖЕК! 21 ОЧКО! ★</bold></gold>"));
                     SoundUtil.playSuccess(p1);
                 } else {
-                    p1.sendActionBar(dev.lovelace.loveactivities.util.TextUtil.parse("<red><bold>У дилера Блэкджек (21 очко)!</bold></red>"));
+                    Notify.actionBar(p1, dev.lovelace.loveactivities.util.TextUtil.parse("<red><bold>У дилера Блэкджек (21 очко)!</bold></red>"));
                     SoundUtil.playLoss(p1);
                 }
             }

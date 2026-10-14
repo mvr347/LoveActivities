@@ -8,6 +8,7 @@ import dev.lovelace.loveactivities.gui.AbstractGUI;
 import dev.lovelace.loveactivities.gui.TutorialGUI;
 import dev.lovelace.loveactivities.manager.SessionManager;
 import dev.lovelace.loveactivities.util.SoundUtil;
+import dev.lovelace.loveactivities.util.Notify;
 import dev.lovelace.loveactivities.util.TextUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -650,7 +651,7 @@ public class CardsGame implements GameSession {
         boolean isP1 = player.getUniqueId().equals(player1);
         if (isP1) pokerP1Acted = true; else pokerP2Acted = true;
 
-        player.sendActionBar(TextUtil.parse("<gray>Вы выбрали: Чек / Пропуск хода</gray>"));
+        Notify.actionBar(player, TextUtil.parse("<gray>Вы выбрали: Чек / Пропуск хода</gray>"));
         SoundUtil.playClick(player);
 
         if (pokerP1Acted && pokerP2Acted) {
@@ -680,14 +681,12 @@ public class CardsGame implements GameSession {
             pokerP1Acted = false;
         }
 
-        player.sendActionBar(TextUtil.parse("<gold><bold>▲ Вы повысили ставки на +" + addition + " монет (Ставки: " + pokerPot + ")</bold></gold>"));
-        player.sendMessage(TextUtil.parse("<gold>▲ Вы повысили ставки на <yellow>+" + addition + "</yellow> монет! (Текущие ставки: <yellow>" + pokerPot + "</yellow>)</gold>"));
+        Notify.actionBar(player, TextUtil.parse("<gold><bold>▲ Вы повысили ставки на +" + addition + " монет (Ставки: " + pokerPot + ")</bold></gold>"));
         SoundUtil.playSuccess(player);
 
         Player opp = Bukkit.getPlayer(getOpponent(player.getUniqueId()));
         if (opp != null && !isNpcMatch()) {
-            opp.sendMessage(TextUtil.parse("<gold>Соперник повысил ставки на <yellow>+" + addition + "</yellow> монет! (Ставки: <yellow>" + pokerPot + "</yellow>)</gold>"));
-            opp.sendActionBar(TextUtil.parse("<gold>▲ Соперник повысил ставку (Ставки: " + pokerPot + ")</gold>"));
+            Notify.actionBar(opp, TextUtil.parse("<gold>▲ Соперник повысил ставку (Ставки: " + pokerPot + ")</gold>"));
             SoundUtil.playChallenge(opp);
         }
 
@@ -777,11 +776,11 @@ public class CardsGame implements GameSession {
             p1.sendMessage(TextUtil.parse("<green>Ваша комбинация:</green> <white>" + p1Desc + "</white>"));
             p1.sendMessage(TextUtil.parse("<yellow>Комбинация " + p2Name + ":</yellow> <white>" + p2Desc + "</white>"));
             if (cmp > 0) {
-                p1.sendActionBar(TextUtil.parse("<green><bold>🏆 Ваша комбинация побеждает: " + p1Desc + "!</bold></green>"));
+                Notify.actionBar(p1, TextUtil.parse("<green><bold>🏆 Ваша комбинация побеждает: " + p1Desc + "!</bold></green>"));
             } else if (cmp < 0) {
-                p1.sendActionBar(TextUtil.parse("<red><bold>☠ " + p2Name + " побеждает с: " + p2Desc + "</bold></red>"));
+                Notify.actionBar(p1, TextUtil.parse("<red><bold>☠ " + p2Name + " побеждает с: " + p2Desc + "</bold></red>"));
             } else {
-                p1.sendActionBar(TextUtil.parse("<yellow><bold>🤝 Ничья комбинаций: " + p1Desc + "</bold></yellow>"));
+                Notify.actionBar(p1, TextUtil.parse("<yellow><bold>🤝 Ничья комбинаций: " + p1Desc + "</bold></yellow>"));
             }
         }
         if (p2 != null && !isNpcMatch()) {
@@ -789,11 +788,11 @@ public class CardsGame implements GameSession {
             p2.sendMessage(TextUtil.parse("<green>Ваша комбинация:</green> <white>" + p2Desc + "</white>"));
             p2.sendMessage(TextUtil.parse("<yellow>Комбинация соперника:</yellow> <white>" + p1Desc + "</white>"));
             if (cmp < 0) {
-                p2.sendActionBar(TextUtil.parse("<green><bold>🏆 Ваша комбинация побеждает: " + p2Desc + "!</bold></green>"));
+                Notify.actionBar(p2, TextUtil.parse("<green><bold>🏆 Ваша комбинация побеждает: " + p2Desc + "!</bold></green>"));
             } else if (cmp > 0) {
-                p2.sendActionBar(TextUtil.parse("<red><bold>☠ Соперник побеждает с: " + p1Desc + "</bold></red>"));
+                Notify.actionBar(p2, TextUtil.parse("<red><bold>☠ Соперник побеждает с: " + p1Desc + "</bold></red>"));
             } else {
-                p2.sendActionBar(TextUtil.parse("<yellow><bold>🤝 Ничья комбинаций: " + p2Desc + "</bold></yellow>"));
+                Notify.actionBar(p2, TextUtil.parse("<yellow><bold>🤝 Ничья комбинаций: " + p2Desc + "</bold></yellow>"));
             }
         }
 

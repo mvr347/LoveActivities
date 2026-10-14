@@ -110,6 +110,8 @@ public class SoundUtil {
         }
     }
 
+    // Turn-timer countdown is HUD, not an event notice: it intentionally bypasses LoveNotify so the
+    // player's /lovenotify channel choice cannot mute (or chat-spam) a ticking timer.
     public static void playTimerAlert(Player player, int seconds) {
         if (player == null || !player.isOnline()) return;
         if (seconds == 15) {
