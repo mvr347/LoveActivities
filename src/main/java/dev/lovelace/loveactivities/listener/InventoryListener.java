@@ -34,6 +34,25 @@ public class InventoryListener implements Listener {
                 int rawSlot = event.getRawSlot();
                 int topSize = event.getInventory().getSize();
 
+                // Double-click gathers from every inventory (would pull the opponent's coins);
+                // hotbar swaps can move items in/out of deposit slots bypassing the checks below.
+                org.bukkit.event.inventory.InventoryAction act = event.getAction();
+                if (act == org.bukkit.event.inventory.InventoryAction.COLLECT_TO_CURSOR
+                        || (rawSlot < topSize && (act == org.bukkit.event.inventory.InventoryAction.HOTBAR_SWAP
+                            || act == org.bukkit.event.inventory.InventoryAction.HOTBAR_MOVE_AND_READD))) {
+                    event.setCancelled(true);
+                    return;
+                }
+
+                // Deposit slots are frozen while anyone is ready or the countdown runs
+                boolean locked = betGUI.isStakeLocked();
+                if (locked && ((rawSlot >= topSize && event.isShiftClick())
+                        || (rawSlot >= 0 && rawSlot < topSize && betGUI.isDepositSlot(rawSlot)))) {
+                    event.setCancelled(true);
+                    SoundUtil.playError(clicker);
+                    return;
+                }
+
                 // If player is clicking in their own bottom inventory
                 if (rawSlot >= topSize) {
                     if (event.isShiftClick()) {
@@ -244,6 +263,10 @@ public class InventoryListener implements Listener {
                 boolean allValid = true;
                 for (int rawSlot : event.getRawSlots()) {
                     if (rawSlot < topSize) {
+                        if (betGUI.isStakeLocked()) {
+                            allValid = false;
+                            break;
+                        }
                         if (isP1 && !betGUI.isP1DepositSlot(rawSlot)) {
                             allValid = false;
                             break;

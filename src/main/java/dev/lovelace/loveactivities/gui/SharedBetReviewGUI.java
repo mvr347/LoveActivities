@@ -280,6 +280,11 @@ public class SharedBetReviewGUI extends AbstractGUI {
         }
     }
 
+    /** Stakes are frozen once anyone is ready, the countdown runs, or the game has started. */
+    public boolean isStakeLocked() {
+        return state.readyP1 || state.readyP2 || state.countdownTask != null || state.gameStarted.get();
+    }
+
     public void onP1SlotsChanged() {
         if (state.readyP1) {
             state.readyP1 = false;
@@ -381,10 +386,21 @@ public class SharedBetReviewGUI extends AbstractGUI {
     }
 
     private void executeGameStart() {
-        if (!state.gameStarted.compareAndSet(false, true)) return;
-
         long valP1 = calculateP1Value();
         long valP2 = calculateP2Value();
+
+        // Stakes must still match at the moment of start; otherwise abort instead of
+        // playing for min(valP1, valP2) while the larger side loses the difference.
+        if (valP1 != valP2) {
+            state.readyP1 = false;
+            state.readyP2 = false;
+            cancelCountdown();
+            updateStatusDisplays();
+            return;
+        }
+
+        if (!state.gameStarted.compareAndSet(false, true)) return;
+
         long agreedBet = Math.min(valP1, valP2);
 
         // Clear deposit slots so coins are not refunded on close
