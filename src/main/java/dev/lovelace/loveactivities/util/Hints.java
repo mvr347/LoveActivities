@@ -1,19 +1,24 @@
 package dev.lovelace.loveactivities.util;
 
 /**
- * One look for click hints in every menu: {@code Shift — сменить · ЛКМ + · ПКМ −}.
- * The key is coloured by the click (Shift yellow, ЛКМ green, ПКМ red), the label is gray,
- * hints are joined by a dark-gray dot, so a menu shows them in a single line.
+ * One look for click hints in every menu: {@code Shift — сменить · ЛКМ — действие}.
+ * Following gui-gen-6 design standard: LMB green, RMB gold, Shift yellow.
  */
 public final class Hints {
 
     private static final String SEP = " <dark_gray>·</dark_gray> ";
+    public static final String SEPARATOR = "<dark_gray><st>─────────────────────</st></dark_gray>";
 
     private Hints() {}
 
+    /** Standard divider before action hints. */
+    public static String separator() {
+        return SEPARATOR;
+    }
+
     /** A hint with a described action: {@code ЛКМ — купить}. */
     public static String act(String key, String action) {
-        return keyTag(key) + " <gray>— " + action + "</gray>";
+        return keyTag(key) + " <dark_gray>—</dark_gray> <gray>" + action + "</gray>";
     }
 
     /** A hint with a short sign or step: {@code ЛКМ +}, {@code Shift ×8}. */
@@ -38,9 +43,10 @@ public final class Hints {
 
     private static String keyTag(String key) {
         String color = switch (key) {
-            case "Shift" -> "yellow";
+            case "Shift", "Shift+ЛКМ", "Shift+ПКМ" -> "yellow";
             case "ЛКМ" -> "green";
-            case "ПКМ" -> "red";
+            case "ПКМ" -> "gold";
+            case "Отмена", "Заблокировано" -> "red";
             default -> "aqua";
         };
         return "<" + color + ">" + key + "</" + color + ">";

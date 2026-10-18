@@ -26,7 +26,7 @@ public class BetSelectionGUI extends AbstractGUI {
     }
 
     public BetSelectionGUI(Player player, Player opponent, GameType gameType, String subMode) {
-        super(player, MenuLayout.SIZE, "<gradient:#FF5E62:#FF9966>Выбор формата игры</gradient>");
+        super(player, MenuLayout.SIZE, "<gold>Выбор формата игры</gold>");
         this.opponent = opponent;
         this.gameType = gameType;
         this.subMode = subMode;
@@ -83,7 +83,7 @@ public class BetSelectionGUI extends AbstractGUI {
                 .lore(
                         "<gray>Внесите физические монеты в общую комнату ставок.</gray>",
                         "<gray>Победитель забирает все ставки!</gray>",
-                        "",
+                        Hints.separator(),
                         Hints.act("ЛКМ", "перейти к ставкам")
                 )
                 .build(), click -> {
@@ -101,7 +101,7 @@ public class BetSelectionGUI extends AbstractGUI {
                 .lore(
                         "<gray>Дружеская игра на интерес.</gray>",
                         "<gray>Без риска потерять монеты.</gray>",
-                        "",
+                        Hints.separator(),
                         Hints.act("ЛКМ", "начать сразу")
                 )
                 .build(), click -> {
