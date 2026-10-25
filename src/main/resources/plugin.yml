@@ -4,7 +4,8 @@ main: dev.lovelace.loveactivities.LoveActivities
 api-version: '26.2'
 author: Lovelace
 description: Interactive 1v1 mini-game suite with physical LoveCore currency betting
-softdepend: [PlaceholderAPI, LoveCore, Vesuvio]
+depend: [LoveCore, LoveEssential]
+softdepend: [PlaceholderAPI, Vesuvio]
 
 # Каждая англоязычная команда продублирована отдельной русскоязычной командой (а не
 # просто алиасом), потому что у алиаса нет собственного permission - право доступа
