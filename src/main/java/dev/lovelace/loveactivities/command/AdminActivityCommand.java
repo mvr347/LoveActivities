@@ -31,19 +31,19 @@ public class AdminActivityCommand implements CommandExecutor, TabCompleter {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+        // Silent on purpose: a command the sender cannot use is simply not theirs.
         if (!sender.hasPermission("loveactivities.admin")) {
-            sender.sendMessage("§cYou do not have permission to use this command.");
             return true;
         }
 
         if (args.length == 0 || args[0].equalsIgnoreCase("help")) {
             sender.sendMessage("§6=== LoveActivities Admin ===");
-            sender.sendMessage("§e/laadmin reload §7— Перезагрузка конфигураций, сообщений и голов");
-            sender.sendMessage("§e/laadmin endgame <player> §7— Принудительно завершить игру игрока");
-            sender.sendMessage("§e/laadmin stats <player> §7— Просмотреть статистику игрока");
-            sender.sendMessage("§e/laadmin npc bind <game> [bet] [name] §7— Привязать игру к NPC (смотрите на сущность)");
-            sender.sendMessage("§e/laadmin npc unbind §7— Отвязать игру от NPC (смотрите на сущность)");
-            sender.sendMessage("§e/laadmin npc list §7— Список всех привязанных NPC");
+            sender.sendMessage("§e/loveactivitiesadmin reload §7— Перезагрузка конфигураций, сообщений и голов");
+            sender.sendMessage("§e/loveactivitiesadmin endgame <player> §7— Принудительно завершить игру игрока");
+            sender.sendMessage("§e/loveactivitiesadmin stats <player> §7— Просмотреть статистику игрока");
+            sender.sendMessage("§e/loveactivitiesadmin npc bind <game> [bet] [name] §7— Привязать игру к NPC (смотрите на сущность)");
+            sender.sendMessage("§e/loveactivitiesadmin npc unbind §7— Отвязать игру от NPC (смотрите на сущность)");
+            sender.sendMessage("§e/loveactivitiesadmin npc list §7— Список всех привязанных NPC");
             return true;
         }
 
@@ -55,7 +55,7 @@ public class AdminActivityCommand implements CommandExecutor, TabCompleter {
             }
             case "endgame" -> {
                 if (args.length < 2) {
-                    sender.sendMessage("§cИспользование: /laadmin endgame <player>");
+                    sender.sendMessage("§cИспользование: /loveactivitiesadmin endgame <player>");
                     return true;
                 }
                 Player target = Bukkit.getPlayer(args[1]);
@@ -91,21 +91,20 @@ public class AdminActivityCommand implements CommandExecutor, TabCompleter {
                 }
             }
             case "npc" -> {
-                if (!(sender instanceof Player player)) {
-                    sender.sendMessage("§cЭта команда доступна только игрокам.");
-                    return true;
-                }
-
                 if (args.length < 2) {
-                    sender.sendMessage("§cИспользование: /laadmin npc <bind|unbind|list> ...");
+                    sender.sendMessage("§cИспользование: /loveactivitiesadmin npc <bind|unbind|list> ...");
                     return true;
                 }
 
                 String npcSub = args[1].toLowerCase();
                 switch (npcSub) {
                     case "bind" -> {
+                        if (!(sender instanceof Player player)) {
+                            sender.sendMessage("§cЭта команда доступна только игрокам.");
+                            return true;
+                        }
                         if (args.length < 3) {
-                            sender.sendMessage("§cИспользование: /laadmin npc bind <game> [bet] [max_bet] [plays_bets: true|false] [name]");
+                            sender.sendMessage("§cИспользование: /loveactivitiesadmin npc bind <game> [bet] [max_bet] [plays_bets: true|false] [name]");
                             return true;
                         }
 
@@ -176,6 +175,10 @@ public class AdminActivityCommand implements CommandExecutor, TabCompleter {
                                 "§a, На деньги: §b" + (playsBets ? "Да" : "Нет") + "§a)!");
                     }
                     case "unbind" -> {
+                        if (!(sender instanceof Player player)) {
+                            sender.sendMessage("§cЭта команда доступна только игрокам.");
+                            return true;
+                        }
                         Entity target = plugin.getNpcManager().findTargetEntity(player);
                         if (target == null) {
                             sender.sendMessage("§cВы не смотрите на сущность / NPC (радиус 6 блоков)!");
@@ -210,10 +213,10 @@ public class AdminActivityCommand implements CommandExecutor, TabCompleter {
                                     " §7| Настроение: " + mood);
                         }
                     }
-                    default -> sender.sendMessage("§cИспользование: /laadmin npc <bind|unbind|list>");
+                    default -> sender.sendMessage("§cИспользование: /loveactivitiesadmin npc <bind|unbind|list>");
                 }
             }
-            default -> sender.sendMessage("§cНеизвестная подкоманда. Используйте /laadmin help");
+            default -> sender.sendMessage("§cНеизвестная подкоманда. Используйте /loveactivitiesadmin help");
         }
 
         return true;
