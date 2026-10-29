@@ -7,7 +7,7 @@ ru:
   prefix: "<gradient:#FF5E62:#FF9966>LoveActivities</gradient> <dark_gray>»</dark_gray> "
 
   request_sent: "<gray>Вы бросили вызов игроку <gradient:#00C9FF:#92FE9D>{player}</gradient> на игру <yellow>{game}</yellow>!</gray>"
-  request_received: "<gray>Игрок <gradient:#00C9FF:#92FE9D>{player}</gradient> бросает вам вызов на <yellow>{game}</yellow>! <click:run_command:'/активности accept {id}'><hover:show_text:'Принять'><green>[Принять]</green></hover></click> <click:run_command:'/активности deny {id}'><hover:show_text:'Отклонить'><red>[Отклонить]</red></hover></click></gray>"
+  request_received: "<gray>Игрок <gradient:#00C9FF:#92FE9D>{player}</gradient> бросает вам вызов на <yellow>{game}</yellow>! <click:run_command:'/активности accept {id}'><hover:show_text:'Принять'><green>[Принять]</green></hover></click> <click:run_command:'/активности decline {id}'><hover:show_text:'Отклонить'><red>[Отклонить]</red></hover></click></gray>"
   request_accepted: "<gray>Вызов принят! Открывается комната ставок...</gray>"
   request_denied: "<gray>Вызов отклонён.</gray>"
   request_expired: "<gray>Время на ответ истекло.</gray>"

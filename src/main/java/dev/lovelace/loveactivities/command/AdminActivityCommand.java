@@ -31,8 +31,8 @@ public class AdminActivityCommand implements CommandExecutor, TabCompleter {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+        // Silent on purpose: a command the sender cannot use is simply not theirs.
         if (!sender.hasPermission("loveactivities.admin")) {
-            sender.sendMessage("§cYou do not have permission to use this command.");
             return true;
         }
 
@@ -91,11 +91,6 @@ public class AdminActivityCommand implements CommandExecutor, TabCompleter {
                 }
             }
             case "npc" -> {
-                if (!(sender instanceof Player player)) {
-                    sender.sendMessage("§cЭта команда доступна только игрокам.");
-                    return true;
-                }
-
                 if (args.length < 2) {
                     sender.sendMessage("§cИспользование: /laadmin npc <bind|unbind|list> ...");
                     return true;
@@ -104,6 +99,10 @@ public class AdminActivityCommand implements CommandExecutor, TabCompleter {
                 String npcSub = args[1].toLowerCase();
                 switch (npcSub) {
                     case "bind" -> {
+                        if (!(sender instanceof Player player)) {
+                            sender.sendMessage("§cЭта команда доступна только игрокам.");
+                            return true;
+                        }
                         if (args.length < 3) {
                             sender.sendMessage("§cИспользование: /laadmin npc bind <game> [bet] [max_bet] [plays_bets: true|false] [name]");
                             return true;
@@ -176,6 +175,10 @@ public class AdminActivityCommand implements CommandExecutor, TabCompleter {
                                 "§a, На деньги: §b" + (playsBets ? "Да" : "Нет") + "§a)!");
                     }
                     case "unbind" -> {
+                        if (!(sender instanceof Player player)) {
+                            sender.sendMessage("§cЭта команда доступна только игрокам.");
+                            return true;
+                        }
                         Entity target = plugin.getNpcManager().findTargetEntity(player);
                         if (target == null) {
                             sender.sendMessage("§cВы не смотрите на сущность / NPC (радиус 6 блоков)!");

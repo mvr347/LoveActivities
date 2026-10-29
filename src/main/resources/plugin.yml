@@ -133,6 +133,7 @@ commands:
     description: Administrative management for LoveActivities
     aliases: [laadmin]
     permission: loveactivities.admin
+    permission-message: ""
     usage: /<command> [reload|endgame|stats|npc]
 
 permissions:
