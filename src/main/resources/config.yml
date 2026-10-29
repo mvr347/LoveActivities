@@ -51,9 +51,9 @@ betting:
 # NPC & Activities Interaction Settings
 # Все привязанные NPC и их уникальные реплики настраиваются в файле npcs.yml!
 # Команды управления NPC:
-#   /laadmin npc bind <игра> [ставка] [имя] — привязать NPC (наведя прицел)
-#   /laadmin npc unbind                    — отвязать NPC
-#   /laadmin npc list                      — список всех привязанных NPC
+#   /loveactivitiesadmin npc bind <игра> [ставка] [имя] — привязать NPC (наведя прицел)
+#   /loveactivitiesadmin npc unbind                    — отвязать NPC
+#   /loveactivitiesadmin npc list                      — список всех привязанных NPC
 npc:
   # Включить диалоговые реплики NPC в чате при игре
   dialogues_enabled: true

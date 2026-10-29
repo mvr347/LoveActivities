@@ -112,7 +112,7 @@ commands:
     usage: /<command> <игрок>
   loveactivities:
     description: Personal settings and invitation management
-    aliases: [la, activities]
+    aliases: [lact, activities]
     permission: loveactivities.english
     usage: /<command> [settings|disable|accept|decline|cancel|tutorial]
   активности:
@@ -131,7 +131,7 @@ commands:
     usage: /<command> [игра]
   loveactivitiesadmin:
     description: Administrative management for LoveActivities
-    aliases: [laadmin]
+    aliases: [lactadmin]
     permission: loveactivities.admin
     permission-message: ""
     usage: /<command> [reload|endgame|stats|npc]
