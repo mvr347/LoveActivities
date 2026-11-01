@@ -8,20 +8,20 @@ class HintsTest {
 
     @Test
     void coinPickerIsOneLine() {
-        assertEquals("<yellow>Shift</yellow> <gray>— сменить</gray> <dark_gray>·</dark_gray> "
-                + "<green>ЛКМ</green> <gray>+</gray> <dark_gray>·</dark_gray> <red>ПКМ</red> <gray>\u2212</gray>",
+        assertEquals("<yellow>Shift</yellow> <dark_gray>—</dark_gray> <gray>сменить</gray> <dark_gray>·</dark_gray> "
+                + "<green>ЛКМ</green> <gray>+</gray> <dark_gray>·</dark_gray> <gold>ПКМ</gold> <gray>\u2212</gray>",
                 Hints.coinPicker());
     }
 
     @Test
     void amountStepperShowsBigStep() {
         assertEquals("<green>ЛКМ</green> <gray>+1</gray> <dark_gray>·</dark_gray> "
-                + "<red>ПКМ</red> <gray>\u22121</gray> <dark_gray>·</dark_gray> <yellow>Shift</yellow> <gray>\u00d78</gray>",
+                + "<gold>ПКМ</gold> <gray>\u22121</gray> <dark_gray>·</dark_gray> <yellow>Shift</yellow> <gray>\u00d78</gray>",
                 Hints.amountStepper(8));
     }
 
     @Test
     void customKeyIsAqua() {
-        assertEquals("<aqua>Q</aqua> <gray>— выбросить</gray>", Hints.act("Q", "выбросить"));
+        assertEquals("<aqua>Q</aqua> <dark_gray>—</dark_gray> <gray>выбросить</gray>", Hints.act("Q", "выбросить"));
     }
 }
