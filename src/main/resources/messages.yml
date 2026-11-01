@@ -4,7 +4,7 @@
 # =========================================================
 
 ru:
-  prefix: "<gradient:#FF5E62:#FF9966>LoveActivities</gradient> <dark_gray>»</dark_gray> "
+  prefix: "<gradient:#FF5E62:#FF9966>События</gradient> <white>»</white> "
 
   request_sent: "<gray>Вы бросили вызов игроку <gradient:#00C9FF:#92FE9D>{player}</gradient> на игру <yellow>{game}</yellow>!</gray>"
   request_received: "<gray>Игрок <gradient:#00C9FF:#92FE9D>{player}</gradient> бросает вам вызов на <yellow>{game}</yellow>! <click:run_command:'/активности accept {id}'><hover:show_text:'Принять'><green>[Принять]</green></hover></click> <click:run_command:'/активности decline {id}'><hover:show_text:'Отклонить'><red>[Отклонить]</red></hover></click></gray>"
@@ -32,7 +32,7 @@ ru:
   only_players: "<red>Только для игроков.</red>"
 
 en:
-  prefix: "<gradient:#FF5E62:#FF9966>LoveActivities</gradient> <dark_gray>»</dark_gray> "
+  prefix: "<gradient:#FF5E62:#FF9966>События</gradient> <white>»</white> "
   request_sent: "<gray>You challenged <gradient:#00C9FF:#92FE9D>{player}</gradient> to <yellow>{game}</yellow>!</gray>"
   request_received: "<gray><gradient:#00C9FF:#92FE9D>{player}</gradient> challenges you to <yellow>{game}</yellow>!</gray>"
   request_accepted: "<gray>Challenge accepted! Opening betting room...</gray>"
