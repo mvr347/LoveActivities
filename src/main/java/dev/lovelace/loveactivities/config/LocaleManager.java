@@ -29,6 +29,37 @@ public class LocaleManager {
         }
         this.messagesConfig = YamlConfiguration.loadConfiguration(file);
         repairStaleAcceptButtonCommand(file);
+        addMissingDefaults(file);
+    }
+
+    /**
+     * 2026-11-05: messages.yml is copied to the server once, so a key added in a newer build would
+     * read as "Missing message" there. Keys absent from the installed file are copied from the
+     * bundled one; anything the admin already has (even edited) is left untouched.
+     */
+    private void addMissingDefaults(File file) {
+        java.io.InputStream stream = plugin.getResource("messages.yml");
+        if (stream == null) return;
+        FileConfiguration defaults;
+        try (java.io.InputStreamReader reader = new java.io.InputStreamReader(stream, java.nio.charset.StandardCharsets.UTF_8)) {
+            defaults = YamlConfiguration.loadConfiguration(reader);
+        } catch (IOException e) {
+            plugin.getLogger().warning("Не удалось прочитать встроенный messages.yml: " + e.getMessage());
+            return;
+        }
+        int added = 0;
+        for (String path : defaults.getKeys(true)) {
+            if (defaults.isConfigurationSection(path) || messagesConfig.contains(path)) continue;
+            messagesConfig.set(path, defaults.get(path));
+            added++;
+        }
+        if (added == 0) return;
+        try {
+            messagesConfig.save(file);
+            plugin.getLogger().info("messages.yml: добавлены новые тексты по умолчанию: " + added);
+        } catch (IOException e) {
+            plugin.getLogger().warning("Не удалось сохранить messages.yml с новыми текстами: " + e.getMessage());
+        }
     }
 
     /**
