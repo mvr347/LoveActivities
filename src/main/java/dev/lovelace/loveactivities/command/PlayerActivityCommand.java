@@ -32,7 +32,7 @@ public class PlayerActivityCommand implements CommandExecutor, TabCompleter {
 
         if (args.length == 0 || args[0].equalsIgnoreCase("settings")) {
             // Optional second argument: the command that opened us (e.g. a profile). It drives the Back button.
-            new SettingsGUI(player, args.length > 1 ? validBackCommand(args[1]) : null).open();
+            new SettingsGUI(player, args.length > 1 ? validBackCommand(String.join(" ", java.util.Arrays.copyOfRange(args, 1, args.length))) : null).open();
             SoundUtil.playClick(player);
             return true;
         }
@@ -98,8 +98,14 @@ public class PlayerActivityCommand implements CommandExecutor, TabCompleter {
     static final java.util.regex.Pattern BACK_LABEL = java.util.regex.Pattern.compile("[\\p{L}\\p{N}_:\\-]{1,64}");
 
     static @Nullable String validBackCommand(@Nullable String raw) {
-        if (raw == null || !BACK_LABEL.matcher(raw).matches()) return null;
-        return org.bukkit.Bukkit.getCommandMap().getCommand(raw) != null ? raw : null;
+        if (raw == null || raw.isBlank()) return null;
+        // "label arg arg": the label must be a real command, every argument a plain token (no chaining).
+        String[] parts = raw.trim().split(" +");
+        if (parts.length > 4 || !BACK_LABEL.matcher(parts[0]).matches()) return null;
+        for (int i = 1; i < parts.length; i++) {
+            if (!BACK_LABEL.matcher(parts[i]).matches()) return null;
+        }
+        return org.bukkit.Bukkit.getCommandMap().getCommand(parts[0]) != null ? String.join(" ", parts) : null;
     }
 
     @Override
