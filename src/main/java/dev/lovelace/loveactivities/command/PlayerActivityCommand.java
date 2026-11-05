@@ -91,11 +91,14 @@ public class PlayerActivityCommand implements CommandExecutor, TabCompleter {
     }
 
     /**
-     * Back target passed by another plugin: a plain command label that really exists, otherwise
+     * Back target passed by another plugin: a plain command label (Unicode letters allowed: Russian aliases are public) that really exists, otherwise
      * no Back button (an unknown label would only make the button print "unknown command").
      */
+    /** Shape of a command label that may be used as a Back target. */
+    static final java.util.regex.Pattern BACK_LABEL = java.util.regex.Pattern.compile("[\\p{L}\\p{N}_:\\-]{1,64}");
+
     static @Nullable String validBackCommand(@Nullable String raw) {
-        if (raw == null || !raw.matches("[A-Za-z0-9_:\\-]{1,64}")) return null;
+        if (raw == null || !BACK_LABEL.matcher(raw).matches()) return null;
         return org.bukkit.Bukkit.getCommandMap().getCommand(raw) != null ? raw : null;
     }
 
