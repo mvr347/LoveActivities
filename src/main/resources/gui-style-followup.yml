@@ -1,0 +1,9 @@
+# Однократное обновление оформления (2026-11-05): общая текстура «выключено» (ui.status_off) для переключателей и игр.
+# preserve-custom: если админ уже поставил свою текстуру, она остаётся; заменяется только точное прежнее значение.
+version: 20261105
+updates:
+- file: heads.yml
+  path: ui.status_off
+  before: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmViNTg4YjIxYTZmOThhZDFmZjRlMDg1YzU1MmRjYjA1MGVmYzljYWI0MjdmNDYwNDhmMThmYzgwMzQ3NWY3In19fQ==
+  value: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzYxODczMWUwNjMzNzlhZWJmODJmMWQ2NGM0MTljOTBkN2YwYzE2NDhjNTQ4ZTliNjE1MWIxYmFiYTY2ZDcyMyJ9fX0=
+  preserve-custom: true

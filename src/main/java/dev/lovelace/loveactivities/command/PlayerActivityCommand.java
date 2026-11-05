@@ -31,7 +31,8 @@ public class PlayerActivityCommand implements CommandExecutor, TabCompleter {
         }
 
         if (args.length == 0 || args[0].equalsIgnoreCase("settings")) {
-            new SettingsGUI(player).open();
+            // Optional second argument: the command that opened us (e.g. a profile). It drives the Back button.
+            new SettingsGUI(player, args.length > 1 ? validBackCommand(args[1]) : null).open();
             SoundUtil.playClick(player);
             return true;
         }
@@ -81,12 +82,21 @@ public class PlayerActivityCommand implements CommandExecutor, TabCompleter {
                 plugin.getSessionManager().startNpcSession(player, type, bet);
             }
             default -> {
-                new SettingsGUI(player).open();
+                new SettingsGUI(player, null).open();
                 SoundUtil.playClick(player);
             }
         }
 
         return true;
+    }
+
+    /**
+     * Back target passed by another plugin: a plain command label that really exists, otherwise
+     * no Back button (an unknown label would only make the button print "unknown command").
+     */
+    static @Nullable String validBackCommand(@Nullable String raw) {
+        if (raw == null || !raw.matches("[A-Za-z0-9_:\\-]{1,64}")) return null;
+        return org.bukkit.Bukkit.getCommandMap().getCommand(raw) != null ? raw : null;
     }
 
     @Override
