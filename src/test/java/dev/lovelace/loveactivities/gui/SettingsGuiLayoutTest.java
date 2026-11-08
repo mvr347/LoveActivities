@@ -10,11 +10,20 @@ import org.junit.jupiter.api.Test;
 class SettingsGuiLayoutTest {
 
     @Test
-    void headerControlsAreCentredInSlotsTwoToSeven() {
-        int[][] expected = {{4}, {3, 5}, {2, 4, 6}, {2, 3, 5, 6}, {2, 3, 4, 6, 7}, {2, 3, 4, 5, 6, 7}};
-        for (int count = 1; count <= 6; count++)
-            for (int i = 0; i < count; i++)
-                assertEquals(expected[count - 1][i], SettingsGUI.headerSlot(i, count), count + "/" + i);
+    void controlsSitInTheWorkZoneRowCentredInColumnsOneToSeven() {
+        for (int count = 1; count <= 7; count++) {
+            java.util.Set<Integer> used = new java.util.HashSet<>();
+            for (int i = 0; i < count; i++) {
+                int slot = SettingsGUI.controlSlot(i, count);
+                assertTrue(slot >= 19 && slot <= 25, "row 2, columns 1-7: " + slot);
+                assertTrue(used.add(slot), "no overlap");
+            }
+            int left = SettingsGUI.controlSlot(0, count) - 19;
+            int right = 25 - SettingsGUI.controlSlot(count - 1, count);
+            assertTrue(Math.abs(left - right) <= 1, "centred for " + count);
+        }
+        assertEquals(20, SettingsGUI.controlSlot(0, 4), "four controls: 20-23");
+        assertEquals(23, SettingsGUI.controlSlot(3, 4));
     }
 
     private static YamlConfiguration resource(String name) {
