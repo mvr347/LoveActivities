@@ -40,10 +40,18 @@ public class SettingsGUI extends AbstractGUI {
         this.backCommand = backCommand;
     }
 
-    /** Slot of control {@code index} of {@code count} in the controls row (19-25), centred in columns 1-7. */
+    /** Slot of control {@code index} of {@code count} in the controls row (19-25), by the ecosystem's centring table. */
     static int controlSlot(int index, int count) {
-        int n = Math.clamp(count, 1, GAMES_PER_ROW);
-        return CONTROLS_FIRST_SLOT + (GAMES_PER_ROW - n) / 2 + Math.clamp(index, 0, n - 1);
+        int[] offsets = switch (Math.clamp(count, 1, GAMES_PER_ROW)) {
+            case 1 -> new int[]{4};
+            case 2 -> new int[]{3, 5};
+            case 3 -> new int[]{2, 4, 6};
+            case 4 -> new int[]{1, 3, 5, 7};
+            case 5 -> new int[]{1, 2, 4, 6, 7};
+            case 6 -> new int[]{1, 2, 3, 5, 6, 7};
+            default -> new int[]{1, 2, 3, 4, 5, 6, 7};
+        };
+        return CONTROLS_FIRST_SLOT - 1 + offsets[Math.clamp(index, 0, offsets.length - 1)];
     }
 
     private String raw(String key) {
@@ -107,7 +115,7 @@ public class SettingsGUI extends AbstractGUI {
             initializeItems();
         });
 
-        setItem(controlSlot(1, controls), switchHead(settings.isSounds(), raw("settings_sounds_title"),
+        setItem(controlSlot(2, controls), switchHead(settings.isSounds(), raw("settings_sounds_title"),
                 lore("settings_sounds_sub", List.of("settings_sounds_d1"),
                         settings.isSounds() ? raw("settings_on") : raw("settings_off"), raw("settings_click_toggle"))), click -> {
             plugin.getSettingsManager().toggleSounds(player.getUniqueId());
@@ -115,7 +123,7 @@ public class SettingsGUI extends AbstractGUI {
             initializeItems();
         });
 
-        setItem(controlSlot(2, controls), switchHead(settings.isParticles(), raw("settings_particles_title"),
+        setItem(controlSlot(1, controls), switchHead(settings.isParticles(), raw("settings_particles_title"),
                 lore("settings_particles_sub", List.of("settings_particles_d1"),
                         settings.isParticles() ? raw("settings_on") : raw("settings_off"), raw("settings_click_toggle"))), click -> {
             plugin.getSettingsManager().toggleParticles(player.getUniqueId());
@@ -131,7 +139,7 @@ public class SettingsGUI extends AbstractGUI {
                 : blocked == all.length ? raw("settings_all_off")
                 : raw("settings_all_partial").replace("{on}", String.valueOf(all.length - blocked))
                         .replace("{total}", String.valueOf(all.length));
-        setItem(controlSlot(3, controls), plugin.getHeadManager().createBuilder("ui.all_games_icon")
+        setItem(controlSlot(3, controls), plugin.getHeadManager().createBuilder(allOn ? "ui.all_games_on" : "ui.all_games_off")
                 .name(raw("settings_all_title"))
                 .lore(lore("settings_all_sub", List.of("settings_all_d1", "settings_all_d2"), state,
                         allOn ? raw("settings_click_all_off") : raw("settings_click_all_on")).toArray(new String[0]))
@@ -147,7 +155,7 @@ public class SettingsGUI extends AbstractGUI {
         for (int i = 0; i < count; i++) {
             GameType game = all[i];
             boolean disabled = settings.isGameBlacklisted(game);
-            String texture = plugin.getHeadManager().getTexture(disabled ? "ui.status_off" : "game_icons." + game.getIconKey());
+            String texture = plugin.getHeadManager().getTexture(disabled ? "ui.status_off" : "ui.game_enabled");
             setItem(first + i, ItemBuilder.base64Head(texture)
                     .name("<gold>" + game.getNameRu() + "</gold>")
                     .lore(lore("settings_game_sub", List.of("settings_game_d1"),
@@ -179,7 +187,7 @@ public class SettingsGUI extends AbstractGUI {
     }
 
     private ItemStack switchHead(boolean on, String title, List<String> lore) {
-        String texture = plugin.getHeadManager().getTexture(on ? "ui.status_on" : "ui.status_off");
+        String texture = plugin.getHeadManager().getTexture(on ? "ui.toggle_on" : "ui.toggle_off");
         return ItemBuilder.base64Head(texture).name(title).lore(lore.toArray(new String[0])).build();
     }
 

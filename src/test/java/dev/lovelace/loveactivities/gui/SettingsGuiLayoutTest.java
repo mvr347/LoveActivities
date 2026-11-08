@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 class SettingsGuiLayoutTest {
 
     @Test
-    void controlsSitInTheWorkZoneRowCentredInColumnsOneToSeven() {
+    void controlsSitInTheWorkZoneRowByTheEcosystemCentringTable() {
         for (int count = 1; count <= 7; count++) {
             java.util.Set<Integer> used = new java.util.HashSet<>();
             for (int i = 0; i < count; i++) {
@@ -18,12 +18,27 @@ class SettingsGuiLayoutTest {
                 assertTrue(slot >= 19 && slot <= 25, "row 2, columns 1-7: " + slot);
                 assertTrue(used.add(slot), "no overlap");
             }
-            int left = SettingsGUI.controlSlot(0, count) - 19;
-            int right = 25 - SettingsGUI.controlSlot(count - 1, count);
-            assertTrue(Math.abs(left - right) <= 1, "centred for " + count);
         }
-        assertEquals(20, SettingsGUI.controlSlot(0, 4), "four controls: 20-23");
-        assertEquals(23, SettingsGUI.controlSlot(3, 4));
+        assertEquals(19, SettingsGUI.controlSlot(0, 4));
+        assertEquals(21, SettingsGUI.controlSlot(1, 4));
+        assertEquals(23, SettingsGUI.controlSlot(2, 4));
+        assertEquals(25, SettingsGUI.controlSlot(3, 4));
+        assertEquals(20, SettingsGUI.controlSlot(0, 3));
+        assertEquals(22, SettingsGUI.controlSlot(1, 3));
+        assertEquals(24, SettingsGUI.controlSlot(2, 3));
+    }
+
+    @Test
+    void theNewSettingsTexturesExistAndAreDistinct() {
+        var heads = resource("heads.yml");
+        java.util.Set<String> textures = new java.util.HashSet<>();
+        for (String key : new String[]{"toggle_on", "toggle_off", "all_games_on", "all_games_off", "game_enabled"}) {
+            String value = heads.getString("ui." + key);
+            assertNotNull(value, key);
+            assertFalse(value.isBlank(), key);
+            assertTrue(textures.add(value), key + " is a duplicate");
+        }
+        assertNotEquals(heads.getString("ui.status_off"), heads.getString("ui.game_enabled"));
     }
 
     private static YamlConfiguration resource(String name) {
