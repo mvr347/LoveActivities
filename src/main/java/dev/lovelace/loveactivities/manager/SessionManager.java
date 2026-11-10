@@ -5,6 +5,7 @@ import dev.lovelace.loveactivities.api.GameSession;
 import dev.lovelace.loveactivities.api.GameState;
 import dev.lovelace.loveactivities.api.GameType;
 import dev.lovelace.loveactivities.api.events.LoveActivityGameEndEvent;
+import dev.lovelace.loveactivities.integration.AchievementsHook;
 import dev.lovelace.loveactivities.api.events.LoveActivityGameStartEvent;
 import dev.lovelace.loveactivities.api.events.LoveActivityWinEvent;
 import dev.lovelace.loveactivities.games.blackjack.BlackjackGame;
@@ -356,6 +357,7 @@ public class SessionManager {
             }
         }
         if (!isNpc(winnerUuid)) Bukkit.getPluginManager().callEvent(new LoveActivityWinEvent(session, session.getGameType(), winnerUuid, loserUuid, totalPot, isNpc, isNpc ? npcName : null));
+        AchievementsHook.gameFinished(session.getPlayer1(), session.getPlayer2(), winnerUuid);
         Bukkit.getPluginManager().callEvent(new LoveActivityGameEndEvent(session, session.getGameType(), session.getPlayer1(), session.getPlayer2(), winnerUuid, session.getBet(), isNpc, isNpc ? npcName : null));
         plugin.getBetLogger().log("Game ended: pot " + totalPot + " " + currency);
         cleanSession(session);
@@ -390,6 +392,7 @@ public class SessionManager {
             plugin.getLocaleManager().send(p2, drawMsgKey);
             SoundUtil.playDraw(p2);
         }
+        AchievementsHook.gameFinished(p1Id, p2Id, null);
         Bukkit.getPluginManager().callEvent(new LoveActivityGameEndEvent(session, session.getGameType(), p1Id, p2Id, null, session.getBet(), isNpc, isNpc ? npcName : null));
         cleanSession(session);
     }
