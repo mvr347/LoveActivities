@@ -214,7 +214,7 @@ public class SharedBetReviewGUI extends AbstractGUI {
                 .build());
 
         // Slot 29: P1 Ready Button
-        String p1ReadyTex = state.readyP1 ? "ui.confirm_ready" : "ui.confirm";
+        String p1ReadyTex = state.readyP1 ? "ui.confirm_ready" : "ui.confirm_not_ready";
         List<String> p1Lore = new ArrayList<>();
         if (!state.readyP1) {
             p1Lore.add("<gray>Нажмите, когда выставите ставку.</gray>");
@@ -235,7 +235,7 @@ public class SharedBetReviewGUI extends AbstractGUI {
                 .build());
 
         // Slot 33: P2 Ready Button
-        String p2ReadyTex = state.readyP2 ? "ui.confirm_ready" : "ui.confirm";
+        String p2ReadyTex = state.readyP2 ? "ui.confirm_ready" : "ui.confirm_not_ready";
         List<String> p2Lore = new ArrayList<>();
         if (!state.readyP2) {
             p2Lore.add("<gray>Нажмите, когда выставите ставку.</gray>");
@@ -257,14 +257,14 @@ public class SharedBetReviewGUI extends AbstractGUI {
 
         // Slot 31: Center Status / Countdown Button
         if (isCounting) {
-            String countHead = switch (state.countdown) {
-                case 3 -> plugin.getHeadManager().getTexture("ui.countdown_3");
-                case 2 -> plugin.getHeadManager().getTexture("ui.countdown_2");
-                case 1 -> plugin.getHeadManager().getTexture("ui.countdown_1");
-                default -> plugin.getHeadManager().getTexture("ui.coin_stack");
+            // Colored glass by the seconds left: green 3, yellow 2, red 1 (owner request 2026-11-12, instead of wool).
+            org.bukkit.Material pane = switch (state.countdown) {
+                case 3 -> org.bukkit.Material.LIME_STAINED_GLASS_PANE;
+                case 2 -> org.bukkit.Material.YELLOW_STAINED_GLASS_PANE;
+                default -> org.bukkit.Material.RED_STAINED_GLASS_PANE;
             };
 
-            setItem(SLOT_STATUS, ItemBuilder.base64Head(countHead)
+            setItem(SLOT_STATUS, ItemBuilder.from(pane)
                     .name("<gold>Старт игры через: " + state.countdown + "...</gold>")
                     .lore("<red>▶ Нажмите, чтобы отменить отсчёт</red>")
                     .build());
