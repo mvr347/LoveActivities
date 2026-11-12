@@ -257,14 +257,14 @@ public class SharedBetReviewGUI extends AbstractGUI {
 
         // Slot 31: Center Status / Countdown Button
         if (isCounting) {
-            String countHead = switch (state.countdown) {
-                case 3 -> plugin.getHeadManager().getTexture("ui.timer_wool_green");
-                case 2 -> plugin.getHeadManager().getTexture("ui.timer_wool_yellow");
-                case 1 -> plugin.getHeadManager().getTexture("ui.timer_wool_red");
-                default -> plugin.getHeadManager().getTexture("ui.coin_stack");
+            // Colored glass by the seconds left: green 3, yellow 2, red 1 (owner request 2026-11-12, instead of wool).
+            org.bukkit.Material pane = switch (state.countdown) {
+                case 3 -> org.bukkit.Material.LIME_STAINED_GLASS_PANE;
+                case 2 -> org.bukkit.Material.YELLOW_STAINED_GLASS_PANE;
+                default -> org.bukkit.Material.RED_STAINED_GLASS_PANE;
             };
 
-            setItem(SLOT_STATUS, ItemBuilder.base64Head(countHead)
+            setItem(SLOT_STATUS, ItemBuilder.from(pane)
                     .name("<gold>Старт игры через: " + state.countdown + "...</gold>")
                     .lore("<red>▶ Нажмите, чтобы отменить отсчёт</red>")
                     .build());
