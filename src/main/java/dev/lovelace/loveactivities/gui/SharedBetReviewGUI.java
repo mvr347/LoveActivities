@@ -214,7 +214,7 @@ public class SharedBetReviewGUI extends AbstractGUI {
                 .build());
 
         // Slot 29: P1 Ready Button
-        String p1ReadyTex = state.readyP1 ? "ui.confirm_ready" : "ui.confirm";
+        String p1ReadyTex = state.readyP1 ? "ui.confirm_ready" : "ui.confirm_not_ready";
         List<String> p1Lore = new ArrayList<>();
         if (!state.readyP1) {
             p1Lore.add("<gray>Нажмите, когда выставите ставку.</gray>");
@@ -235,7 +235,7 @@ public class SharedBetReviewGUI extends AbstractGUI {
                 .build());
 
         // Slot 33: P2 Ready Button
-        String p2ReadyTex = state.readyP2 ? "ui.confirm_ready" : "ui.confirm";
+        String p2ReadyTex = state.readyP2 ? "ui.confirm_ready" : "ui.confirm_not_ready";
         List<String> p2Lore = new ArrayList<>();
         if (!state.readyP2) {
             p2Lore.add("<gray>Нажмите, когда выставите ставку.</gray>");
@@ -258,9 +258,9 @@ public class SharedBetReviewGUI extends AbstractGUI {
         // Slot 31: Center Status / Countdown Button
         if (isCounting) {
             String countHead = switch (state.countdown) {
-                case 3 -> plugin.getHeadManager().getTexture("ui.countdown_3");
-                case 2 -> plugin.getHeadManager().getTexture("ui.countdown_2");
-                case 1 -> plugin.getHeadManager().getTexture("ui.countdown_1");
+                case 3 -> plugin.getHeadManager().getTexture("ui.timer_wool_green");
+                case 2 -> plugin.getHeadManager().getTexture("ui.timer_wool_yellow");
+                case 1 -> plugin.getHeadManager().getTexture("ui.timer_wool_red");
                 default -> plugin.getHeadManager().getTexture("ui.coin_stack");
             };
 
