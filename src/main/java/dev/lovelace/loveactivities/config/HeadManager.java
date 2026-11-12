@@ -26,10 +26,12 @@ public class HeadManager {
 
         // 1. Load embedded defaults from JAR first so all new heads are always available
         java.io.InputStream defaultStream = plugin.getResource("heads.yml");
+        java.util.Map<String, String> jarDefaults = new java.util.HashMap<>();
         if (defaultStream != null) {
             try (java.io.InputStreamReader reader = new java.io.InputStreamReader(defaultStream, java.nio.charset.StandardCharsets.UTF_8)) {
                 FileConfiguration defaultConfig = YamlConfiguration.loadConfiguration(reader);
                 parseConfigIntoCache(defaultConfig);
+                jarDefaults.putAll(textureCache);
             } catch (Exception ignored) {
             }
         }
@@ -42,6 +44,8 @@ public class HeadManager {
         if (file.exists()) {
             FileConfiguration config = YamlConfiguration.loadConfiguration(file);
             parseConfigIntoCache(config);
+            // The file on disk wins over the jar, so an old shipped head in it must be swapped for the new default.
+            textureCache.replaceAll((key, value) -> LegacyHeads.upgrade(key, value, jarDefaults.get(key)));
         }
     }
 
