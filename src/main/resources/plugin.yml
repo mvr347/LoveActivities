@@ -1,7 +1,7 @@
 name: LoveActivities
 version: 1.0.0
 main: dev.lovelace.loveactivities.LoveActivities
-api-version: '26.2'
+api-version: '26.3'
 author: Lovelace
 description: Interactive 1v1 mini-game suite with physical LoveCore currency betting
 depend: [LoveCore, LoveEssential]

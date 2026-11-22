@@ -11,12 +11,12 @@
     <packaging>jar</packaging>
 
     <name>LoveActivities</name>
-    <description>Interactive 1v1 mini-games suite with physical betting and LoveCore integration for Paper/Purpur 26.2 (Java 25)</description>
+    <description>Interactive 1v1 mini-games suite with physical betting and LoveCore integration for Paper/Purpur 26.3 (Java 25)</description>
 
     <properties>
         <java.version>25</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <paper.version>26.2.build.100-stable</paper.version>
+        <paper.version>26.3.build.200-stable</paper.version>
         <maven.compiler.source>25</maven.compiler.source>
         <maven.compiler.target>25</maven.compiler.target>
     </properties>
@@ -37,7 +37,7 @@
     </repositories>
 
     <dependencies>
-        <!-- Paper API 26.2 -->
+        <!-- Paper API 26.3 -->
         <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
