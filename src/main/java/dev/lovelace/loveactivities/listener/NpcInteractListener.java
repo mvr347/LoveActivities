@@ -3,6 +3,8 @@ package dev.lovelace.loveactivities.listener;
 import dev.lovelace.loveactivities.LoveActivities;
 import dev.lovelace.loveactivities.manager.NpcActivityConfig;
 import dev.lovelace.loveactivities.util.SoundUtil;
+import dev.lovelace.lovecore.api.npc.NpcClick;
+import dev.lovelace.lovecore.api.npc.NpcClickEvent;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -43,10 +45,27 @@ public class NpcInteractListener implements Listener {
         handleNpcClick(event.getPlayer(), event.getRightClicked(), event);
     }
 
+    /**
+     * A click on a LoveEssential NPC arrives as LoveCore's {@link NpcClickEvent}: its body is respawned with a new
+     * entity uuid, so the binding is found by the NPC key, not by the clicked entity.
+     */
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    public void onNpcClick(NpcClickEvent event) {
+        if (event.click() != NpcClick.RIGHT) return;
+        NpcActivityConfig config = plugin.getNpcManager().getNpcConfig(event.npc());
+        if (config == null) return;
+        handleNpcClick(event.getPlayer(), config, event);
+    }
+
     private void handleNpcClick(Player player, Entity entity, org.bukkit.event.Cancellable event) {
         if (player == null || entity == null) return;
         NpcActivityConfig config = plugin.getNpcManager().getNpcConfig(entity.getUniqueId());
         if (config == null) return;
+        handleNpcClick(player, config, event);
+    }
+
+    private void handleNpcClick(Player player, NpcActivityConfig config, org.bukkit.event.Cancellable event) {
+        if (player == null || config == null) return;
 
         event.setCancelled(true);
 

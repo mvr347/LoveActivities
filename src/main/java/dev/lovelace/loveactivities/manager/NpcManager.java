@@ -6,6 +6,10 @@ import dev.lovelace.loveactivities.util.SoundUtil;
 import dev.lovelace.loveactivities.config.ConfigManager;
 import dev.lovelace.loveactivities.util.NpcNames;
 import dev.lovelace.loveactivities.util.TextUtil;
+import dev.lovelace.lovecore.api.LoveCore;
+import dev.lovelace.lovecore.api.npc.NpcHandle;
+import dev.lovelace.lovecore.api.npc.NpcProvider;
+import dev.lovelace.lovecore.api.provider.Providers;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
@@ -18,16 +22,29 @@ import org.bukkit.util.Vector;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.logging.Level;
 
 public class NpcManager {
+
+    /** The only supported NPC provider. */
+    public static final String PROVIDER_ID = Providers.LOVE_ESSENTIAL;
 
     private final LoveActivities plugin;
     private final File file;
     private YamlConfiguration config;
     private final Map<UUID, NpcActivityConfig> npcMap = new HashMap<>();
     private final Map<String, List<String>> defaultDialogues = new HashMap<>();
+
+    /**
+     * Stable id for a binding to a LoveEssential NPC. The body of such an NPC is respawned (new entity uuid) when
+     * players come near, so the binding is keyed by the NPC key; this uuid is derived from the key so the rest of the
+     * plugin, which keys everything by uuid, needs no changes.
+     */
+    public static UUID idForKey(String npcKey) {
+        return UUID.nameUUIDFromBytes((PROVIDER_ID + ":" + npcKey).getBytes(StandardCharsets.UTF_8));
+    }
 
     public NpcManager(LoveActivities plugin) {
         this.plugin = plugin;
@@ -76,6 +93,8 @@ public class NpcManager {
                     long refusedUntil = section.getLong(key + ".refused_until", 0L);
 
                     NpcActivityConfig npc = new NpcActivityConfig(uuid, name, type, bet, maxBet, playsBets);
+                    String npcKey = section.getString(key + ".npc-key");
+                    if (npcKey != null && !npcKey.isBlank()) npc.setNpcKey(npcKey.trim());
                     npc.setAcceptChance(acceptChance);
                     npc.setRefusalCooldownMinutes(refusalCooldown);
                     npc.setRefusedUntil(refusedUntil);
@@ -102,6 +121,7 @@ public class NpcManager {
             String path = "npcs." + entry.getKey().toString();
             NpcActivityConfig npc = entry.getValue();
             config.set(path + ".name", npc.getCustomName());
+            if (npc.getNpcKey() != null) config.set(path + ".npc-key", npc.getNpcKey());
             config.set(path + ".game", npc.getGameType().name());
             config.set(path + ".bet", npc.getDefaultBet());
             config.set(path + ".max_bet", npc.getMaxBet());
@@ -130,6 +150,21 @@ public class NpcManager {
         return npcMap.get(entityUuid);
     }
 
+    /** The binding of a LoveEssential NPC clicked through LoveCore's NpcClickEvent, or null. */
+    public NpcActivityConfig getNpcConfig(NpcHandle npc) {
+        if (npc == null || npc.key() == null || !PROVIDER_ID.equalsIgnoreCase(npc.providerId())) return null;
+        return npcMap.get(idForKey(npc.key()));
+    }
+
+    /** The LoveEssential NPC an entity is the body of, or empty for an ordinary entity (or without LoveEssential). */
+    private Optional<NpcHandle> npcOf(Entity entity) {
+        try {
+            return LoveCore.loveEssential(NpcProvider.class).flatMap(provider -> provider.byEntity(entity));
+        } catch (LinkageError coreMissingOrOld) {
+            return Optional.empty();
+        }
+    }
+
     public Map<UUID, NpcActivityConfig> getAllNpcs() {
         return Collections.unmodifiableMap(npcMap);
     }
@@ -139,9 +174,18 @@ public class NpcManager {
         String name = (customName != null && !customName.isBlank()) ? customName : entity.getName();
         if (name == null || name.isBlank()) name = "NPC " + gameType.getNameRu();
 
-        NpcActivityConfig npc = new NpcActivityConfig(entity.getUniqueId(), name, gameType, bet, maxBet, playsBets);
-        npcMap.put(entity.getUniqueId(), npc);
-        applyVisibleName(entity, npc.getCustomName());
+        Optional<NpcHandle> handle = npcOf(entity);
+        if (handle.isPresent()) {
+            // A LoveEssential NPC: bound by its key (the body gets a new uuid on respawn); its name belongs to LoveEssential.
+            String key = handle.get().key();
+            NpcActivityConfig npc = new NpcActivityConfig(idForKey(key), name, gameType, bet, maxBet, playsBets);
+            npc.setNpcKey(key);
+            npcMap.put(npc.getEntityUuid(), npc);
+        } else {
+            NpcActivityConfig npc = new NpcActivityConfig(entity.getUniqueId(), name, gameType, bet, maxBet, playsBets);
+            npcMap.put(entity.getUniqueId(), npc);
+            applyVisibleName(entity, npc.getCustomName());
+        }
         save();
     }
 
@@ -150,17 +194,25 @@ public class NpcManager {
     }
 
     /**
-     * Shows the green name above an ordinary entity. Citizens NPCs are skipped: their name belongs to
-     * Citizens ({@code /npc rename &aName}) and would be overwritten anyway.
+     * Shows the green name above an ordinary entity. LoveEssential NPCs never get here: their name belongs to
+     * LoveEssential and would be overwritten anyway.
      */
     private void applyVisibleName(Entity entity, String storedName) {
-        if (entity.hasMetadata("NPC") || entity instanceof Player) return;
+        if (entity instanceof Player) return;
         try {
             entity.customName(TextUtil.parse(storedName));
             entity.setCustomNameVisible(true);
         } catch (Throwable t) {
             plugin.getLogger().warning("Не удалось показать имя NPC над сущностью: " + t.getMessage());
         }
+    }
+
+    /** Unbinds the binding of this entity: by NPC key for a LoveEssential NPC, by uuid for an ordinary entity. */
+    public boolean unbindNpc(Entity entity) {
+        if (entity == null) return false;
+        Optional<NpcHandle> handle = npcOf(entity);
+        if (handle.isPresent() && unbindNpc(idForKey(handle.get().key()))) return true;
+        return unbindNpc(entity.getUniqueId());
     }
 
     public boolean unbindNpc(UUID entityUuid) {

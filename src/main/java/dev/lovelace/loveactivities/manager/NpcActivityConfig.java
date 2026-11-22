@@ -7,6 +7,8 @@ import java.util.*;
 public class NpcActivityConfig {
 
     private final UUID entityUuid;
+    /** Key of the LoveEssential NPC this binding belongs to; {@code null} for an ordinary entity bound by uuid. */
+    private String npcKey;
     private String customName;
     private GameType gameType;
     private long defaultBet;
@@ -35,6 +37,10 @@ public class NpcActivityConfig {
         this.acceptChance = 0.85;
         initDefaultDialogues();
     }
+
+    public String getNpcKey() { return npcKey; }
+
+    public void setNpcKey(String npcKey) { this.npcKey = npcKey; }
 
     private void initDefaultDialogues() {
         dialogues.put("greetings", List.of(

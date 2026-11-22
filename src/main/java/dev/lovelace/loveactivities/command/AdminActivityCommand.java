@@ -186,7 +186,7 @@ public class AdminActivityCommand implements CommandExecutor, TabCompleter {
                             return true;
                         }
 
-                        if (plugin.getNpcManager().unbindNpc(target.getUniqueId())) {
+                        if (plugin.getNpcManager().unbindNpc(target)) {
                             SoundUtil.playSuccess(player);
                             sender.sendMessage("§a✔ NPC §e" + target.getName() + "§a успешно отвязан от LoveActivities.");
                         } else {
@@ -210,7 +210,8 @@ public class AdminActivityCommand implements CommandExecutor, TabCompleter {
                                     " §7| Ставка: §e" + n.getDefaultBet() +
                                     " §7| Макс: §e" + (n.getMaxBet() > 0 ? n.getMaxBet() : "∞") +
                                     " §7| Ставки: §b" + (n.isPlaysBets() ? "Да" : "Нет") +
-                                    " §7| Настроение: " + mood);
+                                    " §7| Настроение: " + mood
+                                    + (n.getNpcKey() != null ? " §7| NPC: §f" + n.getNpcKey() : ""));
                         }
                     }
                     default -> sender.sendMessage("§cИспользование: /loveactivitiesadmin npc <bind|unbind|list>");
