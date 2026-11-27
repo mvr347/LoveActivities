@@ -69,6 +69,7 @@ public class PlayerActivityCommand implements CommandExecutor, TabCompleter {
                 // this subcommand must keep working for players without that permission too.
                 player.performCommand("настолки");
             }
+            case "npc" -> startWithNpc(player, args);
             case "bot", "play" -> {
                 GameType type = args.length > 1 ? GameType.fromString(args[1]) : GameType.BLACKJACK;
                 if (type == null) type = GameType.BLACKJACK;
@@ -88,6 +89,40 @@ public class PlayerActivityCommand implements CommandExecutor, TabCompleter {
         }
 
         return true;
+    }
+
+    /**
+     * {@code /activities npc <npc key> <game>}: the "play something" button of another plugin's NPC dialog.
+     * Allowed only inside the short window that dialog opens ({@code npc_play_until} metadata), so it cannot be typed
+     * to start a game against an arbitrary NPC. The game is the same confirmation window as for a bound NPC, with
+     * a stake limit from {@code npc.dialog-max-bet}.
+     */
+    private void startWithNpc(Player player, String[] args) {
+        boolean allowed = player.getMetadata("npc_play_until").stream()
+                .anyMatch(v -> v.asLong() > System.currentTimeMillis());
+        if (!allowed || args.length < 3) return;
+        GameType type = GameType.fromString(args[2]);
+        var npc = dev.lovelace.lovecore.api.LoveCore.loveEssential(dev.lovelace.lovecore.api.npc.NpcProvider.class)
+                .flatMap(p -> p.byKey(args[1])).orElse(null);
+        if (type == null || npc == null) return;
+        String name = npc.name() == null || npc.name().isBlank() ? "NPC"
+                : net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().stripTags(npc.name());
+        if (plugin.getSessionManager().isInGame(player.getUniqueId())
+                || plugin.getRequestManager().hasActiveRequest(player.getUniqueId())) {
+            SoundUtil.playError(player);
+            return;
+        }
+        if (plugin.getLoveCoreBridge().hasDisallowedReputation(player.getUniqueId())) {
+            plugin.getNpcManager().speak(player, name, "Я не играю с людьми с дурной славой. Проваливай!");
+            SoundUtil.playError(player);
+            return;
+        }
+        long maxBet = Math.max(0L, plugin.getConfig().getLong("npc.dialog-max-bet"));
+        var config = new dev.lovelace.loveactivities.manager.NpcActivityConfig(
+                dev.lovelace.loveactivities.manager.NpcManager.idForKey(args[1]), name, type, 0L, maxBet, true);
+        config.setNpcKey(args[1]);
+        SoundUtil.playChallenge(player);
+        new dev.lovelace.loveactivities.gui.NpcConfirmationGUI(player, config).open();
     }
 
     /**
